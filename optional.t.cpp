@@ -195,12 +195,35 @@ CASE( "value_or() yields value or default" )
 
 CASE( "Global swap() swaps engage state and values" )
 {
-    optional<int> d;
-    optional<int> e( 42 );
-    d.swap( e );
-    EXPECT(  !e );
-    EXPECT( !!d );
-    EXPECT(  *d == 42 );
+    SETUP( "" ) {
+        optional<int> d1;
+        optional<int> d2;
+        optional<int> e1( 42 );
+        optional<int> e2( 7 );
+
+    SECTION( "swap disengaged with disengaged optional" ) {
+        swap( d1, d2 );
+        EXPECT( !d1 );
+    }
+    SECTION( "swap engaged with engaged optional" ) {
+        swap( e1, e2 );
+        EXPECT( !!e1  );
+        EXPECT( !!e2 );
+        EXPECT( *e1 == 7 );
+        EXPECT( *e2 == 42 );
+    }
+    SECTION( "swap disengaged with engaged optional" ) {
+        swap( d1, e1 );
+        EXPECT( !!d1 );
+        EXPECT(  !e1    );
+        EXPECT( d1 == 42 );
+    }
+    SECTION( "swap engaged with disengaged optional" ) {
+        swap( e1, d1 );
+        EXPECT( !!d1 );
+        EXPECT(  !e1 );
+        EXPECT( *d1 == 42 );
+    }}
 }
 
 CASE( "make_optional() creates optional" )
