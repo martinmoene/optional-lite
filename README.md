@@ -1,4 +1,4 @@
-optional lite - nullable objects for C++03 &emsp; ![Build Status](https://travis-ci.org/martinmoene/optional-lite.png?branch=master)
+optional lite - nullable objects for C++03 &emsp; [![Build Status](https://travis-ci.org/martinmoene/optional-lite.png?branch=master)](https://travis-ci.org/martinmoene/optional-lite)
 ============================================
 
 *optional lite* is a single-header header-only library to represent optional (nullable) objects and pass them by value. The library is a variant of std::optional [1,2] for use with C++03 and later and Visual C++ 6 (VC6).
@@ -77,10 +77,10 @@ Synopsis
 --------
 
 **Contents**
-[Types in namespace nonstd](#types-in-namespace-nonstd)
-[Interface of *optional lite*](#interface-of-optional-lite)
-[Algorithms for *optional lite*](#algorithms-for-optional-lite)
-[Macros to control alignment](#macros-to-control-alignment)
+[Types in namespace nonstd](#types-in-namespace-nonstd)  
+[Interface of *optional lite*](#interface-of-optional-lite)  
+[Algorithms for *optional lite*](#algorithms-for-optional-lite)  
+[Macros to control alignment](#macros-to-control-alignment)  
 
 ### Types in namespace nonstd
 
@@ -96,15 +96,15 @@ Synopsis
 | Kind         | Method | Result |
 |--------------------------------|
 | Construction | optional()            | a nulled object  |
-| &nbsp;       | optional( nullopt_t ) | a nulled object 
-| &nbsp;       | optional( value_type const & value )         | initialized to value
-| &nbsp;       | optional( optional const & other )           | initialized to value of other
-| Destruction  | ~optional()           | destruct current content, if any
+| &nbsp;       | optional( nullopt_t ) | a nulled object  |
+| &nbsp;       | optional( value_type const & value )         | initialized to value |
+| &nbsp;       | optional( optional const & other )           | initialized to value of other|
+| Destruction  | ~optional()           | destruct current content, if any |
 | Assignment   | optional & operator=( nullopt_t )            | null the object;<br>destruct current content, if any |
 | &nbsp;       | optional & operator=( optional const & rhs ) | assign the value of other;<br>destruct current content, if any |
 | Swap         | void swap( optional & other )                | swap with other |
-| State        | operator bool() const | true if content is present (safe bool idiom)
-| Content      | value_type const * operator ->() const       | pointer to current content (const);<br>must contain value
+| State        | operator bool() const | true if content is present (safe bool idiom) |
+| Content      | value_type const * operator ->() const       | pointer to current content (const);<br>must contain value |
 | &nbsp;       | value_type * operator ->()            | pointer to current content (non-const);<br>must contain value |
 | &nbsp;       | value_type const & operator *() const | the current content (const ref);<br>must contain value |
 | &nbsp;       | value_type & operator *()             | the current content (non-const ref);<br>must contain value |
@@ -117,41 +117,41 @@ Synopsis
 | Kind                     | Function |
 |-------------------------------------|
 | Relational operators     | &nbsp;   | 
-| ==                       | template< typename T ><br>bool operator==( optional<T> const & x, optional<T> const & y )
-| !=                       | template< typename T ><br>bool operator!=( optional<T> const & x, optional<T> const & y )
-| <                        | template< typename T ><br>bool operator<( optional<T> const & x, optional<T> const & y )
-| >                        | template< typename T ><br>bool operator>( optional<T> const & x, optional<T> const & y )
-| <=                       | template< typename T ><br>bool operator<=( optional<T> const & x, optional<T> const & y )
-| >=                       | template< typename T ><br>bool operator>=( optional<T> const & x, optional<T> const & y )
+| ==                       | template< typename T ><br>bool operator==( optional<T> const & x, optional<T> const & y ) |
+| !=                       | template< typename T ><br>bool operator!=( optional<T> const & x, optional<T> const & y ) |
+| <                        | template< typename T ><br>bool operator<( optional<T> const & x, optional<T> const & y ) |
+| >                        | template< typename T ><br>bool operator>( optional<T> const & x, optional<T> const & y ) |
+| <=                       | template< typename T ><br>bool operator<=( optional<T> const & x, optional<T> const & y ) |
+| >=                       | template< typename T ><br>bool operator>=( optional<T> const & x, optional<T> const & y ) |
 | Comparison with nullopt  | &nbsp;   | 
-| ==                       | template< typename T ><br>bool operator==( optional<T> const & x, nullopt_t )
-| &nbsp;                   | template< typename T ><br>bool operator==( nullopt_t, optional<T> const & x )
-| !=                       | template< typename T ><br>bool operator!=( optional<T> const & x, nullopt_t )
-| &nbsp;                   | template< typename T ><br>bool operator!=( nullopt_t, optional<T> const & x )
-| <                        | template< typename T ><br>bool operator<( optional<T> const &, nullopt_t )
-| &nbsp;                   | template< typename T ><br>bool operator<( nullopt_t, optional<T> const & x )
-| <=                       | template< typename T ><br>bool operator<=( optional<T> const & x, nullopt_t )
-| &nbsp;                   | template< typename T ><br>bool operator<=( nullopt_t, optional<T> const & )
-| >                        | template< typename T ><br>bool operator>( optional<T> const & x, nullopt_t )
-| &nbsp;                   | template< typename T ><br>bool operator>( nullopt_t, optional<T> const & )
-| >=                       | template< typename T ><br>bool operator>=( optional<T> const &, nullopt_t )
-| &nbsp;                   | template< typename T ><br>bool operator>=( nullopt_t, optional<T> const & x )
+| ==                       | template< typename T ><br>bool operator==( optional<T> const & x, nullopt_t ) |
+| &nbsp;                   | template< typename T ><br>bool operator==( nullopt_t, optional<T> const & x ) |
+| !=                       | template< typename T ><br>bool operator!=( optional<T> const & x, nullopt_t ) |
+| &nbsp;                   | template< typename T ><br>bool operator!=( nullopt_t, optional<T> const & x ) |
+| <                        | template< typename T ><br>bool operator<( optional<T> const &, nullopt_t ) |
+| &nbsp;                   | template< typename T ><br>bool operator<( nullopt_t, optional<T> const & x ) |
+| <=                       | template< typename T ><br>bool operator<=( optional<T> const & x, nullopt_t ) |
+| &nbsp;                   | template< typename T ><br>bool operator<=( nullopt_t, optional<T> const & ) |
+| >                        | template< typename T ><br>bool operator>( optional<T> const & x, nullopt_t ) |
+| &nbsp;                   | template< typename T ><br>bool operator>( nullopt_t, optional<T> const & ) |
+| >=                       | template< typename T ><br>bool operator>=( optional<T> const &, nullopt_t ) |
+| &nbsp;                   | template< typename T ><br>bool operator>=( nullopt_t, optional<T> const & x ) |
 | Comparison with T        | &nbsp;   | 
-| ==                       | template< typename T ><br>bool operator==( optional<T> const & x, const T& v )
-| &nbsp;                   | template< typename T ><br>bool operator==( T const & v, optional<T> const & x )
-| !=                       | template< typename T ><br>bool operator!=( optional<T> const & x, const T& v )
-| &nbsp;                   | template< typename T ><br>bool operator!=( T const & v, optional<T> const & x )
-| <                        | template< typename T ><br>bool operator<( optional<T> const & x, const T& v )
-| &nbsp;                   | template< typename T ><br>bool operator<( T const & v, optional<T> const & x )
-| <=                       | template< typename T ><br>bool operator<=( optional<T> const & x, const T& v )
-| &nbsp;                   | template< typename T ><br>bool operator<=( T const & v, optional<T> const & x )
-| >                        | template< typename T ><br>bool operator>( optional<T> const & x, const T& v )
-| &nbsp;                   | template< typename T ><br>bool operator>( T const & v, optional<T> const & x )
-| >=                       | template< typename T ><br>bool operator>=( optional<T> const & x, const T& v )
-| &nbsp;                   | template< typename T ><br>bool operator>=( T const & v, optional<T> const & x )
+| ==                       | template< typename T ><br>bool operator==( optional<T> const & x, const T& v ) |
+| &nbsp;                   | template< typename T ><br>bool operator==( T const & v, optional<T> const & x ) |
+| !=                       | template< typename T ><br>bool operator!=( optional<T> const & x, const T& v ) |
+| &nbsp;                   | template< typename T ><br>bool operator!=( T const & v, optional<T> const & x ) |
+| <                        | template< typename T ><br>bool operator<( optional<T> const & x, const T& v ) |
+| &nbsp;                   | template< typename T ><br>bool operator<( T const & v, optional<T> const & x ) |
+| <=                       | template< typename T ><br>bool operator<=( optional<T> const & x, const T& v ) |
+| &nbsp;                   | template< typename T ><br>bool operator<=( T const & v, optional<T> const & x ) |
+| >                        | template< typename T ><br>bool operator>( optional<T> const & x, const T& v ) |
+| &nbsp;                   | template< typename T ><br>bool operator>( T const & v, optional<T> const & x ) |
+| >=                       | template< typename T ><br>bool operator>=( optional<T> const & x, const T& v ) |
+| &nbsp;                   | template< typename T ><br>bool operator>=( T const & v, optional<T> const & x ) |
 | Specialized algorithms   | &nbsp;   | 
-| swap                     | template< typename T ><br>void swap( optional<T> & x, optional<T> & y )
-| create                   | template< typename T ><br>optional<T> make_optional( T const & v )
+| swap                     | template< typename T ><br>void swap( optional<T> & x, optional<T> & y ) |
+| create                   | template< typename T ><br>optional<T> make_optional( T const & v ) |
 
 
 ### Macros to control alignment
