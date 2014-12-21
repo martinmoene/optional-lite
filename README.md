@@ -193,7 +193,7 @@ Reported to work with
 ---------------------
 
 *optional lite* is reported to work with the following compilers: 
-- Visual C++ 6 SP5 (VS6), VC10, (VS2010), VC11 (VS2012), VC12 (VS2013), ...
+- Visual C++ 6 SP6 (VS6), VC10, (VS2010), VC11 (VS2012), VC12 (VS2013), ...
 - GNUC 4.8.1 with -std=c++98, -std=c++03, -std=c++11, -std=c++1y 
 - clang
 
