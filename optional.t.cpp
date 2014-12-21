@@ -31,6 +31,7 @@ CASE( "A C++03 union can only contain POD types" )
 /*
  * Positive tests:
  */
+
 CASE( "A default constructed optional is empty" )
 {
     optional<int> oi;
@@ -195,6 +196,10 @@ CASE( "value_or() yields value or default" )
 
 CASE( "Global swap() swaps engage state and values" )
 {
+#if optional_COMPILER_IS_VC6
+    using ::nonstd::swap;
+#endif    
+
     SETUP( "" ) {
         optional<int> d1;
         optional<int> d2;
