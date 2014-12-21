@@ -83,6 +83,7 @@
 
 #ifdef lest_CPP11_OR_GREATER
 
+# include <cstdint>
 # include <random>
 # include <tuple>
 
@@ -803,6 +804,13 @@ struct count : action
 # else
     typedef unsigned long long uint64_t;
 # endif
+#else
+# ifndef lest_CPP11_OR_GREATER )
+    typedef unsigned long long uint64_t;
+# endif
+#endif
+
+#if lest_PLATFORM_IS_WINDOWS
     uint64_t current_ticks()
     {
         static uint64_t hz = 0, hzo = 0;
