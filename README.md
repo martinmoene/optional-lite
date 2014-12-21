@@ -84,11 +84,10 @@ Synopsis
 
 ### Types in namespace nonstd
 
-| Purpose         | Type | Remark |
+| Purpose         | Type | Object |
 |-----------------|------|--------|
 | To be, or not   | template< typename T ><br>class optional; |&nbsp;|
-| Disengaging     | struct nullopt_t;            |&nbsp;  |
-| &nbsp;          | nullopt_t nullopt;           | object |
+| Disengaging     | struct nullopt_t;            | nullopt_t nullopt; |
 | Error reporting | class bad_optional_access;   |&nbsp;  |
 
 ### Interface of *optional lite*
