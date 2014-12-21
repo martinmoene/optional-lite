@@ -76,7 +76,7 @@ Installation
 Synopsis
 --------
 
-**Contents**
+**Contents**  
 [Types in namespace nonstd](#types-in-namespace-nonstd)  
 [Interface of *optional lite*](#interface-of-optional-lite)  
 [Algorithms for *optional lite*](#algorithms-for-optional-lite)  
