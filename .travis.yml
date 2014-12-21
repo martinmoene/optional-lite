@@ -5,10 +5,8 @@ compiler:
   - gcc
 
 env:
-  - STD=c++98
   - STD=c++03
-  - STD=c++11
-  - STD=c++1y
+  - STD=c++0x
 
 install:
   - make STD=$STD
