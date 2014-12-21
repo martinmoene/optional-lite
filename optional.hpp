@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-// optional lite is inspired on std::Optional by Fernando Cacciola and 
+// optional lite is inspired on std::Optional by Fernando Cacciola and
 // Andrzej Krzemienski and on expected lite by Martin Moene.
 
 #ifndef NONSTD_OPTIONAL_LITE_HPP
@@ -38,44 +38,62 @@
 #endif
 
 /* Object allocation and alignment
- * 
- * option lite reserves POD-type storage for an object of the underlying type 
- * inside a union to prevent unwanted construction and uses placement new to 
- * construct the object when required. Using non-placement new (malloc) to 
- * obtain storage, ensures that the memory is properly aligned for the object's 
- * type, whereas that's not the case with placement new. 
+ *
+ * optional lite reserves POD-type storage for an object of the underlying type
+ * inside a union to prevent unwanted construction and uses placement new to
+ * construct the object when required. Using non-placement new (malloc) to
+ * obtain storage, ensures that the memory is properly aligned for the object's
+ * type, whereas that's not the case with placement new.
  *
  * If you access data that's not properly aligned, it 1) may take longer than
  * when it is properly aligned (on x86 processors), or 2) it may terminate
  * the program immediately (many other processors).
  *
- * Although unspecified behaviour according the C++ standard, it's not
- * entirely senseless to use placement new while aligning the object properly.
- * 
- * If *optional lite* is compiled as C++11 or later, C++11 alignment facilities 
- * are used for storage of the underlying object. When compiling with C++03, 
- * *optional lite* tries to determine proper alignment using meta programming. 
- * If this doesn't work out, you can control alignment via two macros. 
+ * Although the C++ standard does not guarantee that all user-defined types
+ * have the alignment of some POD type, in practice it's likely they do.
  *
- * option lite uses the following rules for alignment:
- * 
- * 1. If the program compiles as C++11 or later, C++11 alignment facilities 
+ * If optional lite is compiled as C++11 or later, C++11 alignment facilities
+ * are used for storage of the underlying object. When compiling with C++03,
+ * optional lite tries to determine proper alignment using meta programming.
+ * If this doesn't work out, you can control alignment via three macros.
+ *
+ * optional lite uses the following rules for alignment:
+ *
+ * 1. If the program compiles as C++11 or later, C++11 alignment facilities
  * are used.
  *
- * 2. If you defines -Doptional_FEATURE_MAX_ALIGN_HACK=1 the underlying
- * type is aligned as the most restricted type in the struct max_align_t.
- * This potentially wastes many bytes per optional if the actually required
+ * 2. If you define -Doptional_FEATURE_MAX_ALIGN_HACK=1 the underlying
+ * type is aligned as the most restricted type in `struct max_align_t`. This
+ * potentially wastes many bytes per optional if the actually required
  * alignment is much less, e.g. 24 bytes used instead of the 2 bytes required.
- * 
- * 3. If you defines -Doptional_FEATURE_ALIGN_AS=type the underlying
- * type is aligned as 'type'. It's your obligation to specify a type
- * with proper alignment.
- * 
- * 4. At default, option lite tries to find a POD type with the same alignment 
- * as the underlying type. alignment_of<> is gleaned from Boost.TypeTraits. 
- * 
+ *
+ * 3. If you define -Doptional_FEATURE_ALIGN_AS='pod-type' the
+ * underlying type is aligned as 'pod-type'. It's your obligation to specify a
+ * type with proper alignment.
+ *
+ * 4. If you define -Doptional_FEATURE_ALIGN_AS_FALLBACK='pod-type' the
+ * fallback type for alignment of rule 5 below becomes 'pod-type'. It's your
+ * obligation to specify a type with proper alignment.
+ *
+ * 5. At default, optional lite tries to find a POD type with the same
+ * alignment as the underlying type.
+ *
+ * The algorithm for alignment of 5. is:
+ * - Determine the alignment A of the underlying type using `alignment_of<>`.
+ * - Find a POD type from the list `alignment_types` with exactly alignment A.
+ * - If no such POD type is found, use a type with a relatively strict
+ *   alignment requirement such as double; this type is specified in
+ *   `optional_FEATURE_ALIGN_AS_FALLBACK` (default double).
+ *
+ * Note that the algorithm of 5. differs from the one Andrei Alexandrescu uses
+ * in Generic<Programming>: Discriminated Unions, part 2 (see below).
+ *
+ * The class template `alignment_of<>` is gleaned from Boost.TypeTraits,
+ * The storage type `storage_t<>` is adapted from the one I created for
+ * spike-expected.
+ *
  * See also:
- * 
+ *
  * Andrei Alexandrescu. Generic<Programming>: Discriminated Unions (I-III). CUJ. April 2002.
  * - http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2004/alexandr/alexandr.htm
  * - http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2006/alexandr/alexandr.htm
@@ -215,18 +233,18 @@ struct typelist
 template< typename List, size_t N >
 struct type_of_size
 {
-    typedef typename select< 
-        N == sizeof( typename List::head ), 
+    typedef typename select<
+        N == sizeof( typename List::head ),
             typename List::head,
             typename type_of_size<typename List::tail, N >::type >::type type;
 };
 
 #if ! optional_COMPILER_IS_VC6
 
-template< size_t N > 
-struct type_of_size< nulltype, N > 
-{ 
-    typedef optional_FEATURE_ALIGN_AS_FALLBACK type; 
+template< size_t N >
+struct type_of_size< nulltype, N >
+{
+    typedef optional_FEATURE_ALIGN_AS_FALLBACK type;
 };
 
 #else // optional_COMPILER_IS_VC6
@@ -255,7 +273,7 @@ MK_TYPE_OF_SIZE( 32 );
 
 #endif // optional_COMPILER_IS_VC6
 
-template< typename T> 
+template< typename T>
 struct struct_t { T _; };
 
 #define optional_ALIGN_TYPE( type ) \
@@ -263,28 +281,28 @@ struct struct_t { T _; };
 
 struct Unknown;
 
-typedef 
-    optional_ALIGN_TYPE( char ), 
-    optional_ALIGN_TYPE( short ), 
-    optional_ALIGN_TYPE( int ), 
-    optional_ALIGN_TYPE( long ), 
-    optional_ALIGN_TYPE( float ), 
-    optional_ALIGN_TYPE( double ), 
+typedef
+    optional_ALIGN_TYPE( char ),
+    optional_ALIGN_TYPE( short ),
+    optional_ALIGN_TYPE( int ),
+    optional_ALIGN_TYPE( long ),
+    optional_ALIGN_TYPE( float ),
+    optional_ALIGN_TYPE( double ),
     optional_ALIGN_TYPE( long double ),
-    
-    optional_ALIGN_TYPE( char *), 
-    optional_ALIGN_TYPE( short * ), 
-    optional_ALIGN_TYPE( int * ), 
-    optional_ALIGN_TYPE( long * ), 
-    optional_ALIGN_TYPE( float * ), 
-    optional_ALIGN_TYPE( double * ), 
+
+    optional_ALIGN_TYPE( char *),
+    optional_ALIGN_TYPE( short * ),
+    optional_ALIGN_TYPE( int * ),
+    optional_ALIGN_TYPE( long * ),
+    optional_ALIGN_TYPE( float * ),
+    optional_ALIGN_TYPE( double * ),
     optional_ALIGN_TYPE( long double * ),
-    
+
     optional_ALIGN_TYPE( Unknown ( * )( Unknown ) ),
     optional_ALIGN_TYPE( Unknown * Unknown::*     ),
     optional_ALIGN_TYPE( Unknown ( Unknown::* )( Unknown ) ),
-    
-    nulltype 
+
+    nulltype
     > > > > > > >    > > > > > > >
     > > > > > > >    > > > > > > >
     > > > > > >
