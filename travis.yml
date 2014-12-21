@@ -1,0 +1,17 @@
+language: cpp
+
+compiler:
+  - clang
+  - gcc
+
+env:
+  - STD=c++98
+  - STD=c++03
+  - STD=c++11
+  - STD=c++1y
+
+install:
+  - make STD=$STD
+
+script:
+  - make test-all
