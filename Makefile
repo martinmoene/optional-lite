@@ -25,13 +25,13 @@ $(PROGRAM): $(OBJECTS)
 	$(CXX) -o $@ $^
 
 test: $(PROGRAM)
-	$(PROGRAM)
+	./$(PROGRAM)
 
 test-all: $(PROGRAM)
-	$(PROGRAM) @
+	./$(PROGRAM) @
 
 list: test
-	$(PROGRAM) -l
+	./$(PROGRAM) -l
 
 clean:
 	$(RM) $(OBJECTS)
