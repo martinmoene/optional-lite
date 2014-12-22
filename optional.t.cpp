@@ -81,12 +81,12 @@ CASE( "copy-assignment works for all permutations of engaged and disengaged opti
     SECTION( "a disengaged optional assigned an engaged optional obtains its value" ) {
         d1 = e1;
         EXPECT( !!d1 );
-        EXPECT( d1.value() == 123 );
+        EXPECT( *d1 == 123 );
     }
     SECTION( "an engaged optional assigned an engaged optional obtains its value" ) {
         e1 = e2;
         EXPECT( !!e1 );
-        EXPECT( e1.value() == 987 );
+        EXPECT( *e1 == 987 );
     }
     SECTION( "an engaged optional assigned nullopt becomes empty" ) {
         e1 = nullopt;
