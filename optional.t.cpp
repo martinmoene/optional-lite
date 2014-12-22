@@ -47,7 +47,7 @@ CASE( "An optional that is constructed disengaged explicitly is empty" )
 CASE( "An optional constructed with 42 contains 42" )
 {
     optional<int> oi = 42;
-    EXPECT( oi );
+    EXPECT(  oi );
     EXPECT( *oi == 42 );
 }
 
@@ -62,7 +62,7 @@ CASE( "An optional constructed from an non-empty optional obtains its value" )
 {
     optional<int> oi1( 42 );
     optional<int> oi2( oi1 );
-    EXPECT( oi2 );
+    EXPECT(  oi2 );
     EXPECT( *oi2 == *oi1 );
 }
 
@@ -80,12 +80,12 @@ CASE( "copy-assignment works for all permutations of engaged and disengaged opti
     }
     SECTION( "a disengaged optional assigned an engaged optional obtains its value" ) {
         d1 = e1;
-        EXPECT( !!d1 );
+        EXPECT(  d1 );
         EXPECT( *d1 == 123 );
     }
     SECTION( "an engaged optional assigned an engaged optional obtains its value" ) {
         e1 = e2;
-        EXPECT( !!e1 );
+        EXPECT(  e1 );
         EXPECT( *e1 == 987 );
     }
     SECTION( "an engaged optional assigned nullopt becomes empty" ) {
@@ -112,21 +112,21 @@ CASE( "Member swap() swaps engage state and values" )
     }
     SECTION( "swap engaged with engaged optional" ) {
         e1.swap( e2 );
-        EXPECT( !!e1  );
-        EXPECT( !!e2 );
+        EXPECT(  e1  );
+        EXPECT(  e2 );
         EXPECT( *e1 == 7 );
         EXPECT( *e2 == 42 );
     }
     SECTION( "swap disengaged with engaged optional" ) {
         d1.swap( e1 );
-        EXPECT( !!d1 );
-        EXPECT(  !e1    );
+        EXPECT(  d1 );
+        EXPECT( !e1 );
         EXPECT( *d1 == 42 );
     }
     SECTION( "swap engaged with disengaged optional" ) {
         e1.swap( d1 );
-        EXPECT( !!d1 );
-        EXPECT(  !e1 );
+        EXPECT(  d1 );
+        EXPECT( !e1 );
         EXPECT( *d1 == 42 );
     }}
 }
@@ -171,7 +171,7 @@ CASE( "value() yields value" )
     }
     SECTION( "value() yields value (non-const)" ) {
         e.value() = 7;
-        EXPECT(  e.value() == 7 );
+        EXPECT( e.value() == 7 );
     }}
 }
 
@@ -190,7 +190,7 @@ CASE( "value_or() yields value or default" )
         EXPECT( e.value_or( 7 ) == 42 );
     }
     SECTION( "value_or( 7 ) yields default for empty optional" ) {
-        EXPECT(  d.value_or( 7 ) == 7 );
+        EXPECT( d.value_or( 7 ) == 7 );
     }}
 }
 
@@ -212,21 +212,21 @@ CASE( "Global swap() swaps engage state and values" )
     }
     SECTION( "swap engaged with engaged optional" ) {
         swap( e1, e2 );
-        EXPECT( !!e1  );
-        EXPECT( !!e2 );
+        EXPECT(  e1  );
+        EXPECT(  e2 );
         EXPECT( *e1 == 7 );
         EXPECT( *e2 == 42 );
     }
     SECTION( "swap disengaged with engaged optional" ) {
         swap( d1, e1 );
-        EXPECT( !!d1 );
-        EXPECT(  !e1    );
+        EXPECT(  d1 );
+        EXPECT( !e1 );
         EXPECT( *d1 == 42 );
     }
     SECTION( "swap engaged with disengaged optional" ) {
         swap( e1, d1 );
-        EXPECT( !!d1 );
-        EXPECT(  !e1 );
+        EXPECT(  d1 );
+        EXPECT( !e1 );
         EXPECT( *d1 == 42 );
     }}
 }
