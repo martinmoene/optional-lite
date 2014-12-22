@@ -121,7 +121,7 @@ CASE( "Member swap() swaps engage state and values" )
         d1.swap( e1 );
         EXPECT( !!d1 );
         EXPECT(  !e1    );
-        EXPECT( d1 == 42 );
+        EXPECT( *d1 == 42 );
     }
     SECTION( "swap engaged with disengaged optional" ) {
         e1.swap( d1 );
@@ -221,7 +221,7 @@ CASE( "Global swap() swaps engage state and values" )
         swap( d1, e1 );
         EXPECT( !!d1 );
         EXPECT(  !e1    );
-        EXPECT( d1 == 42 );
+        EXPECT( *d1 == 42 );
     }
     SECTION( "swap engaged with disengaged optional" ) {
         swap( e1, d1 );
