@@ -142,10 +142,10 @@ CASE( "operator->() yields pointer to value" )
     SETUP( "" ) {
         optional<Integer> e( Integer( 42 ) );
     
-    SECTION( "Operator->() yields pointer to value (const)" ) {
+    SECTION( "operator->() yields pointer to value (const)" ) {
         EXPECT(  e->x == 42 );
     }
-    SECTION( "Operator->() yields pointer to value (non-const)" ) {
+    SECTION( "operator->() yields pointer to value (non-const)" ) {
         e->x = 7;
         EXPECT(  e->x == 7 );
     }}
@@ -156,10 +156,10 @@ CASE( "operator*() yields value" )
     SETUP( "" ) {
         optional<int> e( 42 );
     
-    SECTION( "Operator*() yields value (const)" ) {
+    SECTION( "operator*() yields value (const)" ) {
         EXPECT( *e == 42 );
     }
-    SECTION( "Operator*() yields value (non-const)" ) {
+    SECTION( "operator*() yields value (non-const)" ) {
         *e = 7;
         EXPECT( *e == 7 );
     }}
