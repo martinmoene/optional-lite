@@ -19,7 +19,7 @@ using nonstd::nullopt;
 using nonstd::bad_optional_access;
 using nonstd::make_optional;
 
-struct nonpod { nonpod(){}; };
+struct nonpod { nonpod(){} };
 
 CASE( "A C++03 union can only contain POD types" )
 {
