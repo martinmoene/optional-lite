@@ -805,7 +805,7 @@ struct count : action
     typedef unsigned long long uint64_t;
 # endif
 #else
-# ifndef lest_CPP11_OR_GREATER )
+# ifndef lest_CPP11_OR_GREATER
     typedef unsigned long long uint64_t;
 # endif
 #endif
