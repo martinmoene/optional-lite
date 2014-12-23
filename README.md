@@ -1,7 +1,7 @@
-optional lite - nullable objects for C++03 &emsp; [![Build Status](https://travis-ci.org/martinmoene/optional-lite.png?branch=master)](https://travis-ci.org/martinmoene/optional-lite)
+optional lite - nullable objects for C++98 and later&ensp;[![Build Status](https://travis-ci.org/martinmoene/optional-lite.png?branch=master)](https://travis-ci.org/martinmoene/optional-lite)
 ============================================
 
-*optional lite* is a single-header header-only library to represent optional (nullable) objects and pass them by value. The library is a variant of std::optional [1,2] for use with C++03 and later and Visual C++ 6 (VC6).
+*optional lite* is a single-header header-only library to represent optional (nullable) objects and pass them by value. The library is a variant of std::optional [1,2] for use with C++98 and later and with Visual C++ 6 (VC6).
 
 **Contents**  
 - [Example usage](#example-usage)
@@ -53,7 +53,7 @@ prompt>g++ -Wall -Wextra -std=c++03 -I.. -o to_int.exe to_int.cpp && to_int x1
 
 In a nutshell
 ---------------
-**optional lite** is a single-header header-only library to represent optional (nullable) objects and pass them by value. The library is a variant of [std::optional](https://github.com/akrzemi1/Optional) [1,2] for use with C++03 and later and with Visual C++ 6 (VC6). In turn, std::optional is inspired on [Boost.Optional](http://www.boost.org/doc/libs/1_49_0/libs/optional/doc/html/index.html) [3].
+**optional lite** is a single-header header-only library to represent optional (nullable) objects and pass them by value. The library is a variant of [std::optional](https://github.com/akrzemi1/Optional) [1,2] for use with C++98 and later and with Visual C++ 6 (VC6). In turn, std::optional is inspired on [Boost.Optional](http://www.boost.org/doc/libs/1_49_0/libs/optional/doc/html/index.html) [3].
 
 **Features and properties of optional lite** are ease of installation (single header), default and explicit construction of an empty optional, construction and assignment from a value that is convertible to the underlying type, copy-construction and copy-assignment from another optional of the same type, testing for the presence of a value, operators for unchecked access to the value (pointer or reference), value() and value_or() for checked access to the value, relational operators, swap() and make_optional() to create an optional of the proper type.  
 
@@ -155,7 +155,7 @@ Synopsis
 
 ### Macros to control alignment
 
-If *optional lite* is compiled as C++11 or later, C++11 alignment facilities are used for storage of the underlying object. When compiled with C++03, *optional lite* tries to determine proper alignment itself. If this doesn't work out, you can control alignment via the following macros. See also section [Implementation notes](#implementation-notes).
+If *optional lite* is compiled as C++11 or later, C++11 alignment facilities are used for storage of the underlying object. When compiled as pre-C++11, *optional lite* tries to determine proper alignment itself. If this doesn't work out, you can control alignment via the following macros. See also section [Implementation notes](#implementation-notes).
 
 -D<b>optional_FEATURE_MAX_ALIGN_HACK</b>=0  
 Define this to 1 to use the *max align hack* for alignment. Default is 0.
@@ -209,7 +209,7 @@ If you access data that's not properly aligned, it 1) may take longer than when 
 
 Although the C++ standard does not guarantee that all user-defined types have the alignment of some POD type, in practice it's likely they do [6, part 2].
 
-If *optional lite* is compiled as C++11 or later, C++11 alignment facilities are used for storage of the underlying object. When compiling with C++03, *optional lite* tries to determine proper alignment using meta programming. If this doesn't work out, you can control alignment via three macros. 
+If *optional lite* is compiled as C++11 or later, C++11 alignment facilities are used for storage of the underlying object. When compiling as pre-C++11, *optional lite* tries to determine proper alignment using meta programming. If this doesn't work out, you can control alignment via three macros. 
 
 *optional lite* uses the following rules for alignment:
 
