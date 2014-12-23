@@ -399,7 +399,7 @@ private:
 struct nullopt_t
 {
     struct init{};
-    nullopt_t( init ) {};
+    nullopt_t( init ) {}
 };
 
 // extra parenthesis to prevent the most vexing parse:
