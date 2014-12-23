@@ -9,7 +9,7 @@ optional lite - nullable objects for C++98 and later&ensp;[![Build Status](https
 - [Dependencies](#dependencies)
 - [Installation](#installation)
 - [Synopsis](#synopsis)
-- [Comparison of std::optional, optional lite and Boost.Optional](#comparison-of-std-optional-optional-lite-and-boost-optional)
+- [Comparison of std::optional, optional lite and Boost.Optional](#comparison-of-stdoptional-optional-lite-and-boostoptional)
 - [Reported to work with](#reported-to-work-with)
 - [Implementation notes](#implementation-notes)
 - [Notes and references](#notes-and-references)
@@ -182,7 +182,7 @@ Comparison of std::optional, optional lite and Boost.Optional
 | In-place construction	            | emplace, tag in_place | no            | utility in_place_factory |
 | Disengaged state tag	            | nullopt	            | nullopt       | none           |
 | optional references               | no (optionally)       | no            | yes            |
-| Conversion from optional\<U\> to optional\<T\>       | no | no            | yes            |
+| Conversion from optional\<U\><br>to optional\<T\>    | no | no            | yes            |
 | Duplicated interface functions 1) | no                    | no            | yes            |
 | Explicit convert to ptr (get_ptr)	| no                    | no            | yes            |
 
