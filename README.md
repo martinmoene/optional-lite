@@ -70,7 +70,7 @@ License
 
 Dependencies
 ------------
-*optional lite* has no other dependencies than the C++ standard library.
+*optional lite* has no other dependencies than the [C++ standard library](http://en.cppreference.com/w/cpp/header).
 
 
 Installation
