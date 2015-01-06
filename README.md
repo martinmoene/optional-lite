@@ -6,6 +6,7 @@ optional lite - nullable objects for C++98 and later&ensp;[![Build Status](https
 **Contents**  
 - [Example usage](#example-usage)
 - [In a nutshell](#in-a-nutshell)
+- [License](#license)
 - [Dependencies](#dependencies)
 - [Installation](#installation)
 - [Synopsis](#synopsis)
@@ -61,6 +62,11 @@ In a nutshell
 
 For more examples, see [this answer on StackOverflow](http://stackoverflow.com/a/16861022) [4] and the [quick start guide](http://www.boost.org/doc/libs/1_57_0/libs/optional/doc/html/boost_optional/quick_start.html) [5] of Boost.Optional (note that its interface differs from *optional lite*).
 
+
+License
+-------
+*optional lite* uses the [Boost Software License](LICENSE_1_0.txt).
+ 
 
 Dependencies
 ------------
