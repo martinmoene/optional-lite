@@ -403,8 +403,7 @@ struct nullopt_t
 };
 
 // extra parenthesis to prevent the most vexing parse:
-
-nullopt_t nullopt( ( nullopt_t::init() ) );
+const nullopt_t nullopt( ( nullopt_t::init() ) );
 
 /// optional access error
 
