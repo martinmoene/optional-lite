@@ -33,7 +33,7 @@
 # pragma GCC   diagnostic ignored "-Wunused-value"
 #endif
 
-#define  lest_VERSION "1.19.1"
+#define  lest_VERSION "1.22.0"
 
 #ifndef  lest_FEATURE_COLOURISE
 # define lest_FEATURE_COLOURISE 0
@@ -145,7 +145,7 @@ namespace lest
 #endif
 }
 
-#ifndef lest_NO_SHORT_ASSERTION_NAMES
+#if ! defined( lest_NO_SHORT_MACRO_NAMES ) && ! defined( lest_NO_SHORT_ASSERTION_NAMES )
 # define SETUP             lest_SETUP
 # define SECTION           lest_SECTION
 
@@ -175,7 +175,7 @@ namespace lest
 
 #define lest_CASE( specification, proposition ) \
     void lest_FUNCTION( lest::env & ); \
-    namespace { lest::registrar lest_REGISTRAR( specification, lest::test( proposition, lest_FUNCTION ) ); } \
+    namespace { lest::add_test lest_REGISTRAR( specification, lest::test( proposition, lest_FUNCTION ) ); } \
     void lest_FUNCTION( lest::env & $ )
 
 #define lest_ADD_TEST( specification, test ) \
@@ -292,17 +292,17 @@ struct test
     void (* behaviour)( env & );
 
     test( text name, void (* behaviour)( env & ) )
-    : name (name ), behaviour( behaviour ) {}
+    : name( name ), behaviour( behaviour ) {}
 };
 
 typedef std::vector<test> tests;
 typedef tests test_specification;
 
-struct registrar
+struct add_test
 {
-    registrar( tests & s, test const & t )
+    add_test( tests & specification, test const & test_case )
     {
-        s.push_back( t );
+        specification.push_back( test_case );
     }
 };
 
@@ -500,6 +500,40 @@ std::string to_string( T const & value, int=0 /* VC6 */ )
 {
     std::ostringstream os; os << std::boolalpha << value; return os.str();
 }
+
+template<typename T1, typename T2>
+std::string to_string( std::pair<T1,T2> const & pair )
+{
+    std::ostringstream oss;
+    oss << "{ " << to_string( pair.first ) << ", " << to_string( pair.second ) << " }";
+    return oss.str();
+}
+
+#ifdef lest_CPP11_OR_GREATER
+
+template<typename TU, std::size_t N>
+struct make_tuple_string
+{
+    static std::string make( TU const & tuple )
+    {
+        std::ostringstream os; 
+        os << to_string( std::get<N - 1>( tuple ) ) << ( N < std::tuple_size<TU>::value ? ", ": " ");
+        return make_tuple_string<TU, N - 1>::make( tuple ) + os.str();
+    }
+};
+
+template<typename TU>
+struct make_tuple_string<TU, 0>
+{
+    static std::string make( TU const & ) { return ""; }
+};
+
+template<typename ...TS>
+auto to_string( std::tuple<TS...> const & tuple ) -> std::string
+{
+    return "{ " + make_tuple_string<std::tuple<TS...>, sizeof...(TS)>::make( tuple ) + "}";
+}
+#endif
 
 template <typename L, typename R>
 std::string to_string( L const & lhs, std::string op, R const & rhs )
@@ -747,7 +781,7 @@ struct print : action
     }
 };
 
-texts tags( text name, texts result = texts() )
+inline texts tags( text name, texts result = texts() )
 {
     size_t none = std::string::npos;
     size_t lb   = name.find_first_of( "[" );
@@ -811,7 +845,7 @@ struct count : action
 #endif
 
 #if lest_PLATFORM_IS_WINDOWS
-    uint64_t current_ticks()
+    inline uint64_t current_ticks()
     {
         static uint64_t hz = 0, hzo = 0;
         if ( ! hz )
@@ -824,7 +858,7 @@ struct count : action
         return ( ( t - hzo ) * 1000000 ) / hz;
     }
 #else
-    uint64_t current_ticks()
+    inline uint64_t current_ticks()
     {
         timeval t; gettimeofday( &t, NULL );
         return static_cast<uint64_t>( t.tv_sec ) * 1000000ull + static_cast<uint64_t>( t.tv_usec );
