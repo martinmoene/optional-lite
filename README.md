@@ -1,5 +1,6 @@
-optional lite - nullable objects for C++98 and later&ensp;[![Build Status](https://travis-ci.org/martinmoene/optional-lite.png?branch=master)](https://travis-ci.org/martinmoene/optional-lite)
-============================================
+optional lite - nullable objects for C++98 and later
+====================================================
+[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)  [![Standard](https://img.shields.io/badge/c%2B%2B-98-orange.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-BSL-blue.svg)](https://opensource.org/licenses/BSL-1.0) [![Build Status](https://travis-ci.org/martinmoene/optional-lite.svg?branch=master)](https://travis-ci.org/martinmoene/optional-lite) [![Version](https://badge.fury.io/gh/martinmoene%2Foptional-lite.svg)](https://github.com/martinmoene/optional-lite/releases) [![download](https://img.shields.io/badge/latest%20version%20%20-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/optional-lite/master/optional.hpp)
 
 *optional lite* is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library is a variant of std::optional [1,2] for use with C++98 and later and with Visual C++ 6 (VC6).
 
@@ -246,7 +247,7 @@ Notes and references
 
 [1] Fernando Cacciola, Andrzej Krzemieński. [A proposal to add a utility class to represent optional objects (Revision 5)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3793.html).
 
-[2] Andrzej Krzemieński. [optional (nullable) objects for C++14](https://github.com/akrzemi1/Optional). Reference implementation on GetHub.
+[2] Andrzej Krzemieński. [optional (nullable) objects for C++14](https://github.com/akrzemi1/Optional). Reference implementation on GitHub.
 
 [3] Fernando Cacciola. [Boost.Optional library](http://www.boost.org/doc/libs/1_49_0/libs/optional/doc/html/index.html).
 
