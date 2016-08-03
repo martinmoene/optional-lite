@@ -522,7 +522,7 @@ public:
         return contained.value();
     }
 
-    value_type value_or( value_type const & default_value )
+    value_type value_or( value_type const & default_value ) const
     {
         return initialized() ? contained.value() : default_value;
     }
