@@ -13,6 +13,7 @@ optional lite - nullable objects for C++98 and later
 - [Synopsis](#synopsis)
 - [Comparison of std::optional, optional lite and Boost.Optional](#comparison-of-stdoptional-optional-lite-and-boostoptional)
 - [Reported to work with](#reported-to-work-with)
+- [Building the tests](#building-the-tests)
 - [Implementation notes](#implementation-notes)
 - [Notes and references](#notes-and-references)
 
@@ -203,6 +204,39 @@ Reported to work with
 - Visual C++ 6 SP6 (VS6), VC10, (VS2010), VC11 (VS2012), VC12 (VS2013), ...
 - GNUC 4.8.1 with -std=c++98, -std=c++03, -std=c++11, -std=c++1y 
 - clang 3.4 with -std=c++03, -std=c++11 (on Travis)
+
+
+Building the tests
+------------------
+To build the tests you need:
+
+- [CMake](http://cmake.org), version 2.8.12 or later to be installed and in your PATH.
+- A [suitable compiler](#reported-to-work-with).
+
+The [*lest* test framework](https://github.com/martinmoene/lest)  is included in the [test folder](test).
+
+The following steps assume that the [*optional lite* source code](https://github.com/martinmoene/optional-lite) has been cloned into a directory named `c:\optional-lite`.
+
+1. Create a directory for the build outputs for a particular architecture.
+Here we use c:\optional-lite\build-win-x86-vc10.
+
+        cd c:\optional-lite
+        md build-win-x86-vc10
+        cd build-win-x86-vc10
+
+2. Configure CMake to use the compiler of your choice (run `cmake --help` for a list).
+
+        cmake -G "Visual Studio 10 2010" ..
+
+3. Build the test suite in the Debug configuration (alternatively use Release).    
+
+        cmake --build . --config Debug
+
+4. Run the test suite.    
+
+        ctest -V -C Debug
+
+All tests should pass, indicating your platform is supported and you are ready to use *optional lite*.
 
 
 Implementation notes
