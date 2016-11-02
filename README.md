@@ -56,13 +56,13 @@ prompt>g++ -Wall -Wextra -std=c++03 -I.. -o to_int.exe to_int.cpp && to_int x1
 
 In a nutshell
 ---------------
-**optional lite** is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library is a variant of [std::optional](https://github.com/akrzemi1/Optional) [1,2] for use with C++98 and later and with Visual C++ 6 (VC6). In turn, std::optional is inspired on [Boost.Optional](http://www.boost.org/doc/libs/1_49_0/libs/optional/doc/html/index.html) [3].
+**optional lite** is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library is a variant of [std::optional](http://en.cppreference.com/w/cpp/utility/optional) [1,2] for use with C++98 and later and with Visual C++ 6 (VC6). In turn, std::optional is inspired on [Boost.Optional](http://www.boost.org/doc/libs/1_49_0/libs/optional/doc/html/index.html) [5].
 
 **Features and properties of optional lite** are ease of installation (single header), default and explicit construction of an empty optional, construction and assignment from a value that is convertible to the underlying type, copy-construction and copy-assignment from another optional of the same type, testing for the presence of a value, operators for unchecked access to the value (pointer or reference), value() and value_or() for checked access to the value, relational operators, swap() and make_optional() to create an optional of the proper type.  
 
 **Not provided** are reference-type optionals, and C++11 capabilities such as move semantics and in-place construction. *optional lite* doesn't handle overloaded *address of* operators.
 
-For more examples, see [this answer on StackOverflow](http://stackoverflow.com/a/16861022) [4] and the [quick start guide](http://www.boost.org/doc/libs/1_57_0/libs/optional/doc/html/boost_optional/quick_start.html) [5] of Boost.Optional (note that its interface differs from *optional lite*).
+For more examples, see [this answer on StackOverflow](http://stackoverflow.com/a/16861022) [6] and the [quick start guide](http://www.boost.org/doc/libs/1_57_0/libs/optional/doc/html/boost_optional/quick_start.html) [7] of Boost.Optional (note that its interface differs from *optional lite*).
 
 
 License
@@ -180,7 +180,7 @@ Comparison of std::optional, optional lite and Boost.Optional
 
 *optional lite* is inspired on std::optional, which in turn is inspired on Boost.Optional. Here are the significant differences.
 
-| Aspect                            | optional              | optional lite | Boost.Optional |
+| Aspect                            | std::optional         | optional lite | Boost.Optional |
 |-----------------------------------|-----------------------|---------------|----------------|
 | Move semantics                    | yes                   | no            | no             |
 | noexcept                          | yes                   | no            | no             |
@@ -189,7 +189,7 @@ Comparison of std::optional, optional lite and Boost.Optional
 | Literal type	                    | partially             | no            | no             |
 | In-place construction	            | emplace, tag in_place | no            | utility in_place_factory |
 | Disengaged state tag	            | nullopt	            | nullopt       | none           |
-| optional references               | no (optionally)       | no            | yes            |
+| optional references               | no                    | no            | yes            |
 | Conversion from optional\<U\><br>to optional\<T\>    | no | no            | yes            |
 | Duplicated interface functions 1) | no                    | no            | yes            |
 | Explicit convert to ptr (get_ptr)	| no                    | no            | yes            |
@@ -248,7 +248,7 @@ Implementation notes
 
 If you access data that's not properly aligned, it 1) may take longer than when it is properly aligned (on x86 processors), or 2) it may terminate the program immediately (many other processors).
 
-Although the C++ standard does not guarantee that all user-defined types have the alignment of some POD type, in practice it's likely they do [6, part 2].
+Although the C++ standard does not guarantee that all user-defined types have the alignment of some POD type, in practice it's likely they do [8, part 2].
 
 If *optional lite* is compiled as C++11 or later, C++11 alignment facilities are used for storage of the underlying object. When compiling as pre-C++11, *optional lite* tries to determine proper alignment using meta programming. If this doesn't work out, you can control alignment via three macros. 
 
@@ -269,34 +269,37 @@ If *optional lite* is compiled as C++11 or later, C++11 alignment facilities are
 	- Find a POD type from the list `alignment_types` with exactly alignment A.
 	- If no such POD type is found, use a type with a relatively strict alignment requirement such as double; this type is specified in  `optional_FEATURE_ALIGN_AS_FALLBACK` (default double).
 
-Note that the algorithm of 5. differs from the one Andrei Alexandrescu uses in [6, part 2].
+Note that the algorithm of 5. differs from the one Andrei Alexandrescu uses in [8, part 2].
 
 The class template `alignment_of<>` is gleaned from [Boost.TypeTraits, alignment_of](http://www.boost.org/doc/libs/1_57_0/libs/type_traits/doc/html/boost_typetraits/reference/alignment_of.html) [9]. The storage type `storage_t<>` is adapted from the one I created for [spike-expected, expected lite](https://github.com/martinmoene/spike-expected) [11].
 
-For more information on constructed unions and alignment, see [6-10].
+For more information on constructed unions and alignment, see [8-12].
 
 
 Notes and references
 --------------------
+[1] CppReference. [Optional](http://en.cppreference.com/w/cpp/utility/optional).  
 
-[1] Fernando Cacciola, Andrzej Krzemieński. [A proposal to add a utility class to represent optional objects (Revision 5)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3793.html).
+[2] ISO/IEC WG21. [N4606, section 20.6 Optional objects](http://wg21.link/n4606). July 2016.
 
-[2] Andrzej Krzemieński. [optional (nullable) objects for C++14](https://github.com/akrzemi1/Optional). Reference implementation on GitHub.
+[3] Fernando Cacciola, Andrzej Krzemieński. [A proposal to add a utility class to represent optional objects (Revision 5)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3793.html).
 
-[3] Fernando Cacciola. [Boost.Optional library](http://www.boost.org/doc/libs/1_49_0/libs/optional/doc/html/index.html).
+[4] Andrzej Krzemieński. [optional (nullable) objects for C++14](https://github.com/akrzemi1/Optional). Reference implementation on GitHub.
 
-[4] StackOverflow. [How should one use std::optional?](http://stackoverflow.com/a/16861022). Answer by Timothy Shields. 31 May 2013.
+[5] Fernando Cacciola. [Boost.Optional library](http://www.boost.org/doc/libs/1_49_0/libs/optional/doc/html/index.html).
 
-[5] Fernando Cacciola. [Boost.Optional Quick start guide](http://www.boost.org/doc/libs/1_57_0/libs/optional/doc/html/boost_optional/quick_start.html).
+[6] StackOverflow. [How should one use std::optional?](http://stackoverflow.com/a/16861022). Answer by Timothy Shields. 31 May 2013.
 
-[6] Andrei Alexandrescu. [Generic<Programming>: Discriminated Unions part 1](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2004/alexandr/alexandr.htm), [part 2](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2006/alexandr/alexandr.htm), [part 3](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2008/alexandr/alexandr.htm). April 2002. 
+[7] Fernando Cacciola. [Boost.Optional Quick start guide](http://www.boost.org/doc/libs/1_57_0/libs/optional/doc/html/boost_optional/quick_start.html).
 
-[7] Herb Sutter. [Style Case Study #3: Construction Unions](http://www.gotw.ca/gotw/085.htm). GotW #85. 2009
+[8] Andrei Alexandrescu. [Generic<Programming>: Discriminated Unions part 1](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2004/alexandr/alexandr.htm), [part 2](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2006/alexandr/alexandr.htm), [part 3](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2008/alexandr/alexandr.htm). April 2002. 
 
-[8] Kevin T. Manley. [Using Constructed Types in C++ Unions](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/0208/manley/manley.htm). C/C++ Users Journal, 20(8), August 2002.
+[9] Herb Sutter. [Style Case Study #3: Construction Unions](http://www.gotw.ca/gotw/085.htm). GotW #85. 2009
 
-[9] StackOverflow. [Determining maximum possible alignment in C++](http://stackoverflow.com/a/3126992).
+[10] Kevin T. Manley. [Using Constructed Types in C++ Unions](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/0208/manley/manley.htm). C/C++ Users Journal, 20(8), August 2002.
 
-[10] [Boost.TypeTraits, alignment_of](http://www.boost.org/doc/libs/1_57_0/libs/type_traits/doc/html/boost_typetraits/reference/alignment_of.html) ( [code](http://www.boost.org/doc/libs/1_57_0/boost/type_traits/alignment_of.hpp) ).
+[11] StackOverflow. [Determining maximum possible alignment in C++](http://stackoverflow.com/a/3126992).
 
-[11] Martin Moene. [spike-expected](https://github.com/martinmoene/spike-expected) ([expected-lite.hpp](https://github.com/martinmoene/spike-expected/blob/master/exception_ptr_lite.hpp)).
+[12] [Boost.TypeTraits, alignment_of](http://www.boost.org/doc/libs/1_57_0/libs/type_traits/doc/html/boost_typetraits/reference/alignment_of.html) ( [code](http://www.boost.org/doc/libs/1_57_0/boost/type_traits/alignment_of.hpp) ).
+
+[13] Martin Moene. [spike-expected](https://github.com/martinmoene/spike-expected) ([expected-lite.hpp](https://github.com/martinmoene/spike-expected/blob/master/exception_ptr_lite.hpp)).
