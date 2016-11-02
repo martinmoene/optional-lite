@@ -1,4 +1,4 @@
-// Copyright 2013, 2014 by Martin Moene
+// Copyright 2013, 2014, 2015, 2016 by Martin Moene
 //
 // lest is based on ideas by Kevlin Henney, see video at
 // http://skillsmatter.com/podcast/agile-testing/kevlin-henney-rethinking-unit-testing-in-c-plus-plus
@@ -6,8 +6,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef LEST_LEST_H_INCLUDED
-#define LEST_LEST_H_INCLUDED
+#ifndef LEST_LEST_HPP_INCLUDED
+#define LEST_LEST_HPP_INCLUDED
 
 #include <algorithm>
 #include <iomanip>
@@ -28,12 +28,14 @@
 #include <ctime>
 
 #ifdef __clang__
+# pragma clang diagnostic ignored "-Woverloaded-shift-op-parentheses"
+# pragma clang diagnostic ignored "-Wunused-comparison"
 # pragma clang diagnostic ignored "-Wunused-value"
 #elif defined __GNUC__
 # pragma GCC   diagnostic ignored "-Wunused-value"
 #endif
 
-#define  lest_VERSION "1.22.0"
+#define  lest_VERSION "1.27.0"
 
 #ifndef  lest_FEATURE_COLOURISE
 # define lest_FEATURE_COLOURISE 0
@@ -73,15 +75,21 @@
 # endif
 #endif
 
-#if ( __cplusplus >= 201103L )
-# define lest_CPP11_OR_GREATER
+#if defined(_MSC_VER)
+# define lest_COMPILER_MSVC_VERSION   (_MSC_VER / 100 - 5 - (_MSC_VER < 1900))
+#else
+# define lest_COMPILER_MSVC_VERSION   0
 #endif
 
-#if defined( _MSC_VER ) && ( 1200 <= _MSC_VER && _MSC_VER < 1300 )
-# define lest_COMPILER_IS_MSVC6
+#if lest_COMPILER_MSVC_VERSION == 6
+# define lest_COMPILER_IS_MSVC6  1
 #endif
 
-#ifdef lest_CPP11_OR_GREATER
+#if ( __cplusplus >= 201103L ) || lest_COMPILER_MSVC_VERSION >= 12
+# define lest_CPP11_OR_GREATER  1
+#endif
+
+#if lest_CPP11_OR_GREATER || lest_COMPILER_MSVC_VERSION >= 10
 
 # include <cstdint>
 # include <random>
@@ -93,6 +101,11 @@ namespace lest
 }
 
 #else
+
+# if !defined(__clang__) && defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Weffc++"
+# endif
 
 namespace lest
 {
@@ -122,6 +135,11 @@ namespace lest
     {
       return Tie<T1, T2>( first, second );
     }
+
+# if !defined(__clang__) && defined(__GNUC__)
+#  pragma GCC diagnostic pop
+# endif
+
 }
 #endif // lest_CPP11_OR_GREATER
 
@@ -132,13 +150,13 @@ namespace lest
     using ::rand;
     using ::srand;
 
-    double abs( double x ) { return ::fabs( x ); }
+    inline double abs( double x ) { return ::fabs( x ); }
 
     template< typename T >
-    T const & (max)(T const & a, T const & b) { return a >= b ? a : b; }
+    T const & (min)(T const & a, T const & b) { return a <= b ? a : b; }
 #else
     using std::abs;
-    using std::max;
+    using std::min;
     using std::strtol;
     using std::rand;
     using std::srand;
@@ -163,31 +181,31 @@ namespace lest
 # define AND_THEN          lest_AND_THEN
 #endif
 
-#define lest_SCENARIO( sketch  )  lest_CASE( "Scenario: " sketch  )
-#define lest_GIVEN(    context )  lest_SETUP(   "Given: " context )
-#define lest_WHEN(     story   )  lest_SECTION( " When: " story   )
-#define lest_THEN(     story   )  lest_SECTION( " Then: " story   )
-#define lest_AND_WHEN( story   )  lest_SECTION( "  And: " story   )
-#define lest_AND_THEN( story   )  lest_SECTION( "  And: " story   )
+#define lest_SCENARIO( sketch  )  lest_CASE(    lest::text("Scenario: ") + sketch  )
+#define lest_GIVEN(    context )  lest_SETUP(   lest::text(   "Given: ") + context )
+#define lest_WHEN(     story   )  lest_SECTION( lest::text(   " When: ") + story   )
+#define lest_THEN(     story   )  lest_SECTION( lest::text(   " Then: ") + story   )
+#define lest_AND_WHEN( story   )  lest_SECTION( lest::text(   "  And: ") + story   )
+#define lest_AND_THEN( story   )  lest_SECTION( lest::text(   "  And: ") + story   )
 
 #define lest_TEST \
     lest_CASE
 
 #define lest_CASE( specification, proposition ) \
-    void lest_FUNCTION( lest::env & ); \
+    static void lest_FUNCTION( lest::env & ); \
     namespace { lest::add_test lest_REGISTRAR( specification, lest::test( proposition, lest_FUNCTION ) ); } \
-    void lest_FUNCTION( lest::env & $ )
+    static void lest_FUNCTION( lest::env & lest_env )
 
 #define lest_ADD_TEST( specification, test ) \
     specification.push_back( test )
 
 #define lest_SETUP( context ) \
-    for ( int $section = 0, $count = 1; $section < $count; $count -= 0==$section++ )
+    for ( int lest__section = 0, lest__count = 1; lest__section < lest__count; lest__count -= 0==lest__section++ )
 
 #define lest_SECTION( proposition ) \
     static int lest_UNIQUE( id ) = 0; \
-    if ( lest::guard $run = lest::guard( lest_UNIQUE( id ), $section, $count ) ) \
-        for ( int $section = 0, $count = 1; $section < $count; $count -= 0==$section++ )
+    if ( lest::guard( lest_UNIQUE( id ), lest__section, lest__count ) ) \
+        for ( int lest__section = 0, lest__count = 1; lest__section < lest__count; lest__count -= 0==lest__section++ )
 
 #define lest_EXPECT( expr ) \
     do { \
@@ -195,8 +213,8 @@ namespace lest
         { \
             if ( lest::result score = lest_DECOMPOSE( expr ) ) \
                 throw lest::failure( lest_LOCATION, #expr, score.decomposition ); \
-            else if ( $.pass ) \
-                lest::report( $.os, lest::passing( lest_LOCATION, #expr, score.decomposition ), $.testing ); \
+            else if ( lest_env.pass ) \
+                lest::report( lest_env.os, lest::passing( lest_LOCATION, #expr, score.decomposition ), lest_env.testing ); \
         } \
         catch(...) \
         { \
@@ -210,8 +228,8 @@ namespace lest
         { \
             if ( lest::result score = lest_DECOMPOSE( expr ) ) \
             { \
-                if ( $.pass ) \
-                    lest::report( $.os, lest::passing( lest_LOCATION, lest::not_expr( #expr ), lest::not_expr( score.decomposition ) ), $.testing ); \
+                if ( lest_env.pass ) \
+                    lest::report( lest_env.os, lest::passing( lest_LOCATION, lest::not_expr( #expr ), lest::not_expr( score.decomposition ) ), lest_env.testing ); \
             } \
             else \
                 throw lest::failure( lest_LOCATION, lest::not_expr( #expr ), lest::not_expr( score.decomposition ) ); \
@@ -227,8 +245,8 @@ namespace lest
     { \
         try { expr; } \
         catch (...) { lest::inform( lest_LOCATION, #expr ); } \
-        if ( $.pass ) \
-            lest::report( $.os, lest::got_none( lest_LOCATION, #expr ), $.testing ); \
+        if ( lest_env.pass ) \
+            lest::report( lest_env.os, lest::got_none( lest_LOCATION, #expr ), lest_env.testing ); \
     } while ( lest::is_false() )
 
 #define lest_EXPECT_THROWS( expr ) \
@@ -240,8 +258,8 @@ namespace lest
         } \
         catch (...) \
         { \
-            if ( $.pass ) \
-                lest::report( $.os, lest::got( lest_LOCATION, #expr ), $.testing ); \
+            if ( lest_env.pass ) \
+                lest::report( lest_env.os, lest::got( lest_LOCATION, #expr ), lest_env.testing ); \
             break; \
         } \
         throw lest::expected( lest_LOCATION, #expr ); \
@@ -257,8 +275,8 @@ namespace lest
         }  \
         catch ( excpt & ) \
         { \
-            if ( $.pass ) \
-                lest::report( $.os, lest::got( lest_LOCATION, #expr, lest::of_type( #excpt ) ), $.testing ); \
+            if ( lest_env.pass ) \
+                lest::report( lest_env.os, lest::got( lest_LOCATION, #expr, lest::of_type( #excpt ) ), lest_env.testing ); \
             break; \
         } \
         catch (...) {} \
@@ -266,7 +284,7 @@ namespace lest
     } \
     while ( lest::is_false() )
 
-#define lest_DECOMPOSE( expr ) ( lest::expression_decomposer()->* expr )
+#define lest_DECOMPOSE( expr ) ( lest::expression_decomposer() << expr )
 
 #define lest_UNIQUE(  name       ) lest_UNIQUE2( name, __LINE__ )
 #define lest_UNIQUE2( name, line ) lest_UNIQUE3( name, line )
@@ -430,7 +448,7 @@ public:
     friend bool operator == ( double lhs, approx const & rhs )
     {
         // Thanks to Richard Harris for his help refining this formula.
-        return lest::abs( lhs - rhs.magnitude_ ) < rhs.epsilon_ * ( rhs.scale_ + (lest::max)( lest::abs( lhs ), lest::abs( rhs.magnitude_ ) ) );
+        return lest::abs( lhs - rhs.magnitude_ ) < rhs.epsilon_ * ( rhs.scale_ + (lest::min)( lest::abs( lhs ), lest::abs( rhs.magnitude_ ) ) );
     }
 
     friend bool operator == ( approx const & lhs, double rhs ) { return  operator==( rhs, lhs ); }
@@ -483,7 +501,7 @@ inline void inform( location where, text expr )
 
 // Expression decomposition:
 
-#ifdef lest_CPP11_OR_GREATER
+#if lest_CPP11_OR_GREATER || lest_COMPILER_MSVC_VERSION >= 10
 inline std::string to_string( std::nullptr_t const &      ) { return "nullptr"; }
 #endif
 inline std::string to_string( std::string    const & text ) { return "\"" + text + "\"" ; }
@@ -509,14 +527,14 @@ std::string to_string( std::pair<T1,T2> const & pair )
     return oss.str();
 }
 
-#ifdef lest_CPP11_OR_GREATER
+#if lest_CPP11_OR_GREATER
 
 template<typename TU, std::size_t N>
 struct make_tuple_string
 {
     static std::string make( TU const & tuple )
     {
-        std::ostringstream os; 
+        std::ostringstream os;
         os << to_string( std::get<N - 1>( tuple ) ) << ( N < std::tuple_size<TU>::value ? ", ": " ");
         return make_tuple_string<TU, N - 1>::make( tuple ) + os.str();
     }
@@ -548,7 +566,7 @@ struct expression_lhs
 
     expression_lhs( L lhs ) : lhs( lhs ) {}
 
-    operator result() { return result( lhs, to_string( lhs ) ); }
+    operator result() { return result( !!lhs, to_string( lhs ) ); }
 
     template <typename R> result operator==( R const & rhs ) { return result( lhs == rhs, to_string( lhs, "==", rhs ) ); }
     template <typename R> result operator!=( R const & rhs ) { return result( lhs != rhs, to_string( lhs, "!=", rhs ) ); }
@@ -561,7 +579,7 @@ struct expression_lhs
 struct expression_decomposer
 {
     template <typename L>
-    expression_lhs<L const &> operator->* ( L const & operand )
+    expression_lhs<L const &> operator<< ( L const & operand )
     {
         return expression_lhs<L const &>( operand );
     }
@@ -616,7 +634,7 @@ inline std::ostream & operator<<( std::ostream & os, colourise words ) { return 
 inline text colourise( text words ) { return words; }
 #endif
 
-inline text pluralise( int n, text word )
+inline text pluralise( text word,int n )
 {
     return n == 1 ? word : word + "s";
 }
@@ -676,7 +694,7 @@ inline bool hidden( text name )
 #if lest_FEATURE_REGEX_SEARCH
     texts skipped; skipped.push_back( "\\[\\.\\]" ); skipped.push_back( "\\[hide\\]" );
 #else
-    texts skipped; skipped.push_back( "[.]" ); skipped.push_back( "[hide]" );
+    texts skipped; skipped.push_back( "[." ); skipped.push_back( "[hide]" );
 #endif
     return match( skipped, name );
 }
@@ -749,7 +767,7 @@ struct env
     text testing;
 
     env( std::ostream & os, bool pass )
-    : os( os ), pass( pass ) {}
+    : os( os ), pass( pass ), testing() {}
 
     env & operator()( text test )
     {
@@ -799,7 +817,7 @@ struct ptags : action
 {
     std::set<text> result;
 
-    ptags( std::ostream & os ) : action( os ) {}
+    ptags( std::ostream & os ) : action( os ), result() {}
 
     ptags & operator()( test testing )
     {
@@ -826,20 +844,20 @@ struct count : action
 
     ~count()
     {
-        os << n << " selected " << pluralise(n, "test") << "\n";
+        os << n << " selected " << pluralise("test", n) << "\n";
     }
 };
 
 #if lest_FEATURE_TIME
 
 #if lest_PLATFORM_IS_WINDOWS
-# ifdef lest_COMPILER_IS_MSVC6
+# if lest_COMPILER_IS_MSVC6
     typedef /*un*/signed __int64 uint64_t;
 # else
     typedef unsigned long long uint64_t;
 # endif
 #else
-# ifndef lest_CPP11_OR_GREATER
+# if ! lest_CPP11_OR_GREATER
     typedef unsigned long long uint64_t;
 # endif
 #endif
@@ -954,11 +972,11 @@ struct confirm : action
     {
         if ( failures > 0 )
         {
-            os << failures << " out of " << selected << " selected " << pluralise(selected, "test") << " " << colourise( "failed.\n" );
+            os << failures << " out of " << selected << " selected " << pluralise("test", selected) << " " << colourise( "failed.\n" );
         }
         else if ( option.pass )
         {
-            os << "All " << selected << " selected " << pluralise(selected, "test") << " " << colourise( "passed.\n" );
+            os << "All " << selected << " selected " << pluralise("test", selected) << " " << colourise( "passed.\n" );
         }
     }
 };
@@ -999,7 +1017,7 @@ struct rng { int operator()( int n ) { return lest::rand() % n; } };
 
 inline void shuffle( tests & specification, options option )
 {
-#ifdef lest_CPP11_OR_GREATER
+#if lest_CPP11_OR_GREATER
     std::shuffle( specification.begin(), specification.end(), std::mt19937( option.seed ) );
 #else
     lest::srand( option.seed );
@@ -1105,7 +1123,7 @@ inline int usage( std::ostream & os )
 #if lest_FEATURE_TIME
         "  -t, --time         list duration of selected tests\n"
 #endif
-        "  --order=declared   use source code test order\n"
+        "  --order=declared   use source code test order (default)\n"
         "  --order=lexical    use lexical sort test order\n"
         "  --order=random     use random test order\n"
         "  --random-seed=n    use n for random generator seed\n"
@@ -1116,7 +1134,7 @@ inline int usage( std::ostream & os )
         "\n"
         "Test specification:\n"
         "  \"@\", \"*\" all tests, unless excluded\n"
-        "  empty    all tests, unless tagged [hide] or [.]\n"
+        "  empty    all tests, unless tagged [hide] or [.optional-name]\n"
 #if lest_FEATURE_REGEX_SEARCH
         "  \"re\"     select tests that match regular expression\n"
         "  \"!re\"    omit tests that match regular expression\n"
@@ -1136,7 +1154,7 @@ inline text compiler()
 #elif defined (__GNUC__  )
     os << "gcc " << __GNUC__ << "." << __GNUC_MINOR__ << "." << __GNUC_PATCHLEVEL__;
 #elif defined ( _MSC_VER )
-    os << "MSVC " << (_MSC_VER / 100 - 6 ) << " (" << _MSC_VER << ")";
+    os << "MSVC " << lest_COMPILER_MSVC_VERSION << " (" << _MSC_VER << ")";
 #else
     os << "[compiler]";
 #endif
@@ -1241,4 +1259,4 @@ int run(  C const & specification, std::ostream & os = std::cout )
 
 } // namespace lest
 
-#endif // LEST_LEST_H_INCLUDED
+#endif // LEST_LEST_HPP_INCLUDED
