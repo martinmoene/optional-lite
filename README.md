@@ -78,7 +78,7 @@ Dependencies
 Installation
 ------------
 
-*optional lite* is a single-file header-only library. Put `optional.hpp` directly into the project source tree or somewhere reachable from your project.
+*optional lite* is a single-file header-only library. Put `optional.hpp` in the [include](include) folder directly into the project source tree or somewhere reachable from your project.
 
 
 Synopsis
@@ -201,7 +201,7 @@ Reported to work with
 ---------------------
 
 *optional lite* is reported to work with the following compilers: 
-- Visual C++ 6 SP6 (VS6), VC10, (VS2010), VC11 (VS2012), VC12 (VS2013), ...
+- Visual C++ 6 SP6 (VS6), VC10, (VS2010), VC11 (VS2012), VC12 (VS2013), VC14 (VS2015)
 - GNUC 4.8.1 with -std=c++98, -std=c++03, -std=c++11, -std=c++1y 
 - clang 3.4 with -std=c++03, -std=c++11 (on Travis)
 
