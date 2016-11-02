@@ -25,7 +25,6 @@
 		<Unit filename="../../include/nonstd/optional.hpp" />
 		<Unit filename="../../test/CMakeLists.txt" />
 		<Unit filename="../../test/Makefile" />
-		<Unit filename="../../test/foreach-std.bat" />
 		<Unit filename="../../test/lest_cpp03.hpp" />
 		<Unit filename="../../test/optional-lite.t.cpp" />
 		<Unit filename="../../test/optional-lite.t.h" />
