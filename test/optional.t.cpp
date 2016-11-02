@@ -6,13 +6,7 @@
 // optional lite is inspired on std::optional by Fernando Cacciola and Andrzej Krzemienski
 // and on expected lite by Martin Moene.
 
-#include "optional.hpp"
-
-#include "lest_cpp03.hpp"
-
-#define CASE( name ) lest_CASE( specification, name )
-
-lest::test_specification specification;
+#include "optional-lite.t.h"
 
 using nonstd::optional;
 using nonstd::nullopt;
