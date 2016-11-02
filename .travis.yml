@@ -1,15 +1,15 @@
-language: cpp
+# Ubuntu 14.04 Trusty support
+sudo: required
+dist: trusty
+
+language:
+  - cpp
 
 compiler:
   - clang
   - gcc
 
-env:
-  - STD=c++03
-  - STD=c++0x
-
-install:
-  - make STD=$STD
-
 script:
-  - make test-all
+  - mkdir build
+  - cd build
+  - cmake -G "Unix Makefiles" .. && cmake --build . && ctest

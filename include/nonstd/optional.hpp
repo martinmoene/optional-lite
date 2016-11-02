@@ -13,6 +13,8 @@
 #include <stdexcept>
 #include <utility>
 
+#define  optional_lite_VERSION "1.0.2"
+
 #if ( 1200 <= _MSC_VER && _MSC_VER < 1300  )
 # define optional_COMPILER_IS_VC6  1
 #endif
@@ -100,14 +102,14 @@
  * - http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2008/alexandr/alexandr.htm
  */
 
-namespace nonstd {
+namespace nonstd { namespace optional_lite {
 
 /// class optional
 
 template< typename T >
 class optional;
 
-namespace optional_detail {
+namespace detail {
 
 #if optional_FEATURE_MAX_ALIGN_HACK
 
@@ -392,7 +394,7 @@ private:
     }
 };
 
-} // namespace optional_detail
+} // namespace detail
 
 /// disengaged state tag
 
@@ -553,7 +555,7 @@ private:
 
 private:
     bool has_value;
-    optional_detail::storage_t< value_type > contained;
+    detail::storage_t< value_type > contained;
 
 };
 
@@ -727,6 +729,10 @@ optional<T> make_optional( T const & v )
     return optional<T>( v );
 }
 
-} // namespace std
+} // namespace optional
+
+using namespace optional_lite;
+
+} // namespace nonstd
 
 #endif // NONSTD_OPTIONAL_LITE_HPP

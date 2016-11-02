@@ -141,7 +141,7 @@ CASE( "operator->() yields pointer to value" )
 {
     SETUP( "" ) {
         optional<Integer> e( Integer( 42 ) );
-    
+
     SECTION( "operator->() yields pointer to value (const)" ) {
         EXPECT(  e->x == 42 );
     }
@@ -155,7 +155,7 @@ CASE( "operator*() yields value" )
 {
     SETUP( "" ) {
         optional<int> e( 42 );
-    
+
     SECTION( "operator*() yields value (const)" ) {
         EXPECT( *e == 42 );
     }
@@ -169,7 +169,7 @@ CASE( "value() yields value" )
 {
     SETUP( "" ) {
         optional<int> e( 42 );
-    
+
     SECTION( "value() yields value (const)" ) {
         EXPECT( e.value() == 42 );
     }
@@ -189,7 +189,7 @@ CASE( "value_or() yields value or default" )
     SETUP( "" ) {
         optional<int> d;
         optional<int> e( 42 );
-    
+
     SECTION( "value_or( 7 ) yields value for non-empty optional" ) {
         EXPECT( e.value_or( 7 ) == 42 );
     }
@@ -202,7 +202,7 @@ CASE( "Global swap() swaps engage state and values" )
 {
 #if optional_COMPILER_IS_VC6
     using ::nonstd::swap;
-#endif    
+#endif
 
     SETUP( "" ) {
         optional<int> d1;
@@ -246,7 +246,7 @@ CASE( "Relational operators" )
         optional<int> d;
         optional<int> e1( 6 );
         optional<int> e2( 7 );
-    
+
     SECTION( "engaged    == engaged"    ) { EXPECT(   e1 == e1  ); }
     SECTION( "engaged    == disengaged" ) { EXPECT( !(e1 == d ) ); }
     SECTION( "disengaged == engaged"    ) { EXPECT( !(d  == e1) ); }
@@ -317,17 +317,17 @@ struct S{ S(){} };
     "alignment_of<" #type ">: " <<  \
      alignment_of<type>::value  << "\n" <<
 
-CASE("Show alignment of various types" 
+CASE("Show alignment of various types"
      "[.]" )
 {
-#if optional_CPP11_OR_GREATER  
+#if optional_CPP11_OR_GREATER
     using std::alignment_of;
 #elif optional_COMPILER_IS_VC6
-    using namespace ::nonstd::optional_detail;
+    using namespace ::nonstd::detail;
 #else
-    using ::nonstd::optional_detail::alignment_of;
-#endif    
-    std::cout << 
+    using ::nonstd::detail::alignment_of;
+#endif
+    std::cout <<
         optional_OUTPUT_ALIGNMENT_OF( char )
         optional_OUTPUT_ALIGNMENT_OF( short )
         optional_OUTPUT_ALIGNMENT_OF( int )
@@ -345,12 +345,12 @@ CASE("Show alignment of various types"
     "sizeof( optional<" #type "> ): " << \
      sizeof( optional<   type>   )    << " (" << sizeof(type) << ")\n" <<
 
-CASE("Show sizeof various optionals" 
+CASE("Show sizeof various optionals"
      "[.]" )
 {
-    std::cout << 
-        "sizeof( nonstd::optional_detail::storage_t<char> ): " << 
-         sizeof( nonstd::optional_detail::storage_t<char> )    << "\n" << 
+    std::cout <<
+        "sizeof( nonstd::detail::storage_t<char> ): " <<
+         sizeof( nonstd::detail::storage_t<char> )    << "\n" <<
          optional_OUTPUT_SIZEOF( char )
          optional_OUTPUT_SIZEOF( short )
          optional_OUTPUT_SIZEOF( int )
@@ -362,22 +362,3 @@ CASE("Show sizeof various optionals"
          "";
 }
 #undef optional_OUTPUT_SIZEOF
-
-/*
- * Test driver:
- */
-
-int main( int argc, char * argv[] )
-{
-    return lest::run( specification, argc, argv );
-}
-
-#if 0
-cl -nologo -W3 -EHsc optional.t.cpp && optional.t
-cl -nologo -Wall -EHsc optional.t.cpp && optional.t
-
-g++ -Wall -Wextra -std=c++03 -o optional.t.exe optional.t.cpp && optional.t
-g++ -Wall -Wextra -std=c++11 -o optional.t.exe optional.t.cpp && optional.t
-g++ -Wall -Wextra -std=c++1y -o optional.t.exe optional.t.cpp && optional.t
-
-#endif // 0
