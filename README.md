@@ -66,7 +66,7 @@ For more examples, see [this answer on StackOverflow](http://stackoverflow.com/a
 
 License
 -------
-*optional lite* uses the [Boost Software License](LICENSE_1_0.txt).
+*variant lite* uses the [MIT](LICENSE) license.
  
 
 Dependencies

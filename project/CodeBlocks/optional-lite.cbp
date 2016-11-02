@@ -16,6 +16,7 @@
 		<Unit filename="../../.travis.yml" />
 		<Unit filename="../../CHANGES.txt" />
 		<Unit filename="../../CMakeLists.txt" />
+		<Unit filename="../../LICENSE" />
 		<Unit filename="../../README.md" />
 		<Unit filename="../../appveyor.yml" />
 		<Unit filename="../../examples/01-to_int.cpp" />
