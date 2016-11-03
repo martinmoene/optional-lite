@@ -521,8 +521,8 @@ const nullopt_t nullopt( ( nullopt_t::init() ) );
 class bad_optional_access : public std::logic_error
 {
 public:
-  explicit bad_optional_access( char const * const what_arg )
-  : logic_error( what_arg ) {}
+  explicit bad_optional_access()
+  : logic_error( "bad optional access" ) {}
 };
 
 /// optional
@@ -620,7 +620,7 @@ public:
     value_type const & value() const
     {
         if ( ! initialized() )
-            throw bad_optional_access( "accessing value of disengaged optional (const)" );
+            throw bad_optional_access();
 
         return contained.value();
     }
@@ -628,7 +628,7 @@ public:
     value_type & value()
     {
         if ( ! initialized() )
-            throw bad_optional_access( "accessing value of disengaged optional (non-const)" );
+            throw bad_optional_access();
 
         return contained.value();
     }
