@@ -185,6 +185,25 @@ class optional;
 
 namespace detail {
 
+// C++11 emulation:
+
+#if variant_HAVE_CONDITIONAL
+
+using std::conditional;
+
+#else
+
+template< bool Cond, class Then, class Else >
+struct conditional;
+
+template< class Then, class Else >
+struct conditional< true , Then, Else > { typedef Then type; };
+
+template< class Then, class Else >
+struct conditional< false, Then, Else > { typedef Else type; };
+
+#endif // variant_HAVE_CONDITIONAL
+
 #if optional_CONFIG_MAX_ALIGN_HACK
 
 // Max align, use most restricted type for alignment:
@@ -252,10 +271,6 @@ union max_align_t
 #define optional_ALIGN_AS( to_align ) \
     typename type_of_size< alignment_types, alignment_of< to_align >::value >::type
 
-template < bool condition, typename Then, typename Else > struct select;
-template < typename Then, typename Else > struct select< true , Then, Else > { typedef Then type; };
-template < typename Then, typename Else > struct select< false, Then, Else > { typedef Else type; };
-
 template <typename T>
 struct alignment_of;
 
@@ -292,7 +307,7 @@ struct typelist
 template< typename List, size_t N >
 struct type_of_size
 {
-    typedef typename select<
+    typedef typename conditional<
         N == sizeof( typename List::head ),
             typename List::head,
             typename type_of_size<typename List::tail, N >::type >::type type;
