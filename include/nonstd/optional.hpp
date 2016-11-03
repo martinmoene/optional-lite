@@ -434,14 +434,14 @@ private:
         value_ptr()->~T();
     }
 
-    value_type * value_ptr() const
+    value_type const * value_ptr() const
     {
-        return as( (value_type*)0 );
+        return as<value_type>();
     }
 
     value_type * value_ptr()
     {
-        return as( (value_type*)0 );
+        return as<value_type>();
     }
 
     value_type const & value() const
@@ -457,31 +457,45 @@ private:
 #if optional_CPP11_OR_GREATER
 
     using aligned_storage_t = typename std::aligned_storage< sizeof(value_type), alignof(value_type) >::type;
-    aligned_storage_t buffer;
+    aligned_storage_t data;
 
 #elif optional_CONFIG_MAX_ALIGN_HACK
 
     typedef struct { unsigned char data[ sizeof(value_type) ]; } aligned_storage_t;
 
     max_align_t hack;
-    aligned_storage_t buffer;
+    aligned_storage_t data;
 
 #else
     typedef optional_ALIGN_AS(value_type) align_as_type;
 
     typedef struct { align_as_type data[ 1 + ( sizeof(value_type) - 1 ) / sizeof(align_as_type) ]; } aligned_storage_t;
-    aligned_storage_t buffer;
+    aligned_storage_t data;
 
 #   undef optional_ALIGN_AS
 
 #endif // optional_CONFIG_MAX_ALIGN_HACK
 
-    // Note: VC6 cannot handle as<T>():
+    void * ptr() optional_noexcept
+    {
+        return &data;
+    }
+
+    void const * ptr() const optional_noexcept
+    {
+        return &data;
+    }
 
     template <typename U>
-    U * as( U* ) const
+    U * as()
     {
-        return reinterpret_cast<U*>( const_cast<aligned_storage_t *>( &buffer ) );
+        return reinterpret_cast<U*>( ptr() );
+    }
+
+    template <typename U>
+    U const * as() const
+    {
+        return reinterpret_cast<U const *>( ptr() );
     }
 };
 
