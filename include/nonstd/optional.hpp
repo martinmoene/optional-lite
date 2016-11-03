@@ -22,7 +22,7 @@
 #include <stdexcept>
 #include <utility>
 
-#define  optional_lite_VERSION "1.0.2"
+#define  optional_lite_VERSION "2.x.x"
 
 #if ( __cplusplus >= 201103L )
 # define optional_CPP11_OR_GREATER  1
