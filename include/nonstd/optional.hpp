@@ -176,6 +176,53 @@
 # include <tr1/type_traits>
 #endif
 
+//
+// in_place: code duplicated in any-lite, optional-lite, variant-lite:
+//
+
+#if ! nonstd_lite_HAVE_IN_PLACE_TYPES
+
+namespace nonstd {
+
+namespace detail {
+
+template< class T >
+struct in_place_type_tag {};
+
+template< std::size_t I >
+struct in_place_index_tag {};
+
+} // namespace detail
+
+struct in_place_t {};
+
+template< class T >
+inline in_place_t in_place( detail::in_place_type_tag<T> = detail::in_place_type_tag<T>() )
+{
+    return in_place_t();
+}
+
+template< std::size_t I >
+inline in_place_t in_place( detail::in_place_index_tag<I> = detail::in_place_index_tag<I>() )
+{
+    return in_place_t();
+}
+
+// mimic templated typedef:
+
+#define nonstd_lite_in_place_type_t( T)  nonstd::in_place_t(&)( nonstd::detail::in_place_type_tag<T>  )
+#define nonstd_lite_in_place_index_t(T)  nonstd::in_place_t(&)( nonstd::detail::in_place_index_tag<I> )
+
+#define nonstd_lite_HAVE_IN_PLACE_TYPES  1
+
+} // namespace nonstd
+
+#endif // nonstd_lite_HAVE_IN_PLACE_TYPES
+
+//
+// optional:
+//
+
 namespace nonstd { namespace optional_lite {
 
 /// class optional
