@@ -22,10 +22,6 @@
 
 #define  optional_lite_VERSION "1.0.2"
 
-#if ( 1200 <= _MSC_VER && _MSC_VER < 1300  )
-# define optional_COMPILER_IS_VC6  1
-#endif
-
 #if ( __cplusplus >= 201103L )
 # define optional_CPP11_OR_GREATER  1
 #endif
@@ -185,26 +181,9 @@ union max_align_t
 #define optional_ALIGN_AS( to_align ) \
     typename type_of_size< alignment_types, alignment_of< to_align >::value >::type
 
-#if optional_COMPILER_IS_VC6
-
-template< bool condition, typename Then, typename Else >
-struct select
-{
-  template < bool > struct selector;
-
-  template <> struct selector< true  > { typedef Then type; };
-  template <> struct selector< false > { typedef Else type; };
-
-  typedef typename selector< condition >::type type;
-};
-
-#else // optional_COMPILER_IS_VC6
-
 template < bool condition, typename Then, typename Else > struct select;
 template < typename Then, typename Else > struct select< true , Then, Else > { typedef Then type; };
 template < typename Then, typename Else > struct select< false, Then, Else > { typedef Else type; };
-
-#endif // optional_COMPILER_IS_VC6
 
 template <typename T>
 struct alignment_of;
@@ -248,39 +227,11 @@ struct type_of_size
             typename type_of_size<typename List::tail, N >::type >::type type;
 };
 
-#if ! optional_COMPILER_IS_VC6
-
 template< size_t N >
 struct type_of_size< nulltype, N >
 {
     typedef optional_FEATURE_ALIGN_AS_FALLBACK type;
 };
-
-#else // optional_COMPILER_IS_VC6
-
-// VC6: no partial specialization
-
-#define MK_TYPE_OF_SIZE( n ) \
-    template<> \
-    struct type_of_size< nulltype, n > \
-    { \
-        typedef optional_FEATURE_ALIGN_AS_FALLBACK type; \
-    }
-
-MK_TYPE_OF_SIZE( 1  );
-MK_TYPE_OF_SIZE( 2  );
-MK_TYPE_OF_SIZE( 4  );
-MK_TYPE_OF_SIZE( 8  );
-MK_TYPE_OF_SIZE( 12 );
-MK_TYPE_OF_SIZE( 16 );
-MK_TYPE_OF_SIZE( 20 );
-MK_TYPE_OF_SIZE( 24 );
-MK_TYPE_OF_SIZE( 28 );
-MK_TYPE_OF_SIZE( 32 );
-
-#undef MK_TYPE_OF_SIZE
-
-#endif // optional_COMPILER_IS_VC6
 
 template< typename T>
 struct struct_t { T _; };
