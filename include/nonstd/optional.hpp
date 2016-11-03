@@ -564,16 +564,6 @@ public:
             contained.destruct_value();
     }
 
-    operator safe_bool() const
-    {
-        return has_value() ? &optional::this_type_does_not_support_comparisons : 0;
-    }
-
-    optional_constexpr bool has_value() const optional_noexcept
-    {
-        return has_value_;
-    }
-
     optional & operator=( nullopt_t )
     {
         reset();
@@ -597,6 +587,23 @@ public:
     }
 
     // observers
+
+#if optional_CPP11_OR_GREATER
+    optional_constexpr explicit operator bool() const optional_noexcept
+    {
+        return has_value();
+    }
+#else
+    optional_constexpr operator safe_bool() const optional_noexcept
+    {
+        return has_value() ? &optional::this_type_does_not_support_comparisons : 0;
+    }
+#endif
+
+    optional_constexpr bool has_value() const optional_noexcept
+    {
+        return has_value_;
+    }
 
     value_type const * operator ->() const
     {
