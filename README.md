@@ -2,7 +2,7 @@ optional lite - nullable objects for C++98 and later
 ====================================================
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)  [![Standard](https://img.shields.io/badge/c%2B%2B-98-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![Standard](https://img.shields.io/badge/c%2B%2B-11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/martinmoene/optional-lite.svg?branch=master)](https://travis-ci.org/martinmoene/optional-lite) [![Build status](https://ci.appveyor.com/api/projects/status/1oq5gjm7bufrv6ib?svg=true)](https://ci.appveyor.com/project/martinmoene/optional-lite) [![Version](https://badge.fury.io/gh/martinmoene%2Foptional-lite.svg)](https://github.com/martinmoene/optional-lite/releases) [![download](https://img.shields.io/badge/latest%20version%20%20-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/optional-lite/master/optional.hpp)
 
-*optional lite* is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library is a variant of std::optional [1,2] for use with C++98 and later and with Visual C++ 6 (VC6).
+*optional lite* is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library is a variant of std::optional [1,2] for use with C++98 and later.
 
 **Contents**  
 - [Example usage](#example-usage)
@@ -56,7 +56,7 @@ prompt>g++ -Wall -Wextra -std=c++03 -I.. -o to_int.exe to_int.cpp && to_int x1
 
 In a nutshell
 ---------------
-**optional lite** is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library is a variant of [std::optional](http://en.cppreference.com/w/cpp/utility/optional) [1,2] for use with C++98 and later and with Visual C++ 6 (VC6). In turn, std::optional is inspired on [Boost.Optional](http://www.boost.org/doc/libs/1_49_0/libs/optional/doc/html/index.html) [5].
+**optional lite** is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library is a variant of [std::optional](http://en.cppreference.com/w/cpp/utility/optional) [1,2] for use with C++98 and later. In turn, std::optional is inspired on [Boost.Optional](http://www.boost.org/doc/libs/1_49_0/libs/optional/doc/html/index.html) [5].
 
 **Features and properties of optional lite** are ease of installation (single header), default and explicit construction of an empty optional, construction and assignment from a value that is convertible to the underlying type, copy-construction and copy-assignment from another optional of the same type, testing for the presence of a value, operators for unchecked access to the value (pointer or reference), value() and value_or() for checked access to the value, relational operators, swap() and make_optional() to create an optional of the proper type.  
 

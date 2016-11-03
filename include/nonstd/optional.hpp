@@ -457,8 +457,6 @@ private:
 
     void destruct_value()
     {
-        // Note: VC6 requires the use of the
-        // template parameter T (cannot use value_type).
         value_ptr()->~T();
     }
 
