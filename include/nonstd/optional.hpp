@@ -537,36 +537,41 @@ public:
     typedef T value_type;
 
     optional()
-    : has_value( false )
+    : has_value_( false )
      ,contained()
     {}
 
     optional( nullopt_t )
-    : has_value( false )
+    : has_value_( false )
     , contained()
     {}
 
     optional( value_type const & value )
-    : has_value( true )
+    : has_value_( true )
     , contained( value )
     {}
 
     optional( optional const & other )
-    : has_value( other.initialized() )
+    : has_value_( other.has_value() )
     {
-        if ( other.initialized() )
+        if ( other.has_value() )
             contained.construct_value( other.contained.value() );
     }
 
     ~optional()
     {
-        if ( initialized() )
+        if ( has_value() )
             contained.destruct_value();
     }
 
     operator safe_bool() const
     {
-        return initialized() ? &optional::this_type_does_not_support_comparisons : 0;
+        return has_value() ? &optional::this_type_does_not_support_comparisons : 0;
+    }
+
+    optional_constexpr bool has_value() const optional_noexcept
+    {
+        return has_value_;
     }
 
     optional & operator=( nullopt_t )
@@ -577,49 +582,49 @@ public:
 
     optional & operator=( optional const & rhs )
     {
-        if      ( initialized() == true  && rhs.initialized() == false ) reset();
-        else if ( initialized() == false && rhs.initialized() == true  ) initialize( *rhs );
-        else if ( initialized() == true  && rhs.initialized() == true  ) contained.value() = *rhs;
+        if      ( has_value() == true  && rhs.has_value() == false ) reset();
+        else if ( has_value() == false && rhs.has_value() == true  ) initialize( *rhs );
+        else if ( has_value() == true  && rhs.has_value() == true  ) contained.value() = *rhs;
         return *this;
     }
 
     void swap( optional & other )
     {
         using std::swap;
-        if      ( initialized() == true  && other.initialized() == true  ) { swap( **this, *other ); }
-        else if ( initialized() == false && other.initialized() == true  ) { initialize( *other ); other.reset(); }
-        else if ( initialized() == true  && other.initialized() == false ) { other.initialize( **this ); reset(); }
+        if      ( has_value() == true  && other.has_value() == true  ) { swap( **this, *other ); }
+        else if ( has_value() == false && other.has_value() == true  ) { initialize( *other ); other.reset(); }
+        else if ( has_value() == true  && other.has_value() == false ) { other.initialize( **this ); reset(); }
     }
 
     // observers
 
     value_type const * operator ->() const
     {
-        assert( initialized() );
+        assert( has_value() );
         return contained.value_ptr();
     }
 
     value_type * operator ->()
     {
-        assert( initialized() );
+        assert( has_value() );
         return contained.value_ptr();
     }
 
     value_type const & operator *() const
     {
-        assert( initialized() );
+        assert( has_value() );
         return contained.value();
     }
 
     value_type & operator *()
     {
-        assert( initialized() );
+        assert( has_value() );
         return contained.value();
     }
 
     value_type const & value() const
     {
-        if ( ! initialized() )
+        if ( ! has_value() )
             throw bad_optional_access();
 
         return contained.value();
@@ -627,7 +632,7 @@ public:
 
     value_type & value()
     {
-        if ( ! initialized() )
+        if ( ! has_value() )
             throw bad_optional_access();
 
         return contained.value();
@@ -635,35 +640,30 @@ public:
 
     value_type value_or( value_type const & default_value ) const
     {
-        return initialized() ? contained.value() : default_value;
+        return has_value() ? contained.value() : default_value;
     }
 
     void reset() optional_noexcept
     {
-        if ( initialized() )
+        if ( has_value() )
             contained.destruct_value();
 
-        has_value = false;
+        has_value_ = false;
     }
 
 private:
     void this_type_does_not_support_comparisons() const {}
 
-    bool initialized() const
-    {
-        return has_value;
-    }
-
     template< typename V >
     void initialize( V const & value)
     {
-        assert( ! initialized()  );
+        assert( ! has_value()  );
         contained.construct_value( value );
-        has_value = true;
+        has_value_ = true;
     }
 
 private:
-    bool has_value;
+    bool has_value_;
     detail::storage_t< value_type > contained;
 
 };
