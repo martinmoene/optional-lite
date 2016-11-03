@@ -204,6 +204,15 @@ struct conditional< false, Then, Else > { typedef Else type; };
 
 #endif // variant_HAVE_CONDITIONAL
 
+struct nulltype{};
+
+template< typename Head, typename Tail >
+struct typelist
+{
+    typedef Head head;
+    typedef Tail tail;
+};
+
 #if optional_CONFIG_MAX_ALIGN_HACK
 
 // Max align, use most restricted type for alignment:
@@ -293,15 +302,6 @@ struct alignment_of
 {
     enum { value = alignment_logic<
         sizeof( alignment_of_hack<T> ) - sizeof(T), sizeof(T) >::value, };
-};
-
-struct nulltype{};
-
-template< typename Head, typename Tail >
-struct typelist
-{
-    typedef Head head;
-    typedef Tail tail;
 };
 
 template< typename List, size_t N >
