@@ -194,10 +194,6 @@ CASE( "value_or() yields value or default" )
 
 CASE( "Global swap() swaps engage state and values" )
 {
-#if optional_COMPILER_IS_VC6
-    using ::nonstd::swap;
-#endif
-
     SETUP( "" ) {
         optional<int> d1;
         optional<int> d2;
@@ -316,11 +312,8 @@ CASE("Show alignment of various types"
 {
 #if optional_CPP11_OR_GREATER
     using std::alignment_of;
-#elif optional_COMPILER_IS_VC6
-    using namespace ::nonstd::detail;
-#else
-    using ::nonstd::detail::alignment_of;
-#endif
+    using ::nonstd::optional_lite::detail::alignment_of;
+
     std::cout <<
         optional_OUTPUT_ALIGNMENT_OF( char )
         optional_OUTPUT_ALIGNMENT_OF( short )
@@ -343,8 +336,8 @@ CASE("Show sizeof various optionals"
      "[.]" )
 {
     std::cout <<
-        "sizeof( nonstd::detail::storage_t<char> ): " <<
-         sizeof( nonstd::detail::storage_t<char> )    << "\n" <<
+        "sizeof( nonstd::optional_lite::detail::storage_t<char> ): " <<
+         sizeof( nonstd::optional_lite::detail::storage_t<char> )    << "\n" <<
          optional_OUTPUT_SIZEOF( char )
          optional_OUTPUT_SIZEOF( short )
          optional_OUTPUT_SIZEOF( int )
