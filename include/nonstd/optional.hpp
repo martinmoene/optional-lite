@@ -859,12 +859,33 @@ optional<T> make_optional( T const & v )
 {
     return optional<T>( v );
 }
-#endif
+
+#endif // optional_CPP11_OR_GREATER
 
 } // namespace optional
 
 using namespace optional_lite;
 
 } // namespace nonstd
+
+#if optional_CPP11_OR_GREATER
+
+// specialize the std::hash algorithm:
+
+namespace std {
+
+template< class T >
+class hash< nonstd::optional<T> >
+{
+public:
+    std::size_t operator()( nonstd::optional<T> const & v ) const optional_noexcept
+    {
+        return bool( v ) ? hash<T>()( *v ) : 0;
+    }
+};
+
+} //namespace std
+
+#endif // optional_CPP11_OR_GREATER
 
 #endif // NONSTD_OPTIONAL_LITE_HPP
