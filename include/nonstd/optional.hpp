@@ -571,13 +571,13 @@ public:
 
     optional & operator=( nullopt_t )
     {
-        clear();
+        reset();
         return *this;
     }
 
     optional & operator=( optional const & rhs )
     {
-        if      ( initialized() == true  && rhs.initialized() == false ) clear();
+        if      ( initialized() == true  && rhs.initialized() == false ) reset();
         else if ( initialized() == false && rhs.initialized() == true  ) initialize( *rhs );
         else if ( initialized() == true  && rhs.initialized() == true  ) contained.value() = *rhs;
         return *this;
@@ -587,8 +587,8 @@ public:
     {
         using std::swap;
         if      ( initialized() == true  && other.initialized() == true  ) { swap( **this, *other ); }
-        else if ( initialized() == false && other.initialized() == true  ) { initialize( *other ); other.clear(); }
-        else if ( initialized() == true  && other.initialized() == false ) { other.initialize( **this ); clear(); }
+        else if ( initialized() == false && other.initialized() == true  ) { initialize( *other ); other.reset(); }
+        else if ( initialized() == true  && other.initialized() == false ) { other.initialize( **this ); reset(); }
     }
 
     // observers
@@ -638,6 +638,14 @@ public:
         return initialized() ? contained.value() : default_value;
     }
 
+    void reset() optional_noexcept
+    {
+        if ( initialized() )
+            contained.destruct_value();
+
+        has_value = false;
+    }
+
 private:
     void this_type_does_not_support_comparisons() const {}
 
@@ -652,14 +660,6 @@ private:
         assert( ! initialized()  );
         contained.construct_value( value );
         has_value = true;
-    }
-
-    void clear()
-    {
-        if ( initialized() )
-            contained.destruct_value();
-
-        has_value = false;
     }
 
 private:
