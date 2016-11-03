@@ -832,11 +832,34 @@ void swap( optional<T> & x, optional<T> & y )
     x.swap( y );
 }
 
+#if optional_CPP11_OR_GREATER
+
+template< class T >
+constexpr optional< typename std::decay<T>::type > make_optional( T && v )
+{
+    return optional< typename std::decay<T>::type >( std::forward<T>( v ) );
+}
+
+template< class T, class...Args >
+constexpr optional<T> make_optional( Args&&... args )
+{
+    return optional<T>( in_place, std::forward<Args>(args)... );
+}
+
+template< class T, class U, class... Args >
+constexpr optional<T> make_optional( std::initializer_list<U> il, Args&&... args )
+{
+    return optional<T>( in_place, il, std::forward<Args>(args)... );
+}
+
+#else
+
 template< typename T >
 optional<T> make_optional( T const & v )
 {
     return optional<T>( v );
 }
+#endif
 
 } // namespace optional
 
