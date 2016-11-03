@@ -26,9 +26,9 @@ CASE( "union: A C++03 union can only contain POD types" )
     };
 }
 
-/*
- * Positive tests:
- */
+//
+// Positive tests:
+//
 
 CASE( "optional: A default constructed optional is empty" )
 {
@@ -291,13 +291,13 @@ CASE( "optional: Relational operators" )
     }
 }
 
-/*
- * Negative tests:
- */
+//
+// Negative tests:
+//
 
-/*
- * Tests that print information:
- */
+//
+// Tests that print information:
+//
 
 struct S{ S(){} };
 
@@ -351,3 +351,28 @@ CASE("storage_t: Show sizeof various optionals"
          "";
 }
 #undef optional_OUTPUT_SIZEOF
+
+//
+// Issues:
+//
+
+CASE( "optional: isocpp-lib: CH 3, p0032r2 -- let's not have too clever tags" "[.issue #1]" )
+{
+    EXPECT( false );
+//    optional< optional< optional<int> > > o (
+//        in_place<int>,
+//#if 0
+//        in_place<int>,
+//#else
+////        nonstd_lite_in_place_type_t(int),
+//        static_cast< nonstd::in_place_t >( in_place<int> ),
+//#endif
+//        nullopt
+//    );
+//
+//    EXPECT(       o );
+//    EXPECT(      *o );
+//    EXPECT_NOT( **o );
+}
+
+// end of file
