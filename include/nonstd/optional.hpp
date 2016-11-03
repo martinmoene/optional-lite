@@ -506,11 +506,15 @@ private:
 struct nullopt_t
 {
     struct init{};
-    nullopt_t( init ) {}
+    optional_constexpr nullopt_t( init ) {}
 };
 
+#if optional_HAVE_CONSTEXPR_11
+constexpr nullopt_t nullopt{ nullopt_t::init{} };
+#else
 // extra parenthesis to prevent the most vexing parse:
 const nullopt_t nullopt( ( nullopt_t::init() ) );
+#endif
 
 /// optional access error
 
