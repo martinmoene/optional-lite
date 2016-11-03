@@ -312,7 +312,9 @@ CASE("Show alignment of various types"
 {
 #if optional_CPP11_OR_GREATER
     using std::alignment_of;
+#else
     using ::nonstd::optional_lite::detail::alignment_of;
+#endif
 
     std::cout <<
         optional_OUTPUT_ALIGNMENT_OF( char )
