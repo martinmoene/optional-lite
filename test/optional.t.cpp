@@ -1,4 +1,4 @@
-// Copyright 2014 by Martin Moene
+// Copyright 2014-2016 by Martin Moene
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,7 +15,7 @@ using nonstd::make_optional;
 
 struct nonpod { nonpod(){} };
 
-CASE( "A C++03 union can only contain POD types" )
+CASE( "union: A C++03 union can only contain POD types" )
 {
     union U
     {
@@ -30,33 +30,33 @@ CASE( "A C++03 union can only contain POD types" )
  * Positive tests:
  */
 
-CASE( "A default constructed optional is empty" )
+CASE( "optional: A default constructed optional is empty" )
 {
     optional<int> oi;
     EXPECT( !oi );
 }
 
-CASE( "An optional that is constructed disengaged explicitly is empty" )
+CASE( "optional: An optional that is constructed disengaged explicitly is empty" )
 {
     optional<int> oi( nullopt );
     EXPECT( !oi );
 }
 
-CASE( "An optional constructed with 42 contains 42" )
+CASE( "optional: An optional constructed with 42 contains 42" )
 {
     optional<int> oi = 42;
     EXPECT(  oi );
     EXPECT( *oi == 42 );
 }
 
-CASE( "An optional constructed from an empty optional is empty" )
+CASE( "optional: An optional constructed from an empty optional is empty" )
 {
     optional<int> oi1;
     optional<int> oi2( oi1 );
     EXPECT( !oi2 );
 }
 
-CASE( "An optional constructed from an non-empty optional obtains its value" )
+CASE( "optional: An optional constructed from an non-empty optional obtains its value" )
 {
     optional<int> oi1( 42 );
     optional<int> oi2( oi1 );
@@ -64,7 +64,7 @@ CASE( "An optional constructed from an non-empty optional obtains its value" )
     EXPECT( *oi2 == *oi1 );
 }
 
-CASE( "copy-assignment works for all permutations of engaged and disengaged optionals" )
+CASE( "optional: copy-assignment works for all permutations of engaged and disengaged optionals" )
 {
     SETUP( "" ) {
         optional<int> d1;
@@ -96,7 +96,7 @@ CASE( "copy-assignment works for all permutations of engaged and disengaged opti
     }}
 }
 
-CASE( "Member swap() swaps engage state and values" )
+CASE( "optional: Member swap() swaps engage state and values" )
 {
     SETUP( "" ) {
         optional<int> d1;
@@ -131,7 +131,7 @@ CASE( "Member swap() swaps engage state and values" )
 
 struct Integer { int x; Integer(int x) : x(x) {} };
 
-CASE( "operator->() yields pointer to value" )
+CASE( "optional: operator->() yields pointer to value" )
 {
     SETUP( "" ) {
         optional<Integer> e( Integer( 42 ) );
@@ -145,7 +145,7 @@ CASE( "operator->() yields pointer to value" )
     }}
 }
 
-CASE( "operator*() yields value" )
+CASE( "optional: operator*() yields value" )
 {
     SETUP( "" ) {
         optional<int> e( 42 );
@@ -159,7 +159,7 @@ CASE( "operator*() yields value" )
     }}
 }
 
-CASE( "value() yields value" )
+CASE( "optional: value() yields value" )
 {
     SETUP( "" ) {
         optional<int> e( 42 );
@@ -173,12 +173,12 @@ CASE( "value() yields value" )
     }}
 }
 
-CASE( "value() throws bad_optional_access at disengaged access" )
+CASE( "optional: value() throws bad_optional_access at disengaged access" )
 {
     EXPECT_THROWS_AS( optional<int>().value(), bad_optional_access );
 }
 
-CASE( "value_or() yields value or default" )
+CASE( "optional: value_or() yields value or default" )
 {
     SETUP( "" ) {
         optional<int> d;
@@ -192,7 +192,7 @@ CASE( "value_or() yields value or default" )
     }}
 }
 
-CASE( "Global swap() swaps engage state and values" )
+CASE( "optional: Global swap() swaps engage state and values" )
 {
     SETUP( "" ) {
         optional<int> d1;
@@ -225,12 +225,12 @@ CASE( "Global swap() swaps engage state and values" )
     }}
 }
 
-CASE( "make_optional() creates optional" )
+CASE( "optional: make_optional() creates optional" )
 {
     EXPECT( *make_optional( 42 ) == 42 );
 }
 
-CASE( "Relational operators" )
+CASE( "optional: Relational operators" )
 {
     SETUP( "" ) {
         optional<int> d;
@@ -307,7 +307,7 @@ struct S{ S(){} };
     "alignment_of<" #type ">: " <<  \
      alignment_of<type>::value  << "\n" <<
 
-CASE("Show alignment of various types"
+CASE("alignment_of: Show alignment of various types"
      "[.]" )
 {
 #if optional_CPP11_OR_GREATER
@@ -334,7 +334,7 @@ CASE("Show alignment of various types"
     "sizeof( optional<" #type "> ): " << \
      sizeof( optional<   type>   )    << " (" << sizeof(type) << ")\n" <<
 
-CASE("Show sizeof various optionals"
+CASE("storage_t: Show sizeof various optionals"
      "[.]" )
 {
     std::cout <<
