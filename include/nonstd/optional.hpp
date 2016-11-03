@@ -64,6 +64,11 @@
 # pragma warning( disable: 4345 )   // initialization behavior changed
 #endif
 
+#if optional_BETWEEN(optional_COMPILER_MSVC_VERSION, 7, 15 )
+# pragma warning( push )
+# pragma warning( disable: 4814 )   // in C++14 'constexpr' will not imply 'const'
+#endif
+
 // Presence of C++11 language features:
 
 #if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 10
@@ -85,6 +90,7 @@
 # define optional_HAVE_IS_DEFAULT  1
 # define optional_HAVE_IS_DELETE  1
 # define optional_HAVE_NOEXCEPT  1
+# define optional_HAVE_REF_QUALIFIER  1
 #endif
 
 // Presence of C++14 language features:
@@ -162,6 +168,14 @@
 # define optional_nullptr nullptr
 #else
 # define optional_nullptr NULL
+#endif
+
+#if optional_HAVE_REF_QUALIFIER
+# define optional_ref_qual  &
+# define optional_refref_qual  &&
+#else
+# define optional_ref_qual  /*&*/
+# define optional_refref_qual  /*&&*/
 #endif
 
 // additional includes:
@@ -427,6 +441,20 @@ private:
         ::new( value_ptr() ) value_type( v );
     }
 
+#if optional_CPP11_OR_GREATER
+
+    storage_t( value_type && v )
+    {
+        construct_value( std::forward<value_type>( v ) );
+    }
+
+    void construct_value( value_type && v )
+    {
+        ::new( value_ptr() ) value_type( std::forward<value_type>( v ) );
+    }
+
+#endif
+
     void destruct_value()
     {
         // Note: VC6 requires the use of the
@@ -444,15 +472,29 @@ private:
         return as<value_type>();
     }
 
-    value_type const & value() const
+    value_type const & value() const optional_ref_qual
     {
         return * value_ptr();
     }
 
-    value_type & value()
+    value_type & value() optional_ref_qual
     {
         return * value_ptr();
     }
+
+#if optional_CPP11_OR_GREATER
+
+    value_type const && value() const optional_refref_qual
+    {
+        return * value_ptr();
+    }
+
+    value_type && value() optional_refref_qual
+    {
+        return * value_ptr();
+    }
+
+#endif
 
 #if optional_CPP11_OR_GREATER
 
@@ -513,7 +555,7 @@ struct nullopt_t
 constexpr nullopt_t nullopt{ nullopt_t::init{} };
 #else
 // extra parenthesis to prevent the most vexing parse:
-const nullopt_t nullopt( ( nullopt_t::init() ) );
+const nullopt_t nullopt(( nullopt_t::init() ));
 #endif
 
 /// optional access error
@@ -536,27 +578,52 @@ private:
 public:
     typedef T value_type;
 
-    optional()
-    : has_value_( false )
-     ,contained()
-    {}
-
-    optional( nullopt_t )
+    optional_constexpr optional() optional_noexcept
     : has_value_( false )
     , contained()
     {}
 
-    optional( value_type const & value )
+    optional_constexpr optional( nullopt_t ) optional_noexcept
+    : has_value_( false )
+    , contained()
+    {}
+
+    optional( optional const & rhs )
+    : has_value_( rhs.has_value() )
+    {
+        if ( rhs.has_value() )
+            contained.construct_value( rhs.contained.value() );
+    }
+
+#if optional_CPP11_OR_GREATER
+    // NTS:move
+    optional_constexpr14 optional( optional && rhs ) optional_noexcept
+    : has_value_( rhs.has_value() )
+    {
+        if ( rhs.has_value() )
+            contained.construct_value( std::move( rhs.contained.value() ) );
+    }
+#endif
+
+    optional_constexpr optional( value_type const & value )
     : has_value_( true )
     , contained( value )
     {}
 
-    optional( optional const & other )
-    : has_value_( other.has_value() )
-    {
-        if ( other.has_value() )
-            contained.construct_value( other.contained.value() );
-    }
+#if optional_CPP11_OR_GREATER
+
+    optional_constexpr optional( value_type && value )
+    : has_value_( true )
+    , contained( value )
+    {}
+
+    template< class... Args >
+    constexpr explicit optional( in_place_t, Args&&... args );
+
+    template< class U, class... Args >
+    constexpr explicit optional( in_place_t, std::initializer_list<U> il, Args&&... args );
+
+#endif // optional_CPP11_OR_GREATER
 
     ~optional()
     {
@@ -564,7 +631,9 @@ public:
             contained.destruct_value();
     }
 
-    optional & operator=( nullopt_t )
+    // assignment
+
+    optional & operator=( nullopt_t ) optional_noexcept
     {
         reset();
         return *this;
@@ -578,15 +647,91 @@ public:
         return *this;
     }
 
-    void swap( optional & other )
+#if optional_CPP11_OR_GREATER
+
+    optional & operator=( optional && rhs ) noexcept
+    {
+        if      ( has_value() == true  && rhs.has_value() == false ) reset();
+        else if ( has_value() == false && rhs.has_value() == true  ) initialize( std::move( *rhs ) );
+        else if ( has_value() == true  && rhs.has_value() == true  ) contained.value() = std::move( *rhs );
+        return *this;
+    }
+
+    template< class U,
+        typename = typename std::enable_if< std::is_same< typename std::decay<U>::type, T>::value >::type >
+    optional & operator=( U && v )
+    {
+        if ( has_value() ) contained.value() = std::forward<U>( v );
+        else               initialize( std::forward<T>( v ) );
+    }
+
+    template< class... Args >
+    void emplace( Args&&... args )
+    {
+        contained.value() = nullopt;
+        initialize( std::forward<Args>(args)... );
+    }
+
+    template< class U, class... Args >
+    void emplace( std::initializer_list<U> il, Args&&... args )
+    {
+        contained.value() = nullopt;
+        initialize( il, std::forward<Args>(args)... );
+    }
+
+#endif // optional_CPP11_OR_GREATER
+
+    // swap
+
+    void swap( optional & rhs )
     {
         using std::swap;
-        if      ( has_value() == true  && other.has_value() == true  ) { swap( **this, *other ); }
-        else if ( has_value() == false && other.has_value() == true  ) { initialize( *other ); other.reset(); }
-        else if ( has_value() == true  && other.has_value() == false ) { other.initialize( **this ); reset(); }
+        if      ( has_value() == true  && rhs.has_value() == true  ) { swap( **this, *rhs ); }
+        else if ( has_value() == false && rhs.has_value() == true  ) { initialize( *rhs ); rhs.reset(); }
+        else if ( has_value() == true  && rhs.has_value() == false ) { rhs.initialize( **this ); reset(); }
     }
 
     // observers
+
+    optional_constexpr14 value_type const * operator ->() const
+    {
+        assert( has_value() );
+        return contained.value_ptr();
+    }
+
+    optional_constexpr14 value_type * operator ->()
+    {
+        assert( has_value() );
+        return contained.value_ptr();
+    }
+
+    optional_constexpr14 value_type const & operator *() const optional_ref_qual
+    {
+        assert( has_value() );
+        return contained.value();
+    }
+
+    optional_constexpr14 value_type & operator *() optional_ref_qual
+    {
+        assert( has_value() );
+        return contained.value();
+    }
+
+#if optional_CPP11_OR_GREATER
+
+    optional_constexpr14 value_type const && operator *() const optional_refref_qual
+    {
+        assert( has_value() );
+        return std::move( contained.value() );
+    }
+
+    optional_constexpr14 value_type && operator *() optional_refref_qual
+    {
+        assert( has_value() );
+        return std::move( contained.value() );
+    }
+
+#endif
 
 #if optional_CPP11_OR_GREATER
     optional_constexpr explicit operator bool() const optional_noexcept
@@ -605,31 +750,7 @@ public:
         return has_value_;
     }
 
-    value_type const * operator ->() const
-    {
-        assert( has_value() );
-        return contained.value_ptr();
-    }
-
-    value_type * operator ->()
-    {
-        assert( has_value() );
-        return contained.value_ptr();
-    }
-
-    value_type const & operator *() const
-    {
-        assert( has_value() );
-        return contained.value();
-    }
-
-    value_type & operator *()
-    {
-        assert( has_value() );
-        return contained.value();
-    }
-
-    value_type const & value() const
+    optional_constexpr value_type const & value() const optional_ref_qual
     {
         if ( ! has_value() )
             throw bad_optional_access();
@@ -637,7 +758,7 @@ public:
         return contained.value();
     }
 
-    value_type & value()
+    optional_constexpr14 value_type & value() optional_ref_qual
     {
         if ( ! has_value() )
             throw bad_optional_access();
@@ -645,10 +766,51 @@ public:
         return contained.value();
     }
 
-    value_type value_or( value_type const & default_value ) const
+#if optional_HAVE_REF_QUALIFIER
+
+    optional_constexpr14 value_type const && value() const optional_refref_qual
     {
-        return has_value() ? contained.value() : default_value;
+        if ( ! has_value() )
+            throw bad_optional_access();
+
+        return std::move( contained.value() );
     }
+
+    optional_constexpr14 value_type && value() optional_refref_qual
+    {
+        if ( ! has_value() )
+            throw bad_optional_access();
+
+        return std::move( contained.value() );
+    }
+
+#endif
+
+#if optional_CPP11_OR_GREATER
+
+    template< class U >
+    optional_constexpr value_type value_or( U && v ) const optional_ref_qual
+    {
+        return has_value() ? contained.value() : static_cast<T>(std::forward<U>( v ) );
+    }
+
+    template< class U >
+    optional_constexpr value_type value_or( U && v ) const optional_refref_qual
+    {
+        return has_value() ? std::move( contained.value() ) : static_cast<T>(std::forward<U>( v ) );
+    }
+
+#else
+
+    template< class U >
+    optional_constexpr value_type value_or( U const & v ) const
+    {
+        return has_value() ? contained.value() : static_cast<value_type>( v );
+    }
+
+#endif // optional_CPP11_OR_GREATER
+
+    // modifiers
 
     void reset() optional_noexcept
     {
@@ -662,12 +824,23 @@ private:
     void this_type_does_not_support_comparisons() const {}
 
     template< typename V >
-    void initialize( V const & value)
+    void initialize( V const & value )
     {
         assert( ! has_value()  );
         contained.construct_value( value );
         has_value_ = true;
     }
+
+#if optional_CPP11_OR_GREATER
+
+    template< class... Args >
+    void initialize( Args&&... args )
+    {
+        assert( ! has_value()  );
+        contained.construct_value( std::forward<T>(args)... );
+        has_value_ = true;
+    }
+#endif
 
 private:
     bool has_value_;

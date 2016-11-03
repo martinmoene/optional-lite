@@ -128,6 +128,12 @@ CASE( "Presence of C++ language features" "[.stdlanguage]" )
 #else
     optional_ABSENT(  optional_HAVE_NOEXCEPT );
 #endif
+
+#if optional_HAVE_REF_QUALIFIER
+    optional_PRESENT( optional_HAVE_REF_QUALIFIER );
+#else
+    optional_ABSENT(  optional_HAVE_REF_QUALIFIER );
+#endif
 }
 
 CASE( "Presence of C++ library features" "[.stdlibrary]" )
