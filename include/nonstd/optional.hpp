@@ -24,24 +24,156 @@
 
 #define  optional_lite_VERSION "2.x.x"
 
-#if ( __cplusplus >= 201103L )
+// variant-lite alignment configuration:
+
+#ifndef  optional_CONFIG_MAX_ALIGN_HACK
+# define optional_CONFIG_MAX_ALIGN_HACK  0
+#endif
+
+#ifndef  optional_CONFIG_ALIGN_AS
+// no default, used in #if defined()
+#endif
+
+#ifndef  optional_CONFIG_ALIGN_AS_FALLBACK
+# define optional_CONFIG_ALIGN_AS_FALLBACK  double
+#endif
+
+// Compiler detection (C++17 is speculative):
+
+#define optional_CPP11_OR_GREATER  ( __cplusplus >= 201103L )
+#define optional_CPP14_OR_GREATER  ( __cplusplus >= 201402L )
+#define optional_CPP17_OR_GREATER  ( __cplusplus >= 201700L )
+
+// half-open range [lo..hi):
+#define optional_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
+
+#if defined(_MSC_VER) && !defined(__clang__)
+# define optional_COMPILER_MSVC_VERSION   (_MSC_VER / 100 - 5 - (_MSC_VER < 1900))
+#else
+# define optional_COMPILER_MSVC_VERSION   0
+#endif
+
+#if defined __GNUC__
+# define optional_COMPILER_GNUC_VERSION  __GNUC__
+#else
+# define optional_COMPILER_GNUC_VERSION    0
+#endif
+
+#if optional_BETWEEN(optional_COMPILER_MSVC_VERSION, 7, 14 )
+# pragma warning( push )
+# pragma warning( disable: 4345 )   // initialization behavior changed
+#endif
+
+// Presence of C++11 language features:
+
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 10
+# define optional_HAVE_AUTO  1
+# define optional_HAVE_NULLPTR  1
+# define optional_HAVE_STATIC_ASSERT  1
+#endif
+
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 12
+# define optional_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  1
+# define optional_HAVE_INITIALIZER_LIST  1
+#endif
+
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 14
+# define optional_HAVE_ALIAS_TEMPLATE  1
+# define optional_HAVE_CONSTEXPR_11  1
+# define optional_HAVE_ENUM_CLASS  1
+# define optional_HAVE_EXPLICIT_CONVERSION  1
+# define optional_HAVE_IS_DEFAULT  1
+# define optional_HAVE_IS_DELETE  1
+# define optional_HAVE_NOEXCEPT  1
+#endif
+
+// Presence of C++14 language features:
+
+#if optional_CPP14_OR_GREATER
+# define optional_HAVE_CONSTEXPR_14  1
+#endif
+
+// Presence of C++17 language features:
+
+#if optional_CPP17_OR_GREATER
+# define optional_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  1
+#endif
+
+// Presence of C++ library features:
+
+#if optional_COMPILER_GNUC_VERSION
+# define optional_HAVE_TR1_TYPE_TRAITS  1
+# define optional_HAVE_TR1_ADD_POINTER  1
+#endif
+
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 9
+# define optional_HAVE_TYPE_TRAITS  1
+# define optional_HAVE_STD_ADD_POINTER  1
+#endif
+
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 11
+# define optional_HAVE_ARRAY  1
+#endif
+
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 12
+# define optional_HAVE_CONDITIONAL  1
+#endif
+
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 14 || (optional_COMPILER_MSVC_VERSION >= 9 && _HAS_CPP0X)
+# define optional_HAVE_CONTAINER_DATA_METHOD  1
+#endif
+
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 12
+# define optional_HAVE_REMOVE_CV  1
+#endif
+
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 14
+# define optional_HAVE_SIZED_TYPES  1
+#endif
+
+// For the rest, consider VC14 as C++11 for variant-lite:
+
+#if optional_COMPILER_MSVC_VERSION >= 14
+# undef  optional_CPP11_OR_GREATER
 # define optional_CPP11_OR_GREATER  1
 #endif
 
-#if optional_CPP11_OR_GREATER
+// C++ feature usage:
+
+#if optional_HAVE_CONSTEXPR_11
+# define optional_constexpr constexpr
+#else
+# define optional_constexpr /*constexpr*/
+#endif
+
+#if optional_HAVE_CONSTEXPR_14
+# define optional_constexpr14 constexpr
+#else
+# define optional_constexpr14 /*constexpr*/
+#endif
+
+#if optional_HAVE_NOEXCEPT
+# define optional_noexcept noexcept
+#else
+# define optional_noexcept /*noexcept*/
+#endif
+
+#if optional_HAVE_NULLPTR
+# define optional_nullptr nullptr
+#else
+# define optional_nullptr NULL
+#endif
+
+// additional includes:
+
+#if optional_HAVE_INITIALIZER_LIST
+# include <initializer_list>
+#endif
+
+#if optional_HAVE_TYPE_TRAITS
 # include <type_traits>
-#endif
-
-#ifndef  optional_FEATURE_MAX_ALIGN_HACK
-# define optional_FEATURE_MAX_ALIGN_HACK  0
-#endif
-
-#ifndef optional_FEATURE_ALIGN_AS
-// used in #if defined(), so no default...
-#endif
-
-#ifndef  optional_FEATURE_ALIGN_AS_FALLBACK
-# define optional_FEATURE_ALIGN_AS_FALLBACK  double
+#elif optional_HAVE_TR1_TYPE_TRAITS
+# include <tr1/type_traits>
 #endif
 
 namespace nonstd { namespace optional_lite {
@@ -53,7 +185,7 @@ class optional;
 
 namespace detail {
 
-#if optional_FEATURE_MAX_ALIGN_HACK
+#if optional_CONFIG_MAX_ALIGN_HACK
 
 // Max align, use most restricted type for alignment:
 
@@ -106,14 +238,14 @@ union max_align_t
 
 #undef optional_ALIGN_TYPE
 
-#elif defined( optional_FEATURE_ALIGN_AS ) // optional_FEATURE_MAX_ALIGN_HACK
+#elif defined( optional_CONFIG_ALIGN_AS ) // optional_CONFIG_MAX_ALIGN_HACK
 
 // Use user-specified type for alignment:
 
 #define optional_ALIGN_AS( unused ) \
-    optional_FEATURE_ALIGN_AS
+    optional_CONFIG_ALIGN_AS
 
-#else // optional_FEATURE_MAX_ALIGN_HACK
+#else // optional_CONFIG_MAX_ALIGN_HACK
 
 // Determine POD type to use for alignment:
 
@@ -169,7 +301,7 @@ struct type_of_size
 template< size_t N >
 struct type_of_size< nulltype, N >
 {
-    typedef optional_FEATURE_ALIGN_AS_FALLBACK type;
+    typedef optional_CONFIG_ALIGN_AS_FALLBACK type;
 };
 
 template< typename T>
@@ -209,7 +341,7 @@ typedef
 
 #undef optional_ALIGN_TYPE
 
-#endif // optional_FEATURE_MAX_ALIGN_HACK
+#endif // optional_CONFIG_MAX_ALIGN_HACK
 
 /// C++03 constructed union to hold value.
 
@@ -265,7 +397,7 @@ private:
     using aligned_storage_t = typename std::aligned_storage< sizeof(value_type), alignof(value_type) >::type;
     aligned_storage_t buffer;
 
-#elif optional_FEATURE_MAX_ALIGN_HACK
+#elif optional_CONFIG_MAX_ALIGN_HACK
 
     typedef struct { unsigned char data[ sizeof(value_type) ]; } aligned_storage_t;
 
@@ -280,7 +412,7 @@ private:
 
 #   undef optional_ALIGN_AS
 
-#endif // optional_FEATURE_MAX_ALIGN_HACK
+#endif // optional_CONFIG_MAX_ALIGN_HACK
 
     // Note: VC6 cannot handle as<T>():
 
