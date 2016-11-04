@@ -445,12 +445,12 @@ private:
 
     storage_t( value_type && v )
     {
-        construct_value( std::forward<value_type>( v ) );
+        construct_value( std::move( v ) );
     }
 
     void construct_value( value_type && v )
     {
-        ::new( value_ptr() ) value_type( std::forward<value_type>( v ) );
+        ::new( value_ptr() ) value_type( std::move( v ) );
     }
 
 #endif
@@ -594,7 +594,6 @@ public:
     }
 
 #if optional_CPP11_OR_GREATER
-    // NTS:move
     optional_constexpr14 optional( optional && rhs ) optional_noexcept
     : has_value_( rhs.has_value() )
     {
@@ -612,14 +611,20 @@ public:
 
     optional_constexpr optional( value_type && value )
     : has_value_( true )
-    , contained( value )
+    , contained( std::move( value ) )
     {}
 
     template< class... Args >
-    constexpr explicit optional( in_place_t, Args&&... args );
+    optional_constexpr14 explicit optional( nonstd_lite_in_place_type_t(T), Args&&... args )
+    : has_value_( true )
+    , contained( T( std::forward<Args>(args)...) )
+    {}
 
     template< class U, class... Args >
-    constexpr explicit optional( in_place_t, std::initializer_list<U> il, Args&&... args );
+    optional_constexpr14 explicit optional( nonstd_lite_in_place_type_t(T), std::initializer_list<U> il, Args&&... args )
+    : has_value_( true )
+    , contained( T( il, std::forward<Args>(args)...) )
+    {}
 
 #endif // optional_CPP11_OR_GREATER
 
@@ -667,14 +672,14 @@ public:
     void emplace( Args&&... args )
     {
         contained.value() = nullopt;
-        initialize( std::forward<Args>(args)... );
+        initialize( in_place, std::forward<Args>(args)...);
     }
 
     template< class U, class... Args >
     void emplace( std::initializer_list<U> il, Args&&... args )
     {
         contained.value() = nullopt;
-        initialize( il, std::forward<Args>(args)... );
+        initialize( in_place, il, std::forward<Args>(args)...);
     }
 
 #endif // optional_CPP11_OR_GREATER
@@ -830,12 +835,11 @@ private:
     }
 
 #if optional_CPP11_OR_GREATER
-
-    template< class... Args >
-    void initialize( Args&&... args )
+    template< typename V >
+    void initialize( V && value )
     {
         assert( ! has_value()  );
-        contained.construct_value( std::forward<T>(args)... );
+        contained.construct_value( std::move( value ) );
         has_value_ = true;
     }
 #endif
@@ -1013,21 +1017,21 @@ void swap( optional<T> & x, optional<T> & y )
 #if optional_CPP11_OR_GREATER
 
 template< class T >
-constexpr optional< typename std::decay<T>::type > make_optional( T && v )
+optional_constexpr14 optional< typename std::decay<T>::type > make_optional( T && v )
 {
     return optional< typename std::decay<T>::type >( std::forward<T>( v ) );
 }
 
 template< class T, class...Args >
-constexpr optional<T> make_optional( Args&&... args )
+optional_constexpr14 optional<T> make_optional( Args&&... args )
 {
-    return optional<T>( in_place, std::forward<Args>(args)... );
+    return optional<T>( in_place, std::forward<Args>(args)...);
 }
 
 template< class T, class U, class... Args >
-constexpr optional<T> make_optional( std::initializer_list<U> il, Args&&... args )
+optional_constexpr14 optional<T> make_optional( std::initializer_list<U> il, Args&&... args )
 {
-    return optional<T>( in_place, il, std::forward<Args>(args)... );
+    return optional<T>( in_place, il, std::forward<Args>(args)...);
 }
 
 #else
