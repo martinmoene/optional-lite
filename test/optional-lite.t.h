@@ -18,7 +18,7 @@ using namespace nonstd;
 
 extern lest::tests & specification();
 
-namespace nonstd {
+namespace nonstd { namespace optional_lite {
 
 // use oparator<< instead of to_string() overload;
 // see  http://stackoverflow.com/a/10651752/437272
@@ -26,11 +26,11 @@ namespace nonstd {
 template< typename T >
 inline std::ostream & operator<<( std::ostream & os, optional<T> const & v )
 {
-    os << "[optional:";
-    return os << "]";
+    using lest::to_string;
+    return os << "[optional:" << (v ? to_string(*v) : "[empty]") << "]";
 }
 
-}
+}}
 
 namespace lest {
 
