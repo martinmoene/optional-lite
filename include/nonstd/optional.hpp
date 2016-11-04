@@ -753,7 +753,7 @@ public:
         return has_value_;
     }
 
-    optional_constexpr value_type const & value() const optional_ref_qual
+    optional_constexpr14 value_type const & value() const optional_ref_qual
     {
         if ( ! has_value() )
             throw bad_optional_access();
