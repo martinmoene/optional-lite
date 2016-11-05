@@ -665,21 +665,22 @@ public:
     optional & operator=( U && v )
     {
         if ( has_value() ) contained.value() = std::forward<U>( v );
-        else               initialize( std::forward<T>( v ) );
+        else               initialize( T( std::forward<U>( v ) ) );
+        return *this;
     }
 
     template< class... Args >
     void emplace( Args&&... args )
     {
-        contained.value() = nullopt;
-        initialize( in_place, std::forward<Args>(args)...);
+        *this = nullopt;
+        initialize( T( std::forward<Args>(args)...) );
     }
 
     template< class U, class... Args >
     void emplace( std::initializer_list<U> il, Args&&... args )
     {
-        contained.value() = nullopt;
-        initialize( in_place, il, std::forward<Args>(args)...);
+        *this = nullopt;
+        initialize( T( il, std::forward<Args>(args)...) );
     }
 
 #endif // optional_CPP11_OR_GREATER
