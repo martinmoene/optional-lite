@@ -21,7 +21,7 @@
 		<Unit filename="../../appveyor.yml" />
 		<Unit filename="../../examples/01-to_int.cpp" />
 		<Unit filename="../../examples/02-nodefltctor.cpp" />
-		<Unit filename="../../examples/04-any-optional.cpp" />
+		<Unit filename="../../examples/04-any-optional-variant.cpp" />
 		<Unit filename="../../include/nonstd/optional.hpp" />
 		<Unit filename="../../test/CMakeLists.txt" />
 		<Unit filename="../../test/Makefile" />

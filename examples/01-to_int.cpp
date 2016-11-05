@@ -22,8 +22,6 @@ int main( int argc, char * argv[] )
 
     if ( oi ) std::cout << "'" << text << "' is " << *oi;
     else      std::cout << "'" << text << "' isn't a number";
-
-    return 0; // VC6
 }
 
 // cl -nologo -W3 -EHsc -I.. to_int.cpp && to_int x1

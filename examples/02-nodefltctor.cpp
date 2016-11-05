@@ -31,7 +31,6 @@ int main()
     {
         std::cout << "Error: " << e.what();
     }
-    return 0; // VC6
 }
 
 // cl -nologo -W3 -EHsc -I.. 00-nodefltctor.cpp && 00-nodefltctor

@@ -43,7 +43,7 @@ CASE( "compiler version" "[.compiler]" )
 #endif
 }
 
-CASE( "Presence of C++ language features" "[.stdlanguage]" )
+CASE( "presence of C++ language features" "[.stdlanguage]" )
 {
 #if optional_HAVE_AUTO
     optional_PRESENT( optional_HAVE_AUTO );
@@ -128,9 +128,15 @@ CASE( "Presence of C++ language features" "[.stdlanguage]" )
 #else
     optional_ABSENT(  optional_HAVE_NOEXCEPT );
 #endif
+
+#if optional_HAVE_REF_QUALIFIER
+    optional_PRESENT( optional_HAVE_REF_QUALIFIER );
+#else
+    optional_ABSENT(  optional_HAVE_REF_QUALIFIER );
+#endif
 }
 
-CASE( "Presence of C++ library features" "[.stdlibrary]" )
+CASE( "presence of C++ library features" "[.stdlibrary]" )
 {
 #if optional_HAVE_ARRAY
     optional_PRESENT( optional_HAVE_ARRAY );
