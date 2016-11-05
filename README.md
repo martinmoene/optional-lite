@@ -57,9 +57,7 @@ In a nutshell
 ---------------
 **optional lite** is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library aims to provide a [C++17-like optional](http://en.cppreference.com/w/cpp/utility/optional) for use with C++98 and later.
 
-**Features and properties of optional lite** are ease of installation (single header), default and explicit construction of an empty optional, construction and assignment from a value that is convertible to the underlying type, construction and assignment from another optional of the same type, emplacement, testing for the presence of a value, operators for unchecked access to the value (pointer or reference), value() and value_or() for checked access to the value, relational operators, swap() and make_optional() to create an optional of the proper type and a specialization of std::hash. 
-
-Operation that require move-semantics are only available with C++11 and later.
+**Features and properties of optional lite** are ease of installation (single header), freedom of dependencies other than the standard library. *optional lite* shares the approach to in-place tags with [any-lite](https://github.com/martinmoene/any-lite) and with [variant-lite](https://github.com/martinmoene/variant-lite) and these libraries can be used together.
 
 **Not provided** are reference-type optionals. *optional lite* doesn't handle overloaded *address of* operators.
 
