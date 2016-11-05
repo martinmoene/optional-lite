@@ -147,27 +147,27 @@
 // C++ feature usage:
 
 #if optional_HAVE_CONSTEXPR_11
-# define optional_constexpr constexpr
+# define optional_constexpr  constexpr
 #else
-# define optional_constexpr /*constexpr*/
+# define optional_constexpr  /*constexpr*/
 #endif
 
 #if optional_HAVE_CONSTEXPR_14
-# define optional_constexpr14 constexpr
+# define optional_constexpr14  constexpr
 #else
-# define optional_constexpr14 /*constexpr*/
+# define optional_constexpr14  /*constexpr*/
 #endif
 
 #if optional_HAVE_NOEXCEPT
-# define optional_noexcept noexcept
+# define optional_noexcept  noexcept
 #else
-# define optional_noexcept /*noexcept*/
+# define optional_noexcept  /*noexcept*/
 #endif
 
 #if optional_HAVE_NULLPTR
-# define optional_nullptr nullptr
+# define optional_nullptr  nullptr
 #else
-# define optional_nullptr NULL
+# define optional_nullptr  NULL
 #endif
 
 #if optional_HAVE_REF_QUALIFIER
@@ -594,7 +594,7 @@ public:
     }
 
 #if optional_CPP11_OR_GREATER
-    optional_constexpr14 optional( optional && rhs ) optional_noexcept
+    optional_constexpr14 optional( optional && rhs ) noexcept( std::is_nothrow_move_constructible<T>::value )
     : has_value_( rhs.has_value() )
     {
         if ( rhs.has_value() )
@@ -642,7 +642,10 @@ public:
         return *this;
     }
 
-    optional & operator=( optional const & rhs )
+    optional & operator=( optional const & rhs ) 
+#if optional_CPP11_OR_GREATER
+        noexcept( std::is_nothrow_move_assignable<T>::value && std::is_nothrow_move_constructible<T>::value )
+#endif
     {
         if      ( has_value() == true  && rhs.has_value() == false ) reset();
         else if ( has_value() == false && rhs.has_value() == true  ) initialize( *rhs );
@@ -688,6 +691,9 @@ public:
     // swap
 
     void swap( optional & rhs )
+#if optional_CPP11_OR_GREATER
+    noexcept( std::is_nothrow_move_constructible<T>::value && noexcept( std::swap( std::declval<T&>(), std::declval<T&>() ) ) )
+#endif
     {
         using std::swap;
         if      ( has_value() == true  && rhs.has_value() == true  ) { swap( **this, *rhs ); }
@@ -885,52 +891,52 @@ template< typename T > bool operator>=( optional<T> const & x, optional<T> const
 
 // Comparison with nullopt
 
-template< typename T > bool operator==( optional<T> const & x, nullopt_t )
+template< typename T > bool operator==( optional<T> const & x, nullopt_t ) optional_noexcept
 {
     return (!x);
 }
 
-template< typename T > bool operator==( nullopt_t, optional<T> const & x )
+template< typename T > bool operator==( nullopt_t, optional<T> const & x ) optional_noexcept
 {
     return (!x);
 }
 
-template< typename T > bool operator!=( optional<T> const & x, nullopt_t )
+template< typename T > bool operator!=( optional<T> const & x, nullopt_t ) optional_noexcept
 {
     return bool(x);
 }
 
-template< typename T > bool operator!=( nullopt_t, optional<T> const & x )
+template< typename T > bool operator!=( nullopt_t, optional<T> const & x ) optional_noexcept
 {
     return bool(x);
 }
 
-template< typename T > bool operator<( optional<T> const &, nullopt_t )
+template< typename T > bool operator<( optional<T> const &, nullopt_t ) optional_noexcept
 {
     return false;
 }
 
-template< typename T > bool operator<( nullopt_t, optional<T> const & x )
+template< typename T > bool operator<( nullopt_t, optional<T> const & x ) optional_noexcept
 {
     return bool(x);
 }
 
-template< typename T > bool operator<=( optional<T> const & x, nullopt_t )
+template< typename T > bool operator<=( optional<T> const & x, nullopt_t ) optional_noexcept
 {
     return (!x);
 }
 
-template< typename T > bool operator<=( nullopt_t, optional<T> const & )
+template< typename T > bool operator<=( nullopt_t, optional<T> const & ) optional_noexcept
 {
     return true;
 }
 
-template< typename T > bool operator>( optional<T> const & x, nullopt_t )
+template< typename T > bool operator>( optional<T> const & x, nullopt_t ) optional_noexcept
 {
     return bool(x);
 }
 
-template< typename T > bool operator>( nullopt_t, optional<T> const & )
+template< typename T > bool operator>( nullopt_t, optional<T> const & ) optional_noexcept
 {
     return false;
 }
@@ -1011,6 +1017,9 @@ template< typename T > bool operator>=( T const & v, optional<T> const & x )
 
 template< typename T >
 void swap( optional<T> & x, optional<T> & y )
+#if optional_CPP11_OR_GREATER
+    noexcept( noexcept( x.swap(y) ) )
+#endif
 {
     x.swap( y );
 }
