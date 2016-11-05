@@ -1,3 +1,4 @@
+//
 // Copyright 2014-2016 by Martin Moene
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,7 +14,116 @@ using nonstd::nullopt;
 using nonstd::bad_optional_access;
 using nonstd::make_optional;
 
+namespace {
+
 struct nonpod { nonpod(){} };
+
+// ensure comparison of pointers for lest:
+
+// const void * lest_nullptr = 0;
+
+// The following tracer code originates as Oracle from Optional by
+// Andrzej Krzemienski, https://github.com/akrzemi1/Optional.
+
+enum State
+{
+    /* 0 */ default_constructed,
+    /* 1 */ value_copy_constructed,
+    /* 2 */ value_move_constructed,
+    /* 3 */ copy_constructed,
+    /* 4 */ move_constructed,
+    /* 5 */ move_assigned,
+    /* 6 */ copy_assigned,
+    /* 7 */ value_copy_assigned,
+    /* 8 */ value_move_assigned,
+    /* 9 */ moved_from,
+    /*10 */ value_constructed,
+};
+
+struct V
+{
+    State state;
+    int   value;
+
+    V(       ) : state( default_constructed ), value( deflt() ) {}
+    V( int v ) : state( value_constructed   ), value( v       ) {}
+
+    bool operator==( V const & rhs ) const { return state == rhs.state && value == rhs.value; }
+    bool operator==( int       val ) const { return value == val; }
+
+    static int deflt() { return 42; }
+};
+
+struct S
+{
+    State state;
+    V     value;
+
+    S(             ) : state( default_constructed    ) {}
+    S( V const & v ) : state( value_copy_constructed ), value( v ) {}
+    S( S const & s ) : state( copy_constructed       ), value( s.value        ) {}
+
+    S & operator=( V const & v ) { state = value_copy_assigned; value = v; return *this; }
+    S & operator=( const S & s ) { state = copy_assigned      ; value = s.value; return *this; }
+
+#if optional_CPP11_OR_GREATER
+    S(             V && v ) : state(  value_move_constructed ), value(  std::move( v       ) ) { v.state = moved_from; }
+    S(             S && s ) : state(  move_constructed       ), value(  std::move( s.value ) ) { s.state = moved_from; }
+
+    S & operator=( V && v ) { state = value_move_assigned     ; value = std::move( v       ); v.state = moved_from; return *this; }
+    S & operator=( S && s ) { state = move_assigned           ; value = std::move( s.value ); s.state = moved_from; return *this; }
+#endif
+
+    bool operator==( S const & rhs ) const { return state == rhs.state && value == rhs.value; }
+};
+
+inline std::ostream & operator<<( std::ostream & os, V const & v )
+{
+    using lest::to_string;
+    return os << "[V:" << to_string( v.value ) << "]";
+}
+
+inline std::ostream & operator<<( std::ostream & os, S const & s )
+{
+    using lest::to_string;
+    return os << "[S:" << to_string( s.value ) << "]";
+}
+
+struct NoDefaultCopyMove
+{
+    std::string text;
+    NoDefaultCopyMove( std::string text ) : text( text ) {}
+
+private:
+    NoDefaultCopyMove();
+    NoDefaultCopyMove( NoDefaultCopyMove const & );
+    void operator=   ( NoDefaultCopyMove const & );
+#if optional_CPP11_OR_GREATER
+    NoDefaultCopyMove( NoDefaultCopyMove && ) = delete;
+    void operator=   ( NoDefaultCopyMove && ) = delete;
+#endif
+};
+
+#if optional_CPP11_OR_GREATER
+struct InitList
+{
+    std::vector<int> vec;
+    char c;
+    S s;
+
+    InitList( std::initializer_list<int> il, char c, S const & s )
+    : vec( il ), c( c ), s( s ) {}
+
+    InitList( std::initializer_list<int> il, char c, S && s )
+    : vec( il ), c( c ), s( std::move( s ) ) {}
+};
+#endif
+
+} // anonymous namespace
+
+//
+// test specification:
+//
 
 CASE( "union: A C++03 union can only contain POD types" )
 {
@@ -27,44 +137,190 @@ CASE( "union: A C++03 union can only contain POD types" )
 }
 
 //
-// Positive tests:
+// optional member operations:
 //
 
-CASE( "optional: A default constructed optional is empty" )
+// construction:
+
+CASE( "optional: Allows to default construct an empty optional" )
 {
-    optional<int> oi;
-    EXPECT( !oi );
+    optional<int> a;
+
+    EXPECT( !a );
 }
 
-CASE( "optional: An optional that is constructed disengaged explicitly is empty" )
+CASE( "optional: Allows to explicitly construct a disengaged, empty optional via nullopt" )
 {
-    optional<int> oi( nullopt );
-    EXPECT( !oi );
+    optional<int> a( nullopt );
+
+    EXPECT( !a );
 }
 
-CASE( "optional: An optional constructed with 42 contains 42" )
+CASE( "optional: Allows to default construct an empty optional with a non-default-constructible" )
 {
-    optional<int> oi = 42;
-    EXPECT(  oi );
-    EXPECT( *oi == 42 );
+//  FAILS: NoDefaultCopyMove x;
+    optional<NoDefaultCopyMove> a;
+
+    EXPECT( !a );
 }
 
-CASE( "optional: An optional constructed from an empty optional is empty" )
+CASE( "optional: Allows to copy-construct from empty optional" )
 {
-    optional<int> oi1;
-    optional<int> oi2( oi1 );
-    EXPECT( !oi2 );
+    optional<int> a;
+
+    optional<int> b( a );
+
+    EXPECT( !b );
 }
 
-CASE( "optional: An optional constructed from an non-empty optional obtains its value" )
+CASE( "optional: Allows to copy-construct from non-empty optional" )
 {
-    optional<int> oi1( 42 );
-    optional<int> oi2( oi1 );
-    EXPECT(  oi2 );
-    EXPECT( *oi2 == *oi1 );
+    optional<int> a( 7 );
+
+    optional<int> b( a );
+
+    EXPECT(  b      );
+    EXPECT( *b == 7 );
 }
 
-CASE( "optional: copy-assignment works for all permutations of engaged and disengaged optionals" )
+CASE( "optional: Allows to move-construct from optional (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    optional<int> b( optional<int>( 7 ) );
+
+    EXPECT( *b == 7 );
+#else
+    EXPECT( !!"optional: move-construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to copy-construct from literal value" )
+{
+    optional<int> a = 7;
+
+    EXPECT(  a      );
+    EXPECT( *a == 7 );
+}
+
+CASE( "optional: Allows to copy-construct from value" )
+{
+    const int i = 7;
+    optional<int> a( i );
+
+    EXPECT(  a      );
+    EXPECT( *a == 7 );
+}
+
+CASE( "optional: Allows to move-construct from value (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    S s( 7 );
+    optional<S> a( std::move( s ) );
+
+    EXPECT( a->value == 7                );
+    EXPECT( a->state == move_constructed );
+    EXPECT(  s.state == moved_from       );
+#else
+    EXPECT( !!"optional: move-construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to in-place construct from literal value (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    using pair_t = std::pair<char, int>;
+
+    optional<pair_t> a( in_place, 'a', 7 );
+
+    EXPECT( a->first  == 'a' );
+    EXPECT( a->second ==  7  );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to in-place copy-construct from value (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    char c = 'a'; S s( 7 );
+    using pair_t = std::pair<char, S>;
+
+    optional<pair_t> a( in_place, c, s );
+
+    EXPECT( a->first        == 'a' );
+    EXPECT( a->second.value ==  7  );
+    EXPECT( a->second.state == move_constructed );
+    EXPECT(         s.state != moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to in-place move-construct from value (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    char c = 'a'; S s( 7 );
+    using pair_t = std::pair<char, S>;
+
+    optional<pair_t> a( in_place, c, std::move( s ) );
+
+    EXPECT( a->first        == 'a' );
+    EXPECT( a->second.value ==  7  );
+    EXPECT( a->second.state == move_constructed );
+    EXPECT(         s.state == moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to in-place copy-construct from initializer-list (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    S s( 7 );
+    optional<InitList> a( in_place, { 7, 8, 9, }, 'a', s );
+
+    EXPECT( a->vec[0]  ==  7 );
+    EXPECT( a->vec[1]  ==  8 );
+    EXPECT( a->vec[2]  ==  9 );
+    EXPECT( a->c       == 'a');
+    EXPECT( a->s.value ==  7 );
+    EXPECT( a->s.state == move_constructed );
+    EXPECT(    s.state != moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to in-place move-construct from initializer-list (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    S s( 7 );
+    optional<InitList> a( in_place, { 7, 8, 9, }, 'a', std::move( s ) );
+
+    EXPECT( a->vec[0]  ==  7  );
+    EXPECT( a->vec[1]  ==  8  );
+    EXPECT( a->vec[2]  ==  9  );
+    EXPECT( a->c       == 'a' );
+    EXPECT( a->s.value ==  7  );
+    EXPECT( a->s.state == move_constructed );
+    EXPECT(    s.state == moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+// assignment:
+
+CASE( "optional: Allows to assign nullopt to disengage" )
+{
+    optional<int>  a( 7 );
+
+    a = nullopt;
+
+    EXPECT( !a );
+}
+
+CASE( "optional: Allows to copy-assign from/to engaged and disengaged optionals" )
 {
     SETUP( "" ) {
         optional<int> d1;
@@ -96,7 +352,124 @@ CASE( "optional: copy-assignment works for all permutations of engaged and disen
     }}
 }
 
-CASE( "optional: Member swap() swaps engage state and values" )
+CASE( "optional: Allows to move-assign from/to engaged and disengaged optionals (C++11)" )
+{
+}
+
+CASE( "optional: Allows to copy-assign from literal value" )
+{
+    optional<int> a;
+
+    a = 7;
+
+    EXPECT( *a == 7 );
+}
+
+CASE( "optional: Allows to copy-assign from value" )
+{
+    const int i = 7;
+    optional<int> a;
+
+    a = i;
+
+    EXPECT( *a == i );
+}
+
+CASE( "optional: Allows to move-assign from value (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    S s( 7 );
+    optional<S> a;
+
+    a = std::move( s );
+
+    EXPECT( a->value == 7 );
+    EXPECT( a->state == move_constructed );
+    EXPECT(  s.state == moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to copy-emplace content from arguments (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    using pair_t = std::pair<char, S>;
+    S s( 7 );
+    optional<pair_t> a;
+
+    a.emplace( 'a', s );
+
+    EXPECT( a->first        == 'a' );
+    EXPECT( a->second.value ==  7  );
+    EXPECT( a->second.state == move_constructed );
+    EXPECT(         s.state != moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to move-emplace content from arguments (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    using pair_t = std::pair<char, S>;
+    S s( 7 );
+    optional<pair_t> a;
+
+    a.emplace( 'a', std::move( s ) );
+
+    EXPECT( a->first        == 'a' );
+    EXPECT( a->second.value ==  7  );
+    EXPECT( a->second.state == move_constructed );
+    EXPECT(         s.state == moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to copy-emplace content from intializer-list and arguments (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    S s( 7 );
+    optional<InitList> a;
+
+    a.emplace( { 7, 8, 9, }, 'a', s );
+
+    EXPECT( a->vec[0]  ==  7  );
+    EXPECT( a->vec[1]  ==  8  );
+    EXPECT( a->vec[2]  ==  9  );
+    EXPECT( a->c       == 'a' );
+    EXPECT( a->s.value ==  7  );
+    EXPECT( a->s.state == move_constructed );
+    EXPECT(    s.state != moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to move-emplace content from intializer-list and arguments (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    S s( 7 );
+    optional<InitList> a;
+
+    a.emplace( { 7, 8, 9, }, 'a', std::move( s ) );
+
+    EXPECT( a->vec[0]  ==  7  );
+    EXPECT( a->vec[1]  ==  8  );
+    EXPECT( a->vec[2]  ==  9  );
+    EXPECT( a->c       == 'a' );
+    EXPECT( a->s.value ==  7               );
+    EXPECT( a->s.state == move_constructed );
+    EXPECT(    s.state == moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+// swap:
+
+CASE( "optional: Allows to swap with other optional (member)" )
 {
     SETUP( "" ) {
         optional<int> d1;
@@ -129,9 +502,11 @@ CASE( "optional: Member swap() swaps engage state and values" )
     }}
 }
 
+// observers:
+
 struct Integer { int x; Integer(int x) : x(x) {} };
 
-CASE( "optional: operator->() yields pointer to value" )
+CASE( "optional: Allows to obtain pointer to value via operator->()" )
 {
     SETUP( "" ) {
         optional<Integer> e( Integer( 42 ) );
@@ -145,7 +520,7 @@ CASE( "optional: operator->() yields pointer to value" )
     }}
 }
 
-CASE( "optional: operator*() yields value" )
+CASE( "optional: Allows to obtain value via operator*()" )
 {
     SETUP( "" ) {
         optional<int> e( 42 );
@@ -159,7 +534,20 @@ CASE( "optional: operator*() yields value" )
     }}
 }
 
-CASE( "optional: value() yields value" )
+CASE( "optional: Allows to obtain moved-value via operator*()" )
+{
+}
+
+CASE( "optional: Allows to obtain has_value() via operator bool()" )
+{
+    optional<int> a;
+    optional<int> b( 7 );
+
+    EXPECT_NOT( a );
+    EXPECT(     b );
+}
+
+CASE( "optional: Allows to obtain value via value()" )
 {
     SETUP( "" ) {
         optional<int> e( 42 );
@@ -173,12 +561,7 @@ CASE( "optional: value() yields value" )
     }}
 }
 
-CASE( "optional: value() throws bad_optional_access at disengaged access" )
-{
-    EXPECT_THROWS_AS( optional<int>().value(), bad_optional_access );
-}
-
-CASE( "optional: value_or() yields value or default" )
+CASE( "optional: Allows to obtain value or default via value_or()" )
 {
     SETUP( "" ) {
         optional<int> d;
@@ -192,7 +575,31 @@ CASE( "optional: value_or() yields value or default" )
     }}
 }
 
-CASE( "optional: Global swap() swaps engage state and values" )
+CASE( "optional: Allows to obtain moved-value or moved-default via value_or() (C++11)" )
+{
+}
+
+CASE( "optional: Throws bad_optional_access at disengaged access" )
+{
+    EXPECT_THROWS_AS( optional<int>().value(), bad_optional_access );
+}
+
+// modifiers:
+
+CASE( "optional: Allows to reset content" )
+{
+    optional<int> a = 7;
+
+    a.reset();
+
+    EXPECT_NOT( a.has_value() );
+}
+
+//
+// optional non-member functions:
+//
+
+CASE( "optional: Allows to swaps engage state and values (non-member)" )
 {
     SETUP( "" ) {
         optional<int> d1;
@@ -225,12 +632,7 @@ CASE( "optional: Global swap() swaps engage state and values" )
     }}
 }
 
-CASE( "optional: make_optional() creates optional" )
-{
-    EXPECT( *make_optional( 42 ) == 42 );
-}
-
-CASE( "optional: Relational operators" )
+CASE( "optional: Provides relational operators" )
 {
     SETUP( "" ) {
         optional<int> d;
@@ -291,6 +693,96 @@ CASE( "optional: Relational operators" )
     }
 }
 
+CASE( "make_optional: Allows to copy-construct optional" )
+{
+    S s( 7 );
+
+    EXPECT( make_optional( s )->value == 7          );
+    EXPECT(                   s.state != moved_from );
+}
+
+CASE( "make_optional: Allows to move-construct optional (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    S s( 7 );
+
+    EXPECT( make_optional( std::move( s ) )->value == 7          );
+    EXPECT(                                s.state == moved_from );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "make_optional: Allows to in-place copy-construct optional from arguments (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    using pair_t = std::pair<char, S>;
+
+    S s( 7);
+    auto a = make_optional<pair_t>( 'a', s );
+
+    EXPECT( a->first        == 'a' );
+    EXPECT( a->second.value ==  7  );
+    EXPECT( a->second.state == move_constructed );
+    EXPECT(         s.state != moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "make_optional: Allows to in-place move-construct optional from arguments (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    using pair_t = std::pair<char, S>;
+
+    S s( 7 );
+    auto a = make_optional<pair_t>( 'a', std::move( s ) );
+
+    EXPECT( a->first        == 'a' );
+    EXPECT( a->second.value ==  7  );
+    EXPECT( a->second.state == move_constructed );
+    EXPECT(         s.state == moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "make_optional: Allows to in-place copy-construct optional from initializer-list and arguments (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    S s( 7 );
+    auto a = make_optional<InitList>( { 7, 8, 9, }, 'a', s );
+
+    EXPECT( a->vec[0]  ==  7  );
+    EXPECT( a->vec[1]  ==  8  );
+    EXPECT( a->vec[2]  ==  9  );
+    EXPECT( a->c       == 'a' );
+    EXPECT( a->s.value ==  7  );
+    EXPECT( a->s.state == move_constructed );
+    EXPECT(    s.state != moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "make_optional: Allows to in-place move-construct optional from initializer-list and arguments (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    S s( 7 );
+    auto a = make_optional<InitList>( { 7, 8, 9, }, 'a', std::move( s ) );
+
+    EXPECT( a->vec[0]  ==  7  );
+    EXPECT( a->vec[1]  ==  8  );
+    EXPECT( a->vec[2]  ==  9  );
+    EXPECT( a->c       == 'a' );
+    EXPECT( a->s.value ==  7  );
+    EXPECT( a->s.state == move_constructed );
+    EXPECT(    s.state == moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
 //
 // Negative tests:
 //
@@ -299,7 +791,7 @@ CASE( "optional: Relational operators" )
 // Tests that print information:
 //
 
-struct S{ S(){} };
+struct Struct{ Struct(){} };
 
 #if !optional_FEATURE_MAX_ALIGN_HACK
 
@@ -324,7 +816,7 @@ CASE("alignment_of: Show alignment of various types"
         optional_OUTPUT_ALIGNMENT_OF( float )
         optional_OUTPUT_ALIGNMENT_OF( double )
         optional_OUTPUT_ALIGNMENT_OF( long double )
-        optional_OUTPUT_ALIGNMENT_OF( S )
+        optional_OUTPUT_ALIGNMENT_OF( Struct )
          "";
 }
 #undef optional_OUTPUT_ALIGNMENT_OF
@@ -347,7 +839,7 @@ CASE("storage_t: Show sizeof various optionals"
          optional_OUTPUT_SIZEOF( float )
          optional_OUTPUT_SIZEOF( double )
          optional_OUTPUT_SIZEOF( long double )
-         optional_OUTPUT_SIZEOF( S )
+         optional_OUTPUT_SIZEOF( Struct )
          "";
 }
 #undef optional_OUTPUT_SIZEOF
@@ -359,20 +851,22 @@ CASE("storage_t: Show sizeof various optionals"
 CASE( "optional: isocpp-lib: CH 3, p0032r2 -- let's not have too clever tags" "[.issue #1]" )
 {
     EXPECT( false );
-//    optional< optional< optional<int> > > o (
-//        in_place<int>,
-//#if 0
-//        in_place<int>,
-//#else
-////        nonstd_lite_in_place_type_t(int),
-//        static_cast< nonstd::in_place_t >( in_place<int> ),
-//#endif
-//        nullopt
-//    );
-//
-//    EXPECT(       o );
-//    EXPECT(      *o );
-//    EXPECT_NOT( **o );
+#if 0
+    optional< optional< optional<int> > > a (
+        in_place,
+#if 0
+        in_place,
+#else
+//        nonstd_lite_in_place_type_t(int),
+        static_cast< nonstd::in_place_t >( in_place ),
+#endif
+        nullopt
+    );
+
+    EXPECT(       a );
+    EXPECT(      *a );
+    EXPECT_NOT( **a );
+#endif
 }
 
 // end of file
