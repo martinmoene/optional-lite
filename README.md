@@ -1,8 +1,6 @@
-optional lite - nullable objects for C++98 and later
+optional lite - A single-file header-only version of a C++17-like optional, a nullable object for C++98, C++11 and later
 ====================================================
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)  [![Standard](https://img.shields.io/badge/c%2B%2B-98-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![Standard](https://img.shields.io/badge/c%2B%2B-11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/martinmoene/optional-lite.svg?branch=master)](https://travis-ci.org/martinmoene/optional-lite) [![Build status](https://ci.appveyor.com/api/projects/status/1oq5gjm7bufrv6ib?svg=true)](https://ci.appveyor.com/project/martinmoene/optional-lite) [![Version](https://badge.fury.io/gh/martinmoene%2Foptional-lite.svg)](https://github.com/martinmoene/optional-lite/releases) [![download](https://img.shields.io/badge/latest%20version%20%20-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/optional-lite/master/optional.hpp)
-
-*optional lite* is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library is a variant of std::optional [1,2] for use with C++98 and later.
 
 **Contents**  
 - [Example usage](#example-usage)
@@ -16,6 +14,7 @@ optional lite - nullable objects for C++98 and later
 - [Building the tests](#building-the-tests)
 - [Implementation notes](#implementation-notes)
 - [Notes and references](#notes-and-references)
+- [Appendix](#appendix)
 
 
 Example usage
@@ -56,11 +55,13 @@ prompt>g++ -Wall -Wextra -std=c++03 -I.. -o to_int.exe to_int.cpp && to_int x1
 
 In a nutshell
 ---------------
-**optional lite** is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library is a variant of [std::optional](http://en.cppreference.com/w/cpp/utility/optional) [1,2] for use with C++98 and later. In turn, std::optional is inspired on [Boost.Optional](http://www.boost.org/doc/libs/1_49_0/libs/optional/doc/html/index.html) [5].
+**optional lite** is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library aims to provide a [C++17-like optional](http://en.cppreference.com/w/cpp/utility/optional) for use with C++98 and later.
 
-**Features and properties of optional lite** are ease of installation (single header), default and explicit construction of an empty optional, construction and assignment from a value that is convertible to the underlying type, copy-construction and copy-assignment from another optional of the same type, testing for the presence of a value, operators for unchecked access to the value (pointer or reference), value() and value_or() for checked access to the value, relational operators, swap() and make_optional() to create an optional of the proper type.  
+**Features and properties of optional lite** are ease of installation (single header), default and explicit construction of an empty optional, construction and assignment from a value that is convertible to the underlying type, construction and assignment from another optional of the same type, emplacement, testing for the presence of a value, operators for unchecked access to the value (pointer or reference), value() and value_or() for checked access to the value, relational operators, swap() and make_optional() to create an optional of the proper type and a specialization of std::hash. 
 
-**Not provided** are reference-type optionals, and C++11 capabilities such as move semantics and in-place construction. *optional lite* doesn't handle overloaded *address of* operators.
+Operation that require move-semantics are only available with C++11 and later.
+
+**Not provided** are reference-type optionals. *optional lite* doesn't handle overloaded *address of* operators.
 
 For more examples, see [this answer on StackOverflow](http://stackoverflow.com/a/16861022) [6] and the [quick start guide](http://www.boost.org/doc/libs/1_57_0/libs/optional/doc/html/boost_optional/quick_start.html) [7] of Boost.Optional (note that its interface differs from *optional lite*).
 
@@ -72,7 +73,7 @@ License
 
 Dependencies
 ------------
-*optional lite* has no other dependencies than the [C++ standard library](http://en.cppreference.com/w/cpp/header).
+*optional lite* has no rhs dependencies than the [C++ standard library](http://en.cppreference.com/w/cpp/header).
 
 
 Installation
@@ -92,73 +93,98 @@ Synopsis
 
 ### Types in namespace nonstd
 
-| Purpose         | Type | Object |
-|-----------------|------|--------|
-| To be, or not   | template< typename T ><br>class optional; |&nbsp;|
-| Disengaging     | struct nullopt_t;            | nullopt_t nullopt; |
-| Error reporting | class bad_optional_access;   |&nbsp;  |
+| Purpose               | Type | Object |
+|-----------------------|------|--------|
+| To be, or not         | template< typename T ><br>class optional; |&nbsp;|
+| Disengaging           | struct nullopt_t;                | nullopt_t nullopt; |
+| Error reporting       | class bad_optional_access;       |&nbsp;  |
+| In-place construction | struct in_place_tag              | &nbsp; |
+| &nbsp;                | in_place                         | select type or index for in-place construction |
+| &nbsp;                | nonstd_lite_in_place_type_t( T)  | macro for alias template in_place_type_t&lt;T>  |
+| &nbsp;                | nonstd_lite_in_place_index_t( T )| macro for alias template in_place_index_t&lt;T> |
 
 ### Interface of *optional lite*
 
-| Kind         | Method                                       | Result |
-|--------------|----------------------------------------------|--------|
-| Construction | optional()                                   | a nulled object |
-| &nbsp;       | optional( nullopt_t )                        | a nulled object |
-| &nbsp;       | optional( value_type const & value )         | initialized to value |
-| &nbsp;       | optional( optional const & other )           | initialized to value of other|
-| Destruction  | ~optional()                                  | destruct current content, if any |
-| Assignment   | optional & operator=( nullopt_t )            | null the object;<br>destruct current content, if any |
-| &nbsp;       | optional & operator=( optional const & rhs ) | assign the value of other;<br>destruct current content, if any |
-| Swap         | void swap( optional & other )                | swap with other |
-| State        | operator bool() const                        | true if content is present (safe bool idiom) |
-| Content      | value_type const * operator ->() const       | pointer to current content (const);<br>must contain value |
-| &nbsp;       | value_type * operator ->()                   | pointer to current content (non-const);<br>must contain value |
-| &nbsp;       | value_type const & operator *() const        | the current content (const ref);<br>must contain value |
-| &nbsp;       | value_type & operator *()                    | the current content (non-const ref);<br>must contain value |
-| &nbsp;       | value_type const & value() const             | the current content (const ref);<br>throws bad_optional_access if nulled |
-| &nbsp;       | value_type & value()                         | the current content (non-const ref);<br>throws bad_optional_access if nulled |
-| &nbsp;       | value_type value_or( value_type const & default_value ) | the value, or default_value if nulled<br>value_type must be copy-constructible |
+| Kind         | Std  | Method                                       | Result |
+|--------------|------|---------------------------------------------|--------|
+| Construction |&nbsp;| optional() noexcept                          | default construct a nulled object |
+| &nbsp;       |&nbsp;| optional( nullopt_t ) noexcept               | explicitly construct a nulled object |
+| &nbsp;       |&nbsp;| optional( optional const & rhs )             | move-construct from an other optional |
+| &nbsp;       | C++11| optional( optional && rhs ) noexcept(...)    | move-construct from an other optional |
+| &nbsp;       |&nbsp;| optional( value_type const & value )         | copy-construct from a value |
+| &nbsp;       | C++11| optional( value_type && value )              | move-construct from a value |
+| &nbsp;       | C++11| explicit optional( in_place_type_t&lt;T>, Args&&... args ) | in-place-construct type T |
+| &nbsp;       | C++11| explicit optional( in_place_type_t&lt;T>, std::initializer_list&lt;U> il, Args&&... args ) | in-place-construct type T |
+| Destruction  |&nbsp;| ~optional()                                  | destruct current content, if any |
+| Assignment   |&nbsp;| optional & operator=( nullopt_t )            | null the object;<br>destruct current content, if any |
+| &nbsp;       |&nbsp;| optional & operator=( optional const & rhs ) | copy-assign from other optional;<br>destruct current content, if any |
+| &nbsp;       | C++11| optional & operator=( optional && rhs )      | move-assign from other optional;<br>destruct current content, if any |
+| &nbsp;       | C++11| template< class U, ...><br>optional & operator=( U && v ) | move-assign from a value;<br>destruct current content, if any |
+| &nbsp;       | C++11| template< class... Args ><br>void emplace( Args&&... args ) |  emplace type T |
+| &nbsp;       | C++11| template< class U, class... Args ><br>void emplace( std::initializer_list&lt;U> il, Args&&... args ) |  emplace type T |
+| Swap         |&nbsp;| void swap( optional & rhs ) noexcept(...)    | swap with rhs |
+| Content      |&nbsp;| value_type const * operator ->() const       | pointer to current content (const);<br>must contain value |
+| &nbsp;       |&nbsp;| value_type * operator ->()                   | pointer to current content (non-const);<br>must contain value |
+| &nbsp;       |&nbsp;| value_type const & operator *() &            | the current content (const ref);<br>must contain value |
+| &nbsp;       |&nbsp;| value_type & operator *() &                  | the current content (non-const ref);<br>must contain value |
+| &nbsp;       | C++11| value_type const & operator *() &&           | the current content (const ref);<br>must contain value |
+| &nbsp;       | C++11| value_type & operator *() &&                 | the current content (non-const ref);<br>must contain value |
+| State        |&nbsp;| operator bool() const                        | true if content is present |
+| &nbsp;       |&nbsp;| bool has_value() const                       | true if content is present |
+| &nbsp;       |&nbsp;| value_type const & value() &                 | the current content (const ref);<br>throws bad_optional_access if nulled |
+| &nbsp;       |&nbsp;| value_type & value() &                       | the current content (non-const ref);<br>throws bad_optional_access if nulled |
+| &nbsp;       | C++11| value_type const & value() &&                | the current content (const ref);<br>throws bad_optional_access if nulled |
+| &nbsp;       | C++11| value_type & value() &&                      | the current content (non-const ref);<br>throws bad_optional_access if nulled |
+| &nbsp;       |<C++11| value_type value_or( value_type const & default_value ) const | the value, or default_value if nulled<br>value_type must be copy-constructible |
+| &nbsp;       | C++11| value_type value_or( value_type && default_value ) &  | the value, or default_value if nulled<br>value_type must be copy-constructible |
+| &nbsp;       | C++11| value_type value_or( value_type && default_value ) && | the value, or default_value if nulled<br>value_type must be copy-constructible |
+| Modifiers    |&nbsp;| void reset() noexcept                        | make empty |
+
 
 ### Algorithms for *optional lite*
 
-| Kind                     | Function |
-|--------------------------|----------|
-| Relational operators     | &nbsp;   | 
-| ==                       | template< typename T ><br>bool operator==( optional<T> const & x, optional<T> const & y ) |
-| !=                       | template< typename T ><br>bool operator!=( optional<T> const & x, optional<T> const & y ) |
-| <                        | template< typename T ><br>bool operator<( optional<T> const & x, optional<T> const & y )  |
-| >                        | template< typename T ><br>bool operator>( optional<T> const & x, optional<T> const & y )  |
-| <=                       | template< typename T ><br>bool operator<=( optional<T> const & x, optional<T> const & y ) |
-| >=                       | template< typename T ><br>bool operator>=( optional<T> const & x, optional<T> const & y ) |
-| Comparison with nullopt  | &nbsp;   | 
-| ==                       | template< typename T ><br>bool operator==( optional<T> const & x, nullopt_t )   |
-| &nbsp;                   | template< typename T ><br>bool operator==( nullopt_t, optional<T> const & x )   |
-| !=                       | template< typename T ><br>bool operator!=( optional<T> const & x, nullopt_t )   |
-| &nbsp;                   | template< typename T ><br>bool operator!=( nullopt_t, optional<T> const & x )   |
-| <                        | template< typename T ><br>bool operator<( optional<T> const &, nullopt_t )      |
-| &nbsp;                   | template< typename T ><br>bool operator<( nullopt_t, optional<T> const & x )    |
-| <=                       | template< typename T ><br>bool operator<=( optional<T> const & x, nullopt_t )   |
-| &nbsp;                   | template< typename T ><br>bool operator<=( nullopt_t, optional<T> const & )     |
-| >                        | template< typename T ><br>bool operator>( optional<T> const & x, nullopt_t )    |
-| &nbsp;                   | template< typename T ><br>bool operator>( nullopt_t, optional<T> const & )      |
-| >=                       | template< typename T ><br>bool operator>=( optional<T> const &, nullopt_t )     |
-| &nbsp;                   | template< typename T ><br>bool operator>=( nullopt_t, optional<T> const & x )   |
-| Comparison with T        | &nbsp;   | 
-| ==                       | template< typename T ><br>bool operator==( optional<T> const & x, const T& v )  |
-| &nbsp;                   | template< typename T ><br>bool operator==( T const & v, optional<T> const & x ) |
-| !=                       | template< typename T ><br>bool operator!=( optional<T> const & x, const T& v )  |
-| &nbsp;                   | template< typename T ><br>bool operator!=( T const & v, optional<T> const & x ) |
-| <                        | template< typename T ><br>bool operator<( optional<T> const & x, const T& v )   |
-| &nbsp;                   | template< typename T ><br>bool operator<( T const & v, optional<T> const & x )  |
-| <=                       | template< typename T ><br>bool operator<=( optional<T> const & x, const T& v )  |
-| &nbsp;                   | template< typename T ><br>bool operator<=( T const & v, optional<T> const & x ) |
-| >                        | template< typename T ><br>bool operator>( optional<T> const & x, const T& v )   |
-| &nbsp;                   | template< typename T ><br>bool operator>( T const & v, optional<T> const & x )  |
-| >=                       | template< typename T ><br>bool operator>=( optional<T> const & x, const T& v )  |
-| &nbsp;                   | template< typename T ><br>bool operator>=( T const & v, optional<T> const & x ) |
-| Specialized algorithms   | &nbsp;   | 
-| swap                     | template< typename T ><br>void swap( optional<T> & x, optional<T> & y ) |
-| create                   | template< typename T ><br>optional<T> make_optional( T const & v )      |
+| Kind                     | Std  | Function |
+|--------------------------|------|----------|
+| Relational operators     |&nbsp;| &nbsp;   | 
+| ==                       |&nbsp;| template< typename T ><br>bool operator==( optional<T> const & x, optional<T> const & y ) |
+| !=                       |&nbsp;| template< typename T ><br>bool operator!=( optional<T> const & x, optional<T> const & y ) |
+| <                        |&nbsp;| template< typename T ><br>bool operator<( optional<T> const & x, optional<T> const & y )  |
+| >                        |&nbsp;| template< typename T ><br>bool operator>( optional<T> const & x, optional<T> const & y )  |
+| <=                       |&nbsp;| template< typename T ><br>bool operator<=( optional<T> const & x, optional<T> const & y ) |
+| >=                       |&nbsp;| template< typename T ><br>bool operator>=( optional<T> const & x, optional<T> const & y ) |
+| Comparison with nullopt  |&nbsp;| &nbsp;   | 
+| ==                       |&nbsp;| template< typename T ><br>bool operator==( optional<T> const & x, nullopt_t ) noexcept |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator==( nullopt_t, optional<T> const & x ) noexcept |
+| !=                       |&nbsp;| template< typename T ><br>bool operator!=( optional<T> const & x, nullopt_t ) noexcept |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator!=( nullopt_t, optional<T> const & x ) noexcept |
+| <                        |&nbsp;| template< typename T ><br>bool operator<( optional<T> const &, nullopt_t ) noexcept    |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator<( nullopt_t, optional<T> const & x ) noexcept  |
+| <=                       |&nbsp;| template< typename T ><br>bool operator<=( optional<T> const & x, nullopt_t ) noexcept |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator<=( nullopt_t, optional<T> const & ) noexcept   |
+| >                        |&nbsp;| template< typename T ><br>bool operator>( optional<T> const & x, nullopt_t ) noexcept  |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator>( nullopt_t, optional<T> const & ) noexcept    |
+| >=                       |&nbsp;| template< typename T ><br>bool operator>=( optional<T> const &, nullopt_t ) noexcept   |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator>=( nullopt_t, optional<T> const & x ) noexcept |
+| Comparison with T        |&nbsp;| &nbsp;   | 
+| ==                       |&nbsp;| template< typename T ><br>bool operator==( optional<T> const & x, const T& v )  |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator==( T const & v, optional<T> const & x ) |
+| !=                       |&nbsp;| template< typename T ><br>bool operator!=( optional<T> const & x, const T& v )  |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator!=( T const & v, optional<T> const & x ) |
+| <                        |&nbsp;| template< typename T ><br>bool operator<( optional<T> const & x, const T& v )   |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator<( T const & v, optional<T> const & x )  |
+| <=                       |&nbsp;| template< typename T ><br>bool operator<=( optional<T> const & x, const T& v )  |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator<=( T const & v, optional<T> const & x ) |
+| >                        |&nbsp;| template< typename T ><br>bool operator>( optional<T> const & x, const T& v )   |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator>( T const & v, optional<T> const & x )  |
+| >=                       |&nbsp;| template< typename T ><br>bool operator>=( optional<T> const & x, const T& v )  |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator>=( T const & v, optional<T> const & x ) |
+| Specialized algorithms   |&nbsp;| &nbsp;   | 
+| swap                     |&nbsp;| template< typename T ><br>void swap( optional<T> & x, optional<T> & y ) noexcept(...) |
+| create                   |<C++11| template< typename T ><br>optional&lt;T> make_optional( T const & v )      |
+| &nbsp;                   | C++11| template< class T ><br>optional< typename std::decay&lt;T>::type > make_optional( T && v ) |
+| &nbsp;                   | C++11| template< class T, class...Args ><br>optional&lt;T> make_optional( Args&&... args ) |
+| &nbsp;                   | C++11| template< class T, class U, class... Args ><br>optional&lt;T> make_optional( std::initializer_list&lt;U> il, Args&&... args ) |
+| hash                     | C++11| template< class T ><br>class hash< nonstd::optional&lt;T> > |
 
 
 ### Macros to control alignment
@@ -180,30 +206,35 @@ Comparison of std::optional, optional lite and Boost.Optional
 
 *optional lite* is inspired on std::optional, which in turn is inspired on Boost.Optional. Here are the significant differences.
 
-| Aspect                            | std::optional         | optional lite | Boost.Optional |
-|-----------------------------------|-----------------------|---------------|----------------|
-| Move semantics                    | yes                   | no            | no             |
-| noexcept                          | yes                   | no            | no             |
-| Hash support                      | yes                   | no            | no             |
-| Throwing value accessor           | yes                   | yes           | no             |
-| Literal type	                    | partially             | no            | no             |
-| In-place construction	            | emplace, tag in_place | no            | utility in_place_factory |
-| Disengaged state tag	            | nullopt	            | nullopt       | none           |
-| optional references               | no                    | no            | yes            |
-| Conversion from optional\<U\><br>to optional\<T\>    | no | no            | yes            |
-| Duplicated interface functions 1) | no                    | no            | yes            |
-| Explicit convert to ptr (get_ptr)	| no                    | no            | yes            |
+| Aspect                            | std::optional         | optional lite        | Boost.Optional |
+|-----------------------------------|-----------------------|----------------------|----------------|
+| Move semantics                    | yes                   | C++11                | no             |
+| noexcept                          | yes                   | C++11                | no             |
+| Hash support                      | yes                   | C++11                | no             |
+| Throwing value accessor           | yes                   | yes                  | no             |
+| Literal type	                    | partially             | C++11/14             | no             |
+| In-place construction	            | emplace, tag in_place | emplace, tag in_place| utility in_place_factory |
+| Disengaged state tag	            | nullopt	            | nullopt              | none           |
+| optional references               | no                    | no                   | yes            |
+| Conversion from optional&lt;U\><br>to optional&lt;T\>    | no | no               | yes            |
+| Duplicated interface functions 1) | no                    | no                   | yes            |
+| Explicit convert to ptr (get_ptr)	| no                    | no                   | yes            |
 
 1) is_initialized(), reset(), get().
 
 
 Reported to work with
 ---------------------
+The table below mentions the compiler versions *optional lite* is reported to work with.
 
-*optional lite* is reported to work with the following compilers: 
-- Visual C++ 6 SP6 (VS6), VC10, (VS2010), VC11 (VS2012), VC12 (VS2013), VC14 (VS2015)
-- GNUC 4.8.1 with -std=c++98, -std=c++03, -std=c++11, -std=c++1y 
-- clang 3.4 with -std=c++03, -std=c++11 (on Travis)
+OS        | Compiler   | Versions |
+---------:|:-----------|:---------|
+Windows   | Clang/LLVM | ?        |
+&nbsp;    | GCC        | 5.2.0    |
+&nbsp;    | Visual C++<br>(Visual Studio)| 8 (2005), 10 (2010), 11 (2012),<br>12 (2013), 14 (2015) |
+GNU/Linux | Clang/LLVM | 3.5.0    |
+&nbsp;    | GCC        | 4.8.4    |
+OS X      | ?          | ?        |
 
 
 Building the tests
@@ -303,3 +334,54 @@ Notes and references
 [12] [Boost.TypeTraits, alignment_of](http://www.boost.org/doc/libs/1_57_0/libs/type_traits/doc/html/boost_typetraits/reference/alignment_of.html) ( [code](http://www.boost.org/doc/libs/1_57_0/boost/type_traits/alignment_of.hpp) ).
 
 [13] Martin Moene. [spike-expected](https://github.com/martinmoene/spike-expected) ([expected-lite.hpp](https://github.com/martinmoene/spike-expected/blob/master/exception_ptr_lite.hpp)).
+
+
+Appendix
+--------
+### A.1 Optional Lite test specification
+
+```
+union: A C++03 union can only contain POD types
+optional: Allows to default construct an empty optional
+optional: Allows to explicitly construct a disengaged, empty optional via nullopt
+optional: Allows to default construct an empty optional with a non-default-constructible
+optional: Allows to copy-construct from empty optional
+optional: Allows to copy-construct from non-empty optional
+optional: Allows to move-construct from optional (C++11)
+optional: Allows to copy-construct from literal value
+optional: Allows to copy-construct from value
+optional: Allows to move-construct from value (C++11)
+optional: Allows to in-place construct from literal value (C++11)
+optional: Allows to in-place copy-construct from value (C++11)
+optional: Allows to in-place move-construct from value (C++11)
+optional: Allows to in-place copy-construct from initializer-list (C++11)
+optional: Allows to in-place move-construct from initializer-list (C++11)
+optional: Allows to assign nullopt to disengage
+optional: Allows to copy-assign from/to engaged and disengaged optionals
+optional: Allows to move-assign from/to engaged and disengaged optionals (C++11)
+optional: Allows to copy-assign from literal value
+optional: Allows to copy-assign from value
+optional: Allows to move-assign from value (C++11)
+optional: Allows to copy-emplace content from arguments (C++11)
+optional: Allows to move-emplace content from arguments (C++11)
+optional: Allows to copy-emplace content from intializer-list and arguments (C++11)
+optional: Allows to move-emplace content from intializer-list and arguments (C++11)
+optional: Allows to swap with other optional (member)
+optional: Allows to obtain pointer to value via operator->()
+optional: Allows to obtain value via operator*()
+optional: Allows to obtain moved-value via operator*()
+optional: Allows to obtain has_value() via operator bool()
+optional: Allows to obtain value via value()
+optional: Allows to obtain value or default via value_or()
+optional: Allows to obtain moved-value or moved-default via value_or() (C++11)
+optional: Throws bad_optional_access at disengaged access
+optional: Allows to reset content
+optional: Allows to swaps engage state and values (non-member)
+optional: Provides relational operators
+make_optional: Allows to copy-construct optional
+make_optional: Allows to move-construct optional (C++11)
+make_optional: Allows to in-place copy-construct optional from arguments (C++11)
+make_optional: Allows to in-place move-construct optional from arguments (C++11)
+make_optional: Allows to in-place copy-construct optional from initializer-list and arguments (C++11)
+make_optional: Allows to in-place move-construct optional from initializer-list and arguments (C++11)
+```
