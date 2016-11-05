@@ -22,7 +22,7 @@
 #include <stdexcept>
 #include <utility>
 
-#define  optional_lite_VERSION "2.x.x"
+#define  optional_lite_VERSION "2.0.0"
 
 // variant-lite alignment configuration:
 
