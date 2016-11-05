@@ -615,13 +615,13 @@ public:
     {}
 
     template< class... Args >
-    optional_constexpr14 explicit optional( nonstd_lite_in_place_type_t(T), Args&&... args )
+    optional_constexpr explicit optional( nonstd_lite_in_place_type_t(T), Args&&... args )
     : has_value_( true )
     , contained( T( std::forward<Args>(args)...) )
     {}
 
     template< class U, class... Args >
-    optional_constexpr14 explicit optional( nonstd_lite_in_place_type_t(T), std::initializer_list<U> il, Args&&... args )
+    optional_constexpr explicit optional( nonstd_lite_in_place_type_t(T), std::initializer_list<U> il, Args&&... args )
     : has_value_( true )
     , contained( T( il, std::forward<Args>(args)...) )
     {}
@@ -703,33 +703,33 @@ public:
 
     // observers
 
-    optional_constexpr14 value_type const * operator ->() const
+    optional_constexpr value_type const * operator ->() const
     {
-        assert( has_value() );
-        return contained.value_ptr();
+        return assert( has_value() ), 
+            contained.value_ptr();
     }
 
     optional_constexpr14 value_type * operator ->()
     {
-        assert( has_value() );
-        return contained.value_ptr();
+        return assert( has_value() ), 
+            contained.value_ptr();
     }
 
-    optional_constexpr14 value_type const & operator *() const optional_ref_qual
+    optional_constexpr value_type const & operator *() const optional_ref_qual
     {
-        assert( has_value() );
-        return contained.value();
+        return assert( has_value() ), 
+            contained.value();
     }
 
     optional_constexpr14 value_type & operator *() optional_ref_qual
     {
-        assert( has_value() );
-        return contained.value();
+        return assert( has_value() ), 
+            contained.value();
     }
 
 #if optional_CPP11_OR_GREATER
 
-    optional_constexpr14 value_type const && operator *() const optional_refref_qual
+    optional_constexpr value_type const && operator *() const optional_refref_qual
     {
         assert( has_value() );
         return std::move( contained.value() );
@@ -1027,19 +1027,19 @@ void swap( optional<T> & x, optional<T> & y )
 #if optional_CPP11_OR_GREATER
 
 template< class T >
-optional_constexpr14 optional< typename std::decay<T>::type > make_optional( T && v )
+optional_constexpr optional< typename std::decay<T>::type > make_optional( T && v )
 {
     return optional< typename std::decay<T>::type >( std::forward<T>( v ) );
 }
 
 template< class T, class...Args >
-optional_constexpr14 optional<T> make_optional( Args&&... args )
+optional_constexpr optional<T> make_optional( Args&&... args )
 {
     return optional<T>( in_place, std::forward<Args>(args)...);
 }
 
 template< class T, class U, class... Args >
-optional_constexpr14 optional<T> make_optional( std::initializer_list<U> il, Args&&... args )
+optional_constexpr optional<T> make_optional( std::initializer_list<U> il, Args&&... args )
 {
     return optional<T>( in_place, il, std::forward<Args>(args)...);
 }
