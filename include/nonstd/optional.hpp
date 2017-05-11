@@ -180,6 +180,10 @@
 
 // additional includes:
 
+#if optional_CPP11_OR_GREATER
+# include <functional>
+#endif
+
 #if optional_HAVE_INITIALIZER_LIST
 # include <initializer_list>
 #endif
