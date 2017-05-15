@@ -16,7 +16,7 @@ optional<int> to_int( char const * const text )
 
 int main( int argc, char * argv[] )
 {
-    char * text = argc > 1 ? argv[1] : "42";
+    const char * text = argc > 1 ? argv[1] : "42";
 
     optional<int> oi = to_int( text );
 
