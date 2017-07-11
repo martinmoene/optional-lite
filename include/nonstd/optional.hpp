@@ -22,7 +22,7 @@
 #include <stdexcept>
 #include <utility>
 
-#define  optional_lite_VERSION "2.0.0"
+#define  optional_lite_VERSION "2.1.0"
 
 // variant-lite alignment configuration:
 
@@ -646,7 +646,7 @@ public:
         return *this;
     }
 
-    optional & operator=( optional const & rhs ) 
+    optional & operator=( optional const & rhs )
 #if optional_CPP11_OR_GREATER
         noexcept( std::is_nothrow_move_assignable<T>::value && std::is_nothrow_move_constructible<T>::value )
 #endif
@@ -709,25 +709,25 @@ public:
 
     optional_constexpr value_type const * operator ->() const
     {
-        return assert( has_value() ), 
+        return assert( has_value() ),
             contained.value_ptr();
     }
 
     optional_constexpr14 value_type * operator ->()
     {
-        return assert( has_value() ), 
+        return assert( has_value() ),
             contained.value_ptr();
     }
 
     optional_constexpr value_type const & operator *() const optional_ref_qual
     {
-        return assert( has_value() ), 
+        return assert( has_value() ),
             contained.value();
     }
 
     optional_constexpr14 value_type & operator *() optional_ref_qual
     {
-        return assert( has_value() ), 
+        return assert( has_value() ),
             contained.value();
     }
 
