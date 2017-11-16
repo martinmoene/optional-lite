@@ -6,8 +6,8 @@
 
 #pragma once
 
-#ifndef TEST_ANY_LITE_H_INCLUDED
-#define TEST_ANY_LITE_H_INCLUDED
+#ifndef TEST_OPTIONAL_LITE_H_INCLUDED
+#define TEST_OPTIONAL_LITE_H_INCLUDED
 
 #include "optional.hpp"
 #include "lest_cpp03.hpp"
@@ -38,6 +38,6 @@ using ::nonstd::operator<<;
 
 } // namespace lest
 
-#endif // TEST_ANY_LITE_H_INCLUDED
+#endif // TEST_OPTIONAL_LITE_H_INCLUDED
 
 // end of file
