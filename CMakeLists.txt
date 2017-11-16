@@ -6,7 +6,7 @@
 
 cmake_minimum_required( VERSION 2.8.12 )
 
-project( any_lite )
+project( optional_lite )
 
 enable_testing()
 
