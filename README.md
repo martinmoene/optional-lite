@@ -66,7 +66,7 @@ For more examples, see [this answer on StackOverflow](http://stackoverflow.com/a
 
 License
 -------
-*variant lite* uses the [MIT](LICENSE) license.
+*optional lite* uses the [MIT](LICENSE) license.
  
 
 Dependencies
