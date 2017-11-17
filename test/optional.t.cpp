@@ -632,12 +632,13 @@ CASE( "optional: Allows to swaps engage state and values (non-member)" )
     }}
 }
 
-CASE( "optional: Provides relational operators" )
+template< typename R, typename S, typename T >
+void relop( lest::env & lest_env )
 {
     SETUP( "" ) {
-        optional<int> d;
-        optional<int> e1( 6 );
-        optional<int> e2( 7 );
+        optional<R> d;
+        optional<S> e1( 6 );
+        optional<T> e2( 7 );
 
     SECTION( "engaged    == engaged"    ) { EXPECT(   e1 == e1  ); }
     SECTION( "engaged    == disengaged" ) { EXPECT( !(e1 == d ) ); }
@@ -691,6 +692,16 @@ CASE( "optional: Provides relational operators" )
     SECTION( "engaged   >= value"       ) { EXPECT( e2 >= 6  ); }
     SECTION( "value     >= engaged"     ) { EXPECT(  7 >= e1 ); }
     }
+}
+
+CASE( "optional: Provides relational operators" )
+{
+    relop<int, int, int>( lest_env );
+}
+
+CASE( "optional: Provides mixed-type relational operators" )
+{
+    relop<char, int, double>( lest_env );
 }
 
 CASE( "make_optional: Allows to copy-construct optional" )

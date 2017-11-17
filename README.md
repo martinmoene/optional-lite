@@ -376,6 +376,7 @@ optional: Throws bad_optional_access at disengaged access
 optional: Allows to reset content
 optional: Allows to swaps engage state and values (non-member)
 optional: Provides relational operators
+optional: Provides mixed-type relational operators
 make_optional: Allows to copy-construct optional
 make_optional: Allows to move-construct optional (C++11)
 make_optional: Allows to in-place copy-construct optional from arguments (C++11)
