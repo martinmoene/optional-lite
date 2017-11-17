@@ -55,7 +55,7 @@ prompt>g++ -Wall -Wextra -std=c++03 -I.. -o to_int.exe to_int.cpp && to_int x1
 
 In a nutshell
 ---------------
-**optional lite** is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library aims to provide a [C++17-like optional](http://en.cppreference.com/w/cpp/utility/optional) for use with C++98 and later.
+**optional lite** is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library aims to provide a [C++17-like optional](http://en.cppreference.com/w/cpp/utility/optional) for use with C++98 and later. There's also a simpler version, [*optional bare*](https://github.com/martinmoene/optional-bare). Unlike *optional lite*, *optional bare* is limited to default-constructible and copyable types. 
 
 **Features and properties of optional lite** are ease of installation (single header), freedom of dependencies other than the standard library and control over object alignment (if needed). *optional lite* shares the approach to in-place tags with [any-lite](https://github.com/martinmoene/any-lite) and with [variant-lite](https://github.com/martinmoene/variant-lite) and these libraries can be used together.
 
