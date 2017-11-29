@@ -34,7 +34,7 @@ inline std::ostream & operator<<( std::ostream & os, optional<T> const & v )
 
 namespace lest {
 
-using ::nonstd::operator<<;
+using ::nonstd::optional_lite::operator<<;
 
 } // namespace lest
 
