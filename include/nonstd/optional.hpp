@@ -22,9 +22,9 @@
 #include <stdexcept>
 #include <utility>
 
-#define  optional_lite_VERSION "2.2.0"
+#define  optional_lite_VERSION "2.2.1"
 
-// variant-lite alignment configuration:
+// optional-lite alignment configuration:
 
 #ifndef  optional_CONFIG_MAX_ALIGN_HACK
 # define optional_CONFIG_MAX_ALIGN_HACK  0
@@ -137,7 +137,7 @@
 # define optional_HAVE_SIZED_TYPES  1
 #endif
 
-// For the rest, consider VC14 as C++11 for variant-lite:
+// For the rest, consider VC14 as C++11 for optional-lite:
 
 #if optional_COMPILER_MSVC_VERSION >= 14
 # undef  optional_CPP11_OR_GREATER
@@ -252,7 +252,7 @@ namespace detail {
 
 // C++11 emulation:
 
-#if variant_HAVE_CONDITIONAL
+#if optional_HAVE_CONDITIONAL
 
 using std::conditional;
 
@@ -267,7 +267,7 @@ struct conditional< true , Then, Else > { typedef Then type; };
 template< class Then, class Else >
 struct conditional< false, Then, Else > { typedef Else type; };
 
-#endif // variant_HAVE_CONDITIONAL
+#endif // optional_HAVE_CONDITIONAL
 
 struct nulltype{};
 
