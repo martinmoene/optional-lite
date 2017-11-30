@@ -79,10 +79,20 @@ Installation
 
 *optional lite* is a single-file header-only library. Put `optional.hpp` in the [include](include) folder directly into the project source tree or somewhere reachable from your project.
 
-If you use [conan package manager](https://www.conan.io/), follow these steps -
- - Add nonstd-lite to conan remotes - `conan remote add nonstd-lite https://api.bintray.com/conan/agauniyal/nonstd-lite`
- - Add `optional-lite/2.2.0@nonstd-lite/stable` to **`[requires]`** section in **`conanfile.txt`**
- - Run `conan install` command
+Or, if you use the [conan package manager](https://www.conan.io/), follow these steps:
+
+1. Add *nonstd-lite* to the conan remotes:
+
+        conan remote add nonstd-lite https://api.bintray.com/conan/agauniyal/nonstd-lite
+
+2. Add a reference to *optional-lite* to the *requires* section of your project's `conanfile.txt` file:
+
+        [requires]
+        optional-lite/2.2.0@nonstd-lite/stable
+
+3. Run conan's install command:
+
+        conan install
 
 
 Synopsis
