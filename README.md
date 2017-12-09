@@ -113,8 +113,10 @@ Synopsis
 | Error reporting       | class bad_optional_access;       |&nbsp;  |
 | In-place construction | struct in_place_tag              | &nbsp; |
 | &nbsp;                | in_place                         | select type or index for in-place construction |
+| &nbsp;                | in_place_type                    | select type for in-place construction |
+| &emsp;(variant)       | in_place_index                   | select index for in-place construction |
 | &nbsp;                | nonstd_lite_in_place_type_t( T)  | macro for alias template in_place_type_t&lt;T>  |
-| &nbsp;                | nonstd_lite_in_place_index_t( T )| macro for alias template in_place_index_t&lt;T> |
+| &emsp;(variant)       | nonstd_lite_in_place_index_t( T )| macro for alias template in_place_index_t&lt;T> |
 
 ### Interface of *optional lite*
 
