@@ -13,6 +13,7 @@ optional lite - A single-file header-only version of a C++17-like optional, a nu
 - [Reported to work with](#reported-to-work-with)
 - [Building the tests](#building-the-tests)
 - [Implementation notes](#implementation-notes)
+- [Other implementations of optional](#other-implementations-of-optional)
 - [Notes and references](#notes-and-references)
 - [Appendix](#appendix)
 
@@ -320,6 +321,13 @@ Note that the algorithm of 5. differs from the one Andrei Alexandrescu uses in [
 The class template `alignment_of<>` is gleaned from [Boost.TypeTraits, alignment_of](http://www.boost.org/doc/libs/1_57_0/libs/type_traits/doc/html/boost_typetraits/reference/alignment_of.html) [11]. The storage type `storage_t<>` is adapted from the one I created for [spike-expected, expected lite](https://github.com/martinmoene/spike-expected) [13].
 
 For more information on constructed unions and alignment, see [8-12].
+
+
+Other implementations of optional
+---------------------------------
+- Isabella Muerte. [MNMLSTC Core](https://github.com/mnmlstc/core) (C++11).
+- Andrzej Krzemieński. [optional (nullable) objects for C++14](xxxx). Reference implementation.
+- Simon Brand. [C++11/14/17 std::optional with functional-style extensions](xxxx).
 
 
 Notes and references
