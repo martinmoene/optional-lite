@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2016 Martin Moene
+// Copyright (c) 2014-2017 Martin Moene
 //
 // https://github.com/martinmoene/optional-lite
 //
@@ -18,11 +18,57 @@
 #ifndef NONSTD_OPTIONAL_LITE_HPP
 #define NONSTD_OPTIONAL_LITE_HPP
 
+#define  optional_lite_VERSION "2.3.0"
+
+// Compiler detection:
+
+#define optional_CPP11_OR_GREATER  ( __cplusplus >= 201103L )
+#define optional_CPP14_OR_GREATER  ( __cplusplus >= 201402L )
+#define optional_CPP17_OR_GREATER  ( __cplusplus >= 201703L )
+
+// use C++17 std::optional if available:
+
+#if defined( __has_include )
+# define optional_HAS_INCLUDE( arg )  __has_include( arg )
+#else
+# define optional_HAS_INCLUDE( arg )  0
+#endif
+
+#if optional_HAS_INCLUDE( <optional> ) && optional_CPP17_OR_GREATER
+
+#define optional_HAVE_STD_OPTIONAL  1
+
+#include <optional>
+
+namespace nonstd {
+
+    using std::optional;
+    using std::bad_optional_access;
+    using std::hash;
+
+    using std::nullopt;
+    using std::in_place;
+    using std::in_place_type;
+    using std::in_place_index;
+    using std::in_place_t;
+    using std::in_place_type_t;
+    using std::in_place_index_t;
+
+    using std::operator==;
+    using std::operator!=;
+    using std::operator<;
+    using std::operator<=;
+    using std::operator>;
+    using std::operator>=;
+    using std::make_optional;
+    using std::swap;
+}
+
+#else // C++17 std::optional
+
 #include <cassert>
 #include <stdexcept>
 #include <utility>
-
-#define  optional_lite_VERSION "2.2.1"
 
 // optional-lite alignment configuration:
 
@@ -37,12 +83,6 @@
 #ifndef  optional_CONFIG_ALIGN_AS_FALLBACK
 # define optional_CONFIG_ALIGN_AS_FALLBACK  double
 #endif
-
-// Compiler detection (C++17 is speculative):
-
-#define optional_CPP11_OR_GREATER  ( __cplusplus >= 201103L )
-#define optional_CPP14_OR_GREATER  ( __cplusplus >= 201402L )
-#define optional_CPP17_OR_GREATER  ( __cplusplus >= 201700L )
 
 // half-open range [lo..hi):
 #define optional_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
@@ -222,6 +262,18 @@ inline in_place_t in_place( detail::in_place_type_tag<T> = detail::in_place_type
 
 template< std::size_t I >
 inline in_place_t in_place( detail::in_place_index_tag<I> = detail::in_place_index_tag<I>() )
+{
+    return in_place_t();
+}
+
+template< class T >
+inline in_place_t in_place_type( detail::in_place_type_tag<T> = detail::in_place_type_tag<T>() )
+{
+    return in_place_t();
+}
+
+template< std::size_t I >
+inline in_place_t in_place_index( detail::in_place_index_tag<I> = detail::in_place_index_tag<I>() )
 {
     return in_place_t();
 }
@@ -1113,5 +1165,7 @@ public:
 } //namespace std
 
 #endif // optional_CPP11_OR_GREATER
+
+#endif // have C++17 std::optional
 
 #endif // NONSTD_OPTIONAL_LITE_HPP

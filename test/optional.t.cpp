@@ -1,5 +1,5 @@
 //
-// Copyright 2014-2016 by Martin Moene
+// Copyright 2014-2017 by Martin Moene
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -249,7 +249,11 @@ CASE( "optional: Allows to in-place copy-construct from value (C++11)" )
 
     EXPECT( a->first        == 'a' );
     EXPECT( a->second.value ==  7  );
+#if optional_HAVE_STD_OPTIONAL
+    EXPECT( a->second.state == copy_constructed );
+#else
     EXPECT( a->second.state == move_constructed );
+#endif
     EXPECT(         s.state != moved_from       );
 #else
     EXPECT( !!"optional: in-place construction is not available (no C++11)" );
@@ -284,7 +288,11 @@ CASE( "optional: Allows to in-place copy-construct from initializer-list (C++11)
     EXPECT( a->vec[2]  ==  9 );
     EXPECT( a->c       == 'a');
     EXPECT( a->s.value ==  7 );
+#if optional_HAVE_STD_OPTIONAL
+    EXPECT( a->s.state == copy_constructed );
+#else
     EXPECT( a->s.state == move_constructed );
+#endif
     EXPECT(    s.state != moved_from       );
 #else
     EXPECT( !!"optional: in-place construction is not available (no C++11)" );
@@ -402,7 +410,11 @@ CASE( "optional: Allows to copy-emplace content from arguments (C++11)" )
 
     EXPECT( a->first        == 'a' );
     EXPECT( a->second.value ==  7  );
+#if optional_HAVE_STD_OPTIONAL
+    EXPECT( a->second.state == copy_constructed );
+#else
     EXPECT( a->second.state == move_constructed );
+#endif
     EXPECT(         s.state != moved_from       );
 #else
     EXPECT( !!"optional: in-place construction is not available (no C++11)" );
@@ -440,7 +452,11 @@ CASE( "optional: Allows to copy-emplace content from intializer-list and argumen
     EXPECT( a->vec[2]  ==  9  );
     EXPECT( a->c       == 'a' );
     EXPECT( a->s.value ==  7  );
+#if optional_HAVE_STD_OPTIONAL
+    EXPECT( a->s.state == copy_constructed );
+#else
     EXPECT( a->s.state == move_constructed );
+#endif
     EXPECT(    s.state != moved_from       );
 #else
     EXPECT( !!"optional: in-place construction is not available (no C++11)" );
@@ -734,7 +750,11 @@ CASE( "make_optional: Allows to in-place copy-construct optional from arguments 
 
     EXPECT( a->first        == 'a' );
     EXPECT( a->second.value ==  7  );
+#if optional_HAVE_STD_OPTIONAL
+    EXPECT( a->second.state == copy_constructed );
+#else
     EXPECT( a->second.state == move_constructed );
+#endif
     EXPECT(         s.state != moved_from       );
 #else
     EXPECT( !!"optional: in-place construction is not available (no C++11)" );
@@ -769,7 +789,11 @@ CASE( "make_optional: Allows to in-place copy-construct optional from initialize
     EXPECT( a->vec[2]  ==  9  );
     EXPECT( a->c       == 'a' );
     EXPECT( a->s.value ==  7  );
+#if optional_HAVE_STD_OPTIONAL
+    EXPECT( a->s.state == copy_constructed );
+#else
     EXPECT( a->s.state == move_constructed );
+#endif
     EXPECT(    s.state != moved_from       );
 #else
     EXPECT( !!"optional: in-place construction is not available (no C++11)" );
@@ -841,8 +865,10 @@ CASE("storage_t: Show sizeof various optionals"
      "[.]" )
 {
     std::cout <<
+#ifndef optional_HAVE_STD_OPTIONAL
         "sizeof( nonstd::optional_lite::detail::storage_t<char> ): " <<
          sizeof( nonstd::optional_lite::detail::storage_t<char> )    << "\n" <<
+#endif
          optional_OUTPUT_SIZEOF( char )
          optional_OUTPUT_SIZEOF( short )
          optional_OUTPUT_SIZEOF( int )
