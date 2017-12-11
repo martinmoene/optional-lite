@@ -89,7 +89,7 @@ Or, if you use the [conan package manager](https://www.conan.io/), follow these 
 2. Add a reference to *optional-lite* to the *requires* section of your project's `conanfile.txt` file:
 
         [requires]
-        optional-lite/2.2.0@nonstd-lite/stable
+        optional-lite/2.3.0@nonstd-lite/stable
 
 3. Run conan's install command:
 
