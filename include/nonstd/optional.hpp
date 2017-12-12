@@ -18,7 +18,7 @@
 #ifndef NONSTD_OPTIONAL_LITE_HPP
 #define NONSTD_OPTIONAL_LITE_HPP
 
-#define  optional_lite_VERSION "2.3.0"
+#define  optional_lite_VERSION "2.3.1"
 
 // Compiler detection:
 
@@ -47,6 +47,7 @@ namespace nonstd {
     using std::hash;
 
     using std::nullopt;
+    using std::nullopt_t;
     using std::in_place;
     using std::in_place_type;
     using std::in_place_index;
