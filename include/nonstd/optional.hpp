@@ -65,7 +65,7 @@ namespace nonstd {
     using std::swap;
 }
 
-#else // C++17 std::optional
+#else // optional_HAVE_STD_OPTIONAL
 
 #include <cassert>
 #include <stdexcept>
@@ -235,7 +235,7 @@ namespace nonstd {
 # include <tr1/type_traits>
 #endif
 
-// type traits needed:
+// type traits needed in every configuration:
 
 namespace nonstd { namespace optional_lite { namespace detail {
 
@@ -247,6 +247,123 @@ namespace nonstd { namespace optional_lite { namespace detail {
 #endif // optional_HAVE_CONDITIONAL
 
 }}}
+
+//
+// experimental: functional-style extensions: type traits:
+//
+
+#if optional_EXPERIMENTAL_FUNCTIONAL_EXTENSTIONS
+
+#if optional_CPP11_OR_GREATER
+# define optional_RESULT_OF_T(F,T)  typename ::nonstd::optional_lite::detail::result_of<F(T)>::type
+#else
+# define optional_RESULT_OF_T(F,T)  typename ::nonstd::optional_lite::detail::result_of<F>::type
+#endif
+
+#if optional_CPP11_OR_GREATER
+
+namespace nonstd { namespace optional_lite { namespace detail {
+
+    using std::add_pointer;
+    using std::decay;
+    using std::enable_if;
+    using std::is_array;
+    using std::is_function;
+    using std::is_same;
+    using std::is_void;
+    using std::remove_const;
+    using std::remove_cv;
+    using std::remove_extent;
+    using std::remove_reference;
+    using std::remove_volatile;
+    using std::result_of;
+
+}}} // namespace nonstd::optional_lite::detail
+
+#else // optional_CPP11_OR_GREATER
+
+namespace nonstd { namespace optional_lite { namespace detail {
+
+template< typename T, T v >
+struct integral_constant
+{
+   typedef integral_constant< T, v > type;
+   typedef T value_type;
+   static const T value = v;
+};
+
+typedef integral_constant< bool, true  > true_type;
+typedef integral_constant< bool, false > false_type;
+
+template< bool B, typename T = void > struct enable_if {};
+template< typename T >                struct enable_if<true, T> { typedef T type; };
+
+template< typename T, typename U >    struct is_same       : false_type{};
+template< typename T>                 struct is_same<T, T> : true_type {};
+
+template< typename T>                 struct is_array : false_type {};
+template< typename T>                 struct is_array<T[]> : true_type {};
+template< typename T, std::size_t N > struct is_array<T[N]> : true_type {};
+
+template< typename T>                 struct is_function        : false_type{};
+template< typename R, typename T1 >   struct is_function<R(T1)> : true_type {};
+
+template< typename T > struct remove_reference      {typedef T type;};
+template< typename T > struct remove_reference<T&>  {typedef T type;};
+//template< typename T > struct remove_reference<T&&> {typedef T type;};
+
+template< typename T > struct remove_const          { typedef T type; };
+template< typename T > struct remove_const<const T> { typedef T type; };
+
+template< typename T > struct remove_volatile             { typedef T type; };
+template< typename T > struct remove_volatile<volatile T> { typedef T type; };
+
+template< typename T > struct remove_cv { typedef typename remove_volatile<typename remove_const<T>::type>::type type; };
+
+template< typename T >                struct remove_extent       { typedef T type; };
+template< typename T >                struct remove_extent<T[]>  { typedef T type; };
+template< typename T, std::size_t N > struct remove_extent<T[N]> { typedef T type; };
+
+namespace detail_ap {
+
+template< typename T, bool is_function_type = false >
+                                   struct add_pointer              { typedef typename remove_reference<T>::type* type; };
+template< typename T >             struct add_pointer<T, true>     { typedef T type; };
+template< typename R, typename T1> struct add_pointer<R(T1), true> { typedef R(*type)(T1); };
+
+} // namespace detail_ap
+
+template< typename T > struct add_pointer : detail_ap::add_pointer<T, is_function<T>::value> {};
+
+template< typename T > struct is_void : is_same<void, typename remove_cv<T>::type> {};
+
+template< typename T >
+struct decay
+{
+private:
+    typedef typename remove_reference<T>::type U;
+public:
+    typedef typename conditional<
+        is_array<U>::value,
+        typename remove_extent<U>::type*,
+        typename conditional<
+            is_function<U>::value,
+            typename add_pointer<U>::type,
+            typename remove_cv<U>::type
+        >::type
+    >::type type;
+};
+
+template< typename F >              struct result_of;
+template< typename R >              struct result_of<R (*)()>   { typedef R type; };
+template< typename R >              struct result_of<R (&)()>   { typedef R type; };
+template< typename R, typename T1 > struct result_of<R (*)(T1)> { typedef R type; };
+template< typename R, typename T1 > struct result_of<R (&)(T1)> { typedef R type; };
+
+}}} // namespace nonstd::optional_lite::detail
+
+#endif // optional_CPP11_OR_GREATER
+#endif // optional_EXPERIMENTAL_FUNCTIONAL_EXTENSTIONS
 
 //
 // in_place: code duplicated in any-lite, optional-lite, variant-lite:
@@ -302,6 +419,49 @@ inline in_place_t in_place_index( detail::in_place_index_tag<I> = detail::in_pla
 } // namespace nonstd
 
 #endif // nonstd_lite_HAVE_IN_PLACE_TYPES
+
+//
+// monostate:
+//
+
+#if optional_EXPERIMENTAL_FUNCTIONAL_EXTENSTIONS && !nonstd_lite_HAVE_MONOSTATE_TYPE
+
+#define nonstd_lite_HAVE_MONOSTATE_TYPE  1
+
+namespace nonstd {
+
+class monostate {};
+
+optional_constexpr inline bool operator< ( monostate, monostate ) optional_noexcept { return false; }
+optional_constexpr inline bool operator> ( monostate, monostate ) optional_noexcept { return false; }
+optional_constexpr inline bool operator<=( monostate, monostate ) optional_noexcept { return true; }
+optional_constexpr inline bool operator>=( monostate, monostate ) optional_noexcept { return true; }
+optional_constexpr inline bool operator==( monostate, monostate ) optional_noexcept { return true; }
+optional_constexpr inline bool operator!=( monostate, monostate ) optional_noexcept { return false; }
+
+} // namespace nonstd
+
+#if optional_CPP11_OR_GREATER
+
+// specialize the std::hash algorithm:
+
+namespace std {
+
+template<>
+struct hash< nonstd::monostate >
+{
+public:
+    std::size_t operator()( nonstd::monostate const & /*v*/ ) const optional_noexcept
+    {
+        return 0;
+    }
+};
+
+} //namespace std
+
+#endif // optional_CPP11_OR_GREATER
+
+#endif // optional_EXPERIMENTAL_FUNCTIONAL_EXTENSTIONS
 
 //
 // optional:
@@ -908,6 +1068,136 @@ private:
     bool has_value_;
     detail::storage_t< value_type > contained;
 
+#if optional_EXPERIMENTAL_FUNCTIONAL_EXTENSTIONS
+
+public:
+    // and_then(f): return operation `optional<U> f(T)` on the stored object if there is one, otherwise return an empty optional.
+
+    template< typename F >
+    optional_RESULT_OF_T(F,T)
+    and_then( F f ) const
+    {
+        if ( this->has_value() )
+            return f( this->value() );
+
+        return nullopt;
+    }
+
+    // map(f): perform an operation `U f(T)` on the stored object if there is one and return an optional<U>.
+
+    template< typename F >
+    typename detail::enable_if<
+        ! detail::is_void<optional_RESULT_OF_T(F,T)>::value
+        , optional< optional_RESULT_OF_T(F,T) >
+    >::type
+    map( F f ) const
+    {
+        if ( this->has_value() )
+            return f( this->value() );
+
+        return nullopt;
+    }
+
+    // map(f): perform an operation `void f(T)` on the stored object if there is one and return an optional<monostate>.
+
+    template< typename F >
+    typename detail::enable_if<
+        detail::is_void< optional_RESULT_OF_T(F,T) >::value
+        , optional< monostate >
+    >::type
+    map( F f ) const
+    {
+        if ( this->has_value() )
+        {
+            f( this->value() );
+            return monostate();
+        }
+        return nullopt;
+    }
+
+    // or_else(f): return the call `R f()` if optional is empty, otherwise return optional.
+
+    template< typename F >
+    typename detail::enable_if<
+        ! detail::is_void< optional_RESULT_OF_T(F,T) >::value
+        , optional
+    >::type
+    or_else( F f ) const
+    {
+        if ( this->has_value() )
+            return *this;
+
+        return f();
+    }
+
+    // or_else(f): call `void f()` and return nullopt if optional is empty, otherwise return optional.
+
+    template< typename F >
+    typename detail::enable_if<
+        detail::is_void< optional_RESULT_OF_T(F,T) >::value
+        , optional
+    >::type
+    or_else( F f ) const
+    {
+        if ( this->has_value() )
+            return *this;
+
+        f();
+        return nullopt;
+    }
+
+    // map_or(f, u): perform an operation `U f(T)` on the stored object if there is one and return it, otherwise return u.
+
+    template< typename F, typename U >
+    U map_or( F f, U const & u ) const
+    {
+        if ( this->has_value() )
+            return f( this->value() );
+
+        return u;
+    }
+
+    // map_or_else(f, u): perform an operation `U f(T)` on the stored object if there is one and return it, otherwise return operation u().
+
+    template< typename F, typename U >
+    optional_RESULT_OF_T(F,T)
+    map_or_else( F f, U u ) const
+    {
+        if ( this->has_value() )
+            return f( this->value() );
+
+        return u();
+    }
+
+    // conjunction(): return `u` if `*this` has a value, otherwise return an empty optional.
+
+    template< typename U >
+    optional< typename detail::decay<U>::type >
+    conjunction( U u ) const
+    {
+        if ( this->has_value() )
+            return u;
+
+        return nullopt;
+    }
+
+    // disjunction(): return the current value if non-empty, otherwise return `rhs`.
+
+    optional
+    disjunction( optional const & rhs ) const
+    {
+        return this->has_value() ? *this : rhs;
+    }
+
+    // take(): Take the value out of the optional, leaving it empty and return it:
+
+    optional take()
+    {
+        optional result; result.swap( *this );
+        return result;
+    }    
+
+#endif // optional_EXPERIMENTAL_FUNCTIONAL_EXTENSTIONS
 };
 
 // Relational operators
@@ -1137,7 +1427,7 @@ optional<T> make_optional( T const & v )
 
 #endif // optional_CPP11_OR_GREATER
 
-} // namespace optional
+} // namespace optional_lite
 
 using namespace optional_lite;
 
@@ -1163,6 +1453,6 @@ public:
 
 #endif // optional_CPP11_OR_GREATER
 
-#endif // have C++17 std::optional
+#endif // optional_HAVE_STD_OPTIONAL
 
 #endif // NONSTD_OPTIONAL_LITE_HPP
