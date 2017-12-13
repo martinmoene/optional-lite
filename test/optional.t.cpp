@@ -823,12 +823,60 @@ CASE( "make_optional: Allows to in-place move-construct optional from initialize
 //
 
 //
+// Functional extension:
+//
+
+#if optional_EXPERIMENTAL_FUNCTIONAL_EXTENSTIONS
+
+CASE( "optional map(f): non-void" "[functional]")
+{
+}
+
+CASE( "optional map(f): void" "[functional]")
+{
+}
+
+CASE( "optional map_or(f): " "[functional]")
+{
+}
+
+CASE( "optional map_or_else(f): " "[functional]")
+{
+}
+
+CASE( "optional and_then(f): " "[functional]")
+{
+}
+
+CASE( "optional or_else(f): non-void" "[functional]")
+{
+}
+
+CASE( "optional or_else(f): void" "[functional]")
+{
+}
+
+CASE( "optional conjunction(u): " "[functional]")
+{
+}
+
+CASE( "optional disjunction(rhs): " "[functional]")
+{
+}
+
+CASE( "optional take(): " "[functional]")
+{
+}
+
+#endif // optional_EXPERIMENTAL_FUNCTIONAL_EXTENSTIONS
+
+//
 // Tests that print information:
 //
 
 struct Struct{ Struct(){} };
 
-#if !optional_FEATURE_MAX_ALIGN_HACK
+#if !optional_HAVE_STD_OPTIONAL && !optional_FEATURE_MAX_ALIGN_HACK
 
 #define optional_OUTPUT_ALIGNMENT_OF( type ) \
     "alignment_of<" #type ">: " <<  \
@@ -865,7 +913,7 @@ CASE("storage_t: Show sizeof various optionals"
      "[.]" )
 {
     std::cout <<
-#ifndef optional_HAVE_STD_OPTIONAL
+#if ! optional_HAVE_STD_OPTIONAL
         "sizeof( nonstd::optional_lite::detail::storage_t<char> ): " <<
          sizeof( nonstd::optional_lite::detail::storage_t<char> )    << "\n" <<
 #endif
