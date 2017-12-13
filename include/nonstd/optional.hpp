@@ -23,8 +23,8 @@
 // Compiler detection:
 
 #define optional_CPP11_OR_GREATER  ( __cplusplus >= 201103L )
-#define optional_CPP14_OR_GREATER  ( __cplusplus >= 201402L /* || (_MSVC_LANG +0) >= 201402L */ )
-#define optional_CPP17_OR_GREATER  ( __cplusplus >= 201703L    || (_MSVC_LANG +0) >= 201703L    )
+#define optional_CPP14_OR_GREATER  ( __cplusplus >= 201402L /* || _MSVC_LANG >= 201402L */ )
+#define optional_CPP17_OR_GREATER  ( __cplusplus >= 201703L    || _MSVC_LANG >= 201703L    )
 
 // use C++17 std::optional if available:
 
