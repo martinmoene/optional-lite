@@ -23,8 +23,8 @@
 // Compiler detection:
 
 #define optional_CPP11_OR_GREATER  ( __cplusplus >= 201103L )
-#define optional_CPP14_OR_GREATER  ( __cplusplus >= 201402L )
-#define optional_CPP17_OR_GREATER  ( __cplusplus >= 201703L )
+#define optional_CPP14_OR_GREATER  ( __cplusplus >= 201402L /* || (_MSVC_LANG +0) >= 201402L */ )
+#define optional_CPP17_OR_GREATER  ( __cplusplus >= 201703L    || (_MSVC_LANG +0) >= 201703L    )
 
 // use C++17 std::optional if available:
 
@@ -34,9 +34,9 @@
 # define optional_HAS_INCLUDE( arg )  0
 #endif
 
-#if optional_HAS_INCLUDE( <optional> ) && optional_CPP17_OR_GREATER
+#define optional_HAVE_STD_OPTIONAL  ( optional_HAS_INCLUDE( <optional> ) && optional_CPP17_OR_GREATER )
 
-#define optional_HAVE_STD_OPTIONAL  1
+#if optional_HAVE_STD_OPTIONAL  
 
 #include <optional>
 
@@ -235,14 +235,27 @@ namespace nonstd {
 # include <tr1/type_traits>
 #endif
 
+// type traits needed:
+
+namespace nonstd { namespace optional_lite { namespace detail {
+
+#if optional_HAVE_CONDITIONAL
+    using std::conditional;
+#else
+    template< bool B, typename T, typename F > struct conditional              { typedef T type; };
+    template<         typename T, typename F > struct conditional<false, T, F> { typedef F type; };
+#endif // optional_HAVE_CONDITIONAL
+
+}}}
+
 //
 // in_place: code duplicated in any-lite, optional-lite, variant-lite:
 //
 
 #if ! nonstd_lite_HAVE_IN_PLACE_TYPES
 
-namespace nonstd {
-
+namespace nonstd { 
+    
 namespace detail {
 
 template< class T >
@@ -304,23 +317,6 @@ class optional;
 namespace detail {
 
 // C++11 emulation:
-
-#if optional_HAVE_CONDITIONAL
-
-using std::conditional;
-
-#else
-
-template< bool Cond, class Then, class Else >
-struct conditional;
-
-template< class Then, class Else >
-struct conditional< true , Then, Else > { typedef Then type; };
-
-template< class Then, class Else >
-struct conditional< false, Then, Else > { typedef Else type; };
-
-#endif // optional_HAVE_CONDITIONAL
 
 struct nulltype{};
 
