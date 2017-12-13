@@ -21,12 +21,29 @@ lest::tests & specification()
 CASE( "__cplusplus" "[.stdc++]" )
 {
     optional_PRESENT( __cplusplus );
+
+#if _MSVC_LANG
+    optional_PRESENT( _MSVC_LANG );
+#else
+    optional_ABSENT(  _MSVC_LANG );
+#endif
 }
 
 CASE( "optional-lite version" "[.version]" )
 {
     optional_PRESENT( optional_lite_VERSION );
 }
+
+CASE( "optional-lite configuration" "[.config]" )
+{
+#if optional_HAVE_STD_OPTIONAL
+    std::cout << "Using std::optional\n";
+#else
+    std::cout << "Using nonstd::optional\n";
+#endif
+}
+
+#if !optional_HAVE_STD_OPTIONAL
 
 CASE( "compiler version" "[.compiler]" )
 {
@@ -180,6 +197,8 @@ CASE( "presence of C++ library features" "[.stdlibrary]" )
     optional_ABSENT(  _HAS_CPP0X );
 #endif
 }
+
+#endif // optional_HAVE_STD_OPTIONAL
 
 int main( int argc, char * argv[] )
 {
