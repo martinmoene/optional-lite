@@ -249,7 +249,7 @@ CASE( "optional: Allows to in-place copy-construct from value (C++11)" )
 
     EXPECT( a->first        == 'a' );
     EXPECT( a->second.value ==  7  );
-#if optional_HAVE_STD_OPTIONAL
+#if optional_USES_STD_OPTIONAL
     EXPECT( a->second.state == copy_constructed );
 #else
     EXPECT( a->second.state == move_constructed );
@@ -288,7 +288,7 @@ CASE( "optional: Allows to in-place copy-construct from initializer-list (C++11)
     EXPECT( a->vec[2]  ==  9 );
     EXPECT( a->c       == 'a');
     EXPECT( a->s.value ==  7 );
-#if optional_HAVE_STD_OPTIONAL
+#if optional_USES_STD_OPTIONAL
     EXPECT( a->s.state == copy_constructed );
 #else
     EXPECT( a->s.state == move_constructed );
@@ -410,7 +410,7 @@ CASE( "optional: Allows to copy-emplace content from arguments (C++11)" )
 
     EXPECT( a->first        == 'a' );
     EXPECT( a->second.value ==  7  );
-#if optional_HAVE_STD_OPTIONAL
+#if optional_USES_STD_OPTIONAL
     EXPECT( a->second.state == copy_constructed );
 #else
     EXPECT( a->second.state == move_constructed );
@@ -452,7 +452,7 @@ CASE( "optional: Allows to copy-emplace content from intializer-list and argumen
     EXPECT( a->vec[2]  ==  9  );
     EXPECT( a->c       == 'a' );
     EXPECT( a->s.value ==  7  );
-#if optional_HAVE_STD_OPTIONAL
+#if optional_USES_STD_OPTIONAL
     EXPECT( a->s.state == copy_constructed );
 #else
     EXPECT( a->s.state == move_constructed );
@@ -750,7 +750,7 @@ CASE( "make_optional: Allows to in-place copy-construct optional from arguments 
 
     EXPECT( a->first        == 'a' );
     EXPECT( a->second.value ==  7  );
-#if optional_HAVE_STD_OPTIONAL
+#if optional_USES_STD_OPTIONAL
     EXPECT( a->second.state == copy_constructed );
 #else
     EXPECT( a->second.state == move_constructed );
@@ -789,7 +789,7 @@ CASE( "make_optional: Allows to in-place copy-construct optional from initialize
     EXPECT( a->vec[2]  ==  9  );
     EXPECT( a->c       == 'a' );
     EXPECT( a->s.value ==  7  );
-#if optional_HAVE_STD_OPTIONAL
+#if optional_USES_STD_OPTIONAL
     EXPECT( a->s.state == copy_constructed );
 #else
     EXPECT( a->s.state == move_constructed );
@@ -828,12 +828,29 @@ CASE( "make_optional: Allows to in-place move-construct optional from initialize
 
 #if optional_EXPERIMENTAL_FUNCTIONAL_EXTENSTIONS
 
+int  double_int( int arg ) { return 2 * arg; }
+void voider_int( int arg ) {}
+
 CASE( "optional map(f): non-void" "[functional]")
 {
+    const int v = 21;
+
+    EXPECT( 2*v == optional<int>(v).map( double_int ).value() );
+
+#if optional_CPP11_OR_GREATER
+    EXPECT( 2*v == optional<int>(v).map( [](int arg) {return 2*arg; } ).value() );
+#endif
 }
 
 CASE( "optional map(f): void" "[functional]")
 {
+    const int v = 21;
+
+    EXPECT( monostate() == optional<int>(v).map( voider_int ).value() );
+
+#if optional_CPP11_OR_GREATER
+    EXPECT( monostate() == optional<int>(v).map( [](int arg) -> void {} ).value() );
+#endif
 }
 
 CASE( "optional map_or(f): " "[functional]")
@@ -844,8 +861,22 @@ CASE( "optional map_or_else(f): " "[functional]")
 {
 }
 
-CASE( "optional and_then(f): " "[functional]")
+optional<int> double_opt( int arg ) { return 2 * arg; }
+optional<int> fail_opt  ( int arg ) { return nullopt; }
+
+CASE( "optional and_then(f): success" "[functional]")
 {
+    const int  v = 21;
+
+    EXPECT( 2*v == optional<int>(v).and_then( double_opt ).value() );
+}
+
+CASE( "optional and_then(f): fail" "[functional]")
+{
+    EXPECT_NOT( optional<int>(7)
+        .and_then( double_opt )
+        .and_then( fail_opt   )
+        .and_then( double_opt ).has_value() );
 }
 
 CASE( "optional or_else(f): non-void" "[functional]")

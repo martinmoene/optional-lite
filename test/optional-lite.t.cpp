@@ -36,7 +36,19 @@ CASE( "optional-lite version" "[.version]" )
 
 CASE( "optional-lite configuration" "[.config]" )
 {
+#if optional_EXPERIMENTAL_FUNCTIONAL_EXTENSTIONS
+    optional_PRESENT( optional_EXPERIMENTAL_FUNCTIONAL_EXTENSTIONS );
+#else
+    optional_ABSENT(  optional_EXPERIMENTAL_FUNCTIONAL_EXTENSTIONS );
+#endif
+
 #if optional_HAVE_STD_OPTIONAL
+    std::cout << "Have std::optional\n";
+#else
+    std::cout << "No std::optional\n";
+#endif
+
+#if optional_USES_STD_OPTIONAL
     std::cout << "Using std::optional\n";
 #else
     std::cout << "Using nonstd::optional\n";

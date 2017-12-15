@@ -18,7 +18,14 @@ using namespace nonstd;
 
 extern lest::tests & specification();
 
-namespace nonstd { namespace optional_lite {
+namespace nonstd { 
+    
+inline std::ostream & operator<<( std::ostream & os, monostate const & )
+{
+    return os << "[monostate]";
+}
+    
+namespace optional_lite {
 
 // use oparator<< instead of to_string() overload;
 // see  http://stackoverflow.com/a/10651752/437272
@@ -30,7 +37,7 @@ inline std::ostream & operator<<( std::ostream & os, optional<T> const & v )
     return os << "[optional:" << (v ? to_string(*v) : "[empty]") << "]";
 }
 
-}}
+}} // namespace nonstd::optional_lite
 
 namespace lest {
 
