@@ -35,8 +35,9 @@
 #endif
 
 #define optional_HAVE_STD_OPTIONAL  ( optional_HAS_INCLUDE( <optional> ) && optional_CPP17_OR_GREATER )
+#define optional_USES_STD_OPTIONAL  ( optional_HAVE_STD_OPTIONAL && !optional_EXPERIMENTAL_FUNCTIONAL_EXTENSTIONS )
 
-#if optional_HAVE_STD_OPTIONAL  
+#if optional_USES_STD_OPTIONAL
 
 #include <optional>
 
@@ -65,7 +66,7 @@ namespace nonstd {
     using std::swap;
 }
 
-#else // optional_HAVE_STD_OPTIONAL
+#else // optional_USES_STD_OPTIONAL
 
 #include <cassert>
 #include <stdexcept>
@@ -371,8 +372,8 @@ template< typename R, typename T1 > struct result_of<R (&)(T1)> { typedef R type
 
 #if ! nonstd_lite_HAVE_IN_PLACE_TYPES
 
-namespace nonstd { 
-    
+namespace nonstd {
+
 namespace detail {
 
 template< class T >
@@ -1195,7 +1196,7 @@ public:
     {
         optional result; result.swap( *this );
         return result;
-    }    
+    }
 
 #endif // optional_EXPERIMENTAL_FUNCTIONAL_EXTENSTIONS
 };
@@ -1453,6 +1454,6 @@ public:
 
 #endif // optional_CPP11_OR_GREATER
 
-#endif // optional_HAVE_STD_OPTIONAL
+#endif // optional_USES_STD_OPTIONAL
 
 #endif // NONSTD_OPTIONAL_LITE_HPP
