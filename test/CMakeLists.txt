@@ -19,8 +19,11 @@ set( HAS_CPP11_FLAG FALSE )
 set( HAS_CPP14_FLAG FALSE )
 set( HAS_CPP17_FLAG FALSE )
 
+add_definitions( -Doptional_EXPERIMENTAL_FUNCTIONAL_EXTENSTIONS=1 )
+
 if( MSVC )
-    add_compile_options( -W3 -EHsc -D_SCL_SECURE_NO_WARNINGS )
+    add_compile_options( -W3 -EHsc )
+    add_definitions( -D_SCL_SECURE_NO_WARNINGS )
 
 elseif( CMAKE_CXX_COMPILER_ID MATCHES GNU OR
         CMAKE_CXX_COMPILER_ID MATCHES Clang )
