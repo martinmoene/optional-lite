@@ -12,4 +12,4 @@ before_build:
 
 build_script:
     - cmake --build .
-    - ctest -C %CONFIGURATION%
+    - ctest -C %configuration%
