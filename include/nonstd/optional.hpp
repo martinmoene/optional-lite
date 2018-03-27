@@ -20,11 +20,20 @@
 
 #define  optional_lite_VERSION "2.3.1"
 
-// Compiler detection:
+// Compiler detection (C++20 is speculative):
+// Note: MSVC supports C++14 since it supports C++17.
 
-#define optional_CPP11_OR_GREATER  ( __cplusplus >= 201103L )
-#define optional_CPP14_OR_GREATER  ( __cplusplus >= 201402L /* || _MSVC_LANG >= 201402L */ )
-#define optional_CPP17_OR_GREATER  ( __cplusplus >= 201703L    || _MSVC_LANG >= 201703L    )
+#ifdef _MSVC_LANG
+# define optional_MSVC_LANG  _MSVC_LANG
+#else
+# define optional_MSVC_LANG  0
+#endif
+
+#define optional_CPP11             (__cplusplus == 201103L )
+#define optional_CPP11_OR_GREATER  (__cplusplus >= 201103L || optional_MSVC_LANG >= 201103L )
+#define optional_CPP14_OR_GREATER  (__cplusplus >= 201402L || optional_MSVC_LANG >= 201703L )
+#define optional_CPP17_OR_GREATER  (__cplusplus >= 201703L || optional_MSVC_LANG >= 201703L )
+#define optional_CPP20_OR_GREATER  (__cplusplus >= 202000L || optional_MSVC_LANG >= 202000L )
 
 // use C++17 std::optional if available:
 
