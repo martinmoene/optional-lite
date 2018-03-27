@@ -22,6 +22,10 @@
 
 // Compiler detection:
 
+#if !defined(_MSVC_LANG)
+# define _MSVC_LANG 0
+#endif
+
 #define optional_CPP11_OR_GREATER  ( __cplusplus >= 201103L )
 #define optional_CPP14_OR_GREATER  ( __cplusplus >= 201402L /* || _MSVC_LANG >= 201402L */ )
 #define optional_CPP17_OR_GREATER  ( __cplusplus >= 201703L    || _MSVC_LANG >= 201703L    )
@@ -138,6 +142,8 @@ namespace nonstd {
 
 #if optional_CPP14_OR_GREATER
 # define optional_HAVE_CONSTEXPR_14  1
+#else
+# define optional_HAVE_CONSTEXPR_14  0
 #endif
 
 // Presence of C++17 language features:
@@ -252,7 +258,7 @@ namespace nonstd { namespace optional_lite { namespace detail {
 // in_place: code duplicated in any-lite, optional-lite, variant-lite:
 //
 
-#if ! nonstd_lite_HAVE_IN_PLACE_TYPES
+#if !defined(nonstd_lite_HAVE_IN_PLACE_TYPES) || ! nonstd_lite_HAVE_IN_PLACE_TYPES
 
 namespace nonstd { 
     
@@ -1164,5 +1170,9 @@ public:
 #endif // optional_CPP11_OR_GREATER
 
 #endif // have C++17 std::optional
+
+#if 0 == _MSVC_LANG
+# undef _MSVC_LANG
+#endif
 
 #endif // NONSTD_OPTIONAL_LITE_HPP
