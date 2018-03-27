@@ -22,13 +22,15 @@
 
 // Compiler detection:
 
-#if !defined(_MSVC_LANG)
-# define _MSVC_LANG 0
+#ifdef _MSVC_LANG
+# define type_MSVC_LANG _MSVC_LANG
+#else
+# define type_MSVC_LANG 0
 #endif
 
 #define optional_CPP11_OR_GREATER  ( __cplusplus >= 201103L )
-#define optional_CPP14_OR_GREATER  ( __cplusplus >= 201402L /* || _MSVC_LANG >= 201402L */ )
-#define optional_CPP17_OR_GREATER  ( __cplusplus >= 201703L    || _MSVC_LANG >= 201703L    )
+#define optional_CPP14_OR_GREATER  ( __cplusplus >= 201402L /* || type_MSVC_LANG >= 201402L */ )
+#define optional_CPP17_OR_GREATER  ( __cplusplus >= 201703L    || type_MSVC_LANG >= 201703L    )
 
 // use C++17 std::optional if available:
 
@@ -1170,9 +1172,5 @@ public:
 #endif // optional_CPP11_OR_GREATER
 
 #endif // have C++17 std::optional
-
-#if 0 == _MSVC_LANG
-# undef _MSVC_LANG
-#endif
 
 #endif // NONSTD_OPTIONAL_LITE_HPP
