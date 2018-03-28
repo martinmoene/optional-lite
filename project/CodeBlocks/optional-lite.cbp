@@ -26,8 +26,8 @@
 		<Unit filename="../../test/CMakeLists.txt" />
 		<Unit filename="../../test/Makefile" />
 		<Unit filename="../../test/lest_cpp03.hpp" />
-		<Unit filename="../../test/optional-lite.t.cpp" />
-		<Unit filename="../../test/optional-lite.t.h" />
+		<Unit filename="../../test/optional-main.t.cpp" />
+		<Unit filename="../../test/optional-main.t.h" />
 		<Unit filename="../../test/optional.t.cpp" />
 		<Unit filename="../../test/t.bat" />
 		<Unit filename="../../test/tc.bat" />

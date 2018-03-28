@@ -4,7 +4,15 @@
 //
 // This code is licensed under the MIT License (MIT).
 
-#include "optional-lite.t.h"
+#include "optional-main.t.h"
+
+#ifdef __clang__
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wundef"
+#elif defined  __GNUC__
+# pragma  GCC  diagnostic push
+# pragma  GCC  diagnostic ignored "-Wundef"
+#endif // __clang__
 
 #define optional_PRESENT( x ) \
     std::cout << #x << ": " << x << "\n"
@@ -185,6 +193,12 @@ int main( int argc, char * argv[] )
 {
     return lest::run( specification(), argc, argv );
 }
+
+#ifdef __clang__
+_Pragma("clang diagnostic pop")
+#elif defined __GNUC__
+_Pragma("GCC diagnostic pop")
+#endif
 
 #if 0
 g++            -I../include/nonstd -o optional-lite.t.exe optional-lite.t.cpp && optional-lite.t.exe --pass

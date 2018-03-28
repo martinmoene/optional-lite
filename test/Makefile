@@ -8,7 +8,7 @@
 
 # Usage: gmake [STD=c++03]
 
-PROGRAM = optional.t
+PROGRAM = optional-main.t
 SOURCES = $(wildcard *.cpp)
 OBJECTS = $(SOURCES:.cpp=.o)
 
@@ -17,7 +17,7 @@ STD_OPTION = -std=$(STD)
 endif
 
 CXX = g++
-CXXFLAGS = $(STD_OPTION) -Wall  # -Wextra 
+CXXFLAGS = $(STD_OPTION) -I../include/nonstd -Wall  # -Wextra 
 
 all: $(PROGRAM)
 
