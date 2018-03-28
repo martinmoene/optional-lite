@@ -18,7 +18,7 @@
 #ifndef NONSTD_OPTIONAL_LITE_HPP
 #define NONSTD_OPTIONAL_LITE_HPP
 
-#define  optional_lite_VERSION "2.3.1"
+#define  optional_lite_VERSION "2.3.2"
 
 // Compiler detection (C++20 is speculative):
 // Note: MSVC supports C++14 since it supports C++17.
@@ -119,6 +119,10 @@ namespace nonstd {
 # pragma warning( disable: 4814 )   // in C++14 'constexpr' will not imply 'const'
 #endif
 
+// Presence of language and library features:
+
+#define optional_HAVE(FEATURE) ( defined optional_HAVE_##FEATURE && optional_HAVE_##FEATURE )
+
 // Presence of C++11 language features:
 
 #if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 10
@@ -196,31 +200,31 @@ namespace nonstd {
 
 // C++ feature usage:
 
-#if optional_HAVE_CONSTEXPR_11
+#if optional_HAVE( CONSTEXPR_11 )
 # define optional_constexpr  constexpr
 #else
 # define optional_constexpr  /*constexpr*/
 #endif
 
-#if optional_HAVE_CONSTEXPR_14
+#if optional_HAVE( CONSTEXPR_14 )
 # define optional_constexpr14  constexpr
 #else
 # define optional_constexpr14  /*constexpr*/
 #endif
 
-#if optional_HAVE_NOEXCEPT
+#if optional_HAVE( NOEXCEPT )
 # define optional_noexcept  noexcept
 #else
 # define optional_noexcept  /*noexcept*/
 #endif
 
-#if optional_HAVE_NULLPTR
+#if optional_HAVE( NULLPTR )
 # define optional_nullptr  nullptr
 #else
 # define optional_nullptr  NULL
 #endif
 
-#if optional_HAVE_REF_QUALIFIER
+#if optional_HAVE( REF_QUALIFIER )
 # define optional_ref_qual  &
 # define optional_refref_qual  &&
 #else
@@ -234,11 +238,11 @@ namespace nonstd {
 # include <functional>
 #endif
 
-#if optional_HAVE_INITIALIZER_LIST
+#if optional_HAVE( INITIALIZER_LIST )
 # include <initializer_list>
 #endif
 
-#if optional_HAVE_TYPE_TRAITS
+#if optional_HAVE( TYPE_TRAITS )
 # include <type_traits>
 #elif optional_HAVE_TR1_TYPE_TRAITS
 # include <tr1/type_traits>
@@ -248,7 +252,7 @@ namespace nonstd {
 
 namespace nonstd { namespace optional_lite { namespace detail {
 
-#if optional_HAVE_CONDITIONAL
+#if optional_HAVE( CONDITIONAL )
     using std::conditional;
 #else
     template< bool B, typename T, typename F > struct conditional              { typedef T type; };
@@ -261,7 +265,7 @@ namespace nonstd { namespace optional_lite { namespace detail {
 // in_place: code duplicated in any-lite, optional-lite, variant-lite:
 //
 
-#if ! nonstd_lite_HAVE_IN_PLACE_TYPES
+#ifndef nonstd_lite_HAVE_IN_PLACE_TYPES
 
 namespace nonstd { 
     
@@ -611,7 +615,7 @@ struct nullopt_t
     optional_constexpr nullopt_t( init ) {}
 };
 
-#if optional_HAVE_CONSTEXPR_11
+#if optional_HAVE( CONSTEXPR_11 )
 constexpr nullopt_t nullopt{ nullopt_t::init{} };
 #else
 // extra parenthesis to prevent the most vexing parse:
@@ -838,7 +842,7 @@ public:
         return contained.value();
     }
 
-#if optional_HAVE_REF_QUALIFIER
+#if optional_HAVE( REF_QUALIFIER )
 
     optional_constexpr14 value_type const && value() const optional_refref_qual
     {
