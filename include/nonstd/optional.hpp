@@ -43,9 +43,9 @@
 # define optional_HAS_INCLUDE( arg )  0
 #endif
 
-#define optional_HAVE_STD_OPTIONAL  ( optional_HAS_INCLUDE( <optional> ) && optional_CPP17_OR_GREATER )
+#define optional_HAVE_STD_OPTIONAL  ( optional_CPP17_OR_GREATER && optional_HAS_INCLUDE( <optional> ) )
 
-#if optional_HAVE_STD_OPTIONAL  
+#if optional_HAVE_STD_OPTIONAL
 
 #include <optional>
 
@@ -94,6 +94,16 @@ namespace nonstd {
 # define optional_CONFIG_ALIGN_AS_FALLBACK  double
 #endif
 
+// Compiler warning suppression:
+
+#ifdef __clang__
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wundef"
+#elif defined __GNUC__
+# pragma GCC   diagnostic push
+# pragma GCC   diagnostic ignored "-Wundef"
+#endif
+
 // half-open range [lo..hi):
 #define optional_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
 
@@ -121,7 +131,7 @@ namespace nonstd {
 
 // Presence of language and library features:
 
-#define optional_HAVE(FEATURE) ( !!optional_HAVE_##FEATURE )
+#define optional_HAVE(FEATURE) ( optional_HAVE_##FEATURE )
 
 // Presence of C++11 language features:
 
@@ -267,8 +277,8 @@ namespace nonstd { namespace optional_lite { namespace detail {
 
 #ifndef nonstd_lite_HAVE_IN_PLACE_TYPES
 
-namespace nonstd { 
-    
+namespace nonstd {
+
 namespace detail {
 
 template< class T >
@@ -897,7 +907,7 @@ public:
     }
 
 private:
-    void this_type_does_not_support_comparisons() const {}
+    static void this_type_does_not_support_comparisons() {}
 
     template< typename V >
     void initialize( V const & value )
@@ -928,7 +938,7 @@ private:
 template< typename T, typename U >
 inline optional_constexpr bool operator==( optional<T> const & x, optional<U> const & y )
 {
-    return bool(x) != bool(y) ? false : bool(x) == false ? true : *x == *y;
+    return bool(x) != bool(y) ? false : !bool( x ) ? true : *x == *y;
 }
 
 template< typename T, typename U >
@@ -1175,6 +1185,12 @@ public:
 } //namespace std
 
 #endif // optional_CPP11_OR_GREATER
+
+#ifdef __clang__
+# pragma clang diagnostic pop
+#elif defined __GNUC__
+# pragma GCC   diagnostic pop
+#endif
 
 #endif // have C++17 std::optional
 
