@@ -1,10 +1,10 @@
-// Copyright 2013, 2014, 2015, 2016 by Martin Moene
+// Copyright 2013-2018 by Martin Moene
 //
 // lest is based on ideas by Kevlin Henney, see video at
 // http://skillsmatter.com/podcast/agile-testing/kevlin-henney-rethinking-unit-testing-in-c-plus-plus
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+// file LICENSE.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef LEST_LEST_HPP_INCLUDED
 #define LEST_LEST_HPP_INCLUDED
@@ -27,15 +27,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#ifdef __clang__
-# pragma clang diagnostic ignored "-Woverloaded-shift-op-parentheses"
-# pragma clang diagnostic ignored "-Wunused-comparison"
-# pragma clang diagnostic ignored "-Wunused-value"
-#elif defined __GNUC__
-# pragma GCC   diagnostic ignored "-Wunused-value"
-#endif
-
-#define  lest_VERSION "1.27.0"
+#define  lest_VERSION "1.33.0"
 
 #ifndef  lest_FEATURE_COLOURISE
 # define lest_FEATURE_COLOURISE 0
@@ -58,7 +50,9 @@
 #endif
 
 #ifdef _WIN32
-# define lest_PLATFORM_IS_WINDOWS 1
+# define lest_PLATFORM_IS_WINDOWS  1
+#else
+# define lest_PLATFORM_IS_WINDOWS  0
 #endif
 
 #if lest_FEATURE_REGEX_SEARCH
@@ -68,12 +62,31 @@
 #if lest_FEATURE_TIME
 # if lest_PLATFORM_IS_WINDOWS
 #  include <iomanip>
-#  include <windows.h>
+#  include <Windows.h>
 # else
 #  include <iomanip>
 #  include <sys/time.h>
 # endif
 #endif
+
+// Compiler warning suppression:
+
+#ifdef __clang__
+# pragma clang diagnostic ignored "-Woverloaded-shift-op-parentheses"
+# pragma clang diagnostic ignored "-Wshadow"
+# pragma clang diagnostic ignored "-Wunused-parameter"
+# pragma clang diagnostic ignored "-Wunused-value"
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wdate-time"
+# pragma clang diagnostic ignored "-Wundef"
+#elif defined __GNUC__
+# pragma GCC   diagnostic ignored "-Wunused-parameter"
+# pragma GCC   diagnostic ignored "-Wunused-value"
+# pragma GCC   diagnostic push
+# pragma GCC   diagnostic ignored "-Wundef"
+#endif
+
+// Compiler versions:
 
 #if defined(_MSC_VER)
 # define lest_COMPILER_MSVC_VERSION   (_MSC_VER / 100 - 5 - (_MSC_VER < 1900))
@@ -81,13 +94,42 @@
 # define lest_COMPILER_MSVC_VERSION   0
 #endif
 
-#if lest_COMPILER_MSVC_VERSION == 6
-# define lest_COMPILER_IS_MSVC6  1
+#define lest_COMPILER_IS_MSVC6  ( lest_COMPILER_MSVC_VERSION == 6 )
+
+// C++ language support detection (C++20 is speculative):
+// Note: MSVC supports C++14 since it supports C++17.
+
+#ifdef _MSVC_LANG
+# define lest_MSVC_LANG  _MSVC_LANG
+#else
+# define lest_MSVC_LANG  0
 #endif
 
-#if ( __cplusplus >= 201103L ) || lest_COMPILER_MSVC_VERSION >= 12
-# define lest_CPP11_OR_GREATER  1
+#define lest_CPP11             (__cplusplus == 201103L )
+#define lest_CPP11_OR_GREATER  (__cplusplus >= 201103L || lest_MSVC_LANG >= 201103L || lest_COMPILER_MSVC_VERSION >= 12 )
+#define lest_CPP14_OR_GREATER  (__cplusplus >= 201402L || lest_MSVC_LANG >= 201703L )
+#define lest_CPP17_OR_GREATER  (__cplusplus >= 201703L || lest_MSVC_LANG >= 201703L )
+#define lest_CPP20_OR_GREATER  (__cplusplus >= 202000L || lest_MSVC_LANG >= 202000L )
+
+// Presence of language and library features:
+
+#define lest_HAVE(FEATURE) ( lest_HAVE_##FEATURE )
+
+// Presence of C++11 language features:
+
+#if lest_CPP11_OR_GREATER || lest_COMPILER_MSVC_VERSION >= 10
+# define lest_HAVE_NULLPTR  1
 #endif
+
+// C++ feature usage:
+
+#if lest_HAVE( NULLPTR )
+# define lest_nullptr  nullptr
+#else
+# define lest_nullptr  NULL
+#endif
+
+// Additional includes and tie:
 
 #if lest_CPP11_OR_GREATER || lest_COMPILER_MSVC_VERSION >= 10
 
@@ -145,7 +187,7 @@ namespace lest
 
 namespace lest
 {
-#ifdef lest_COMPILER_IS_MSVC6
+#if lest_COMPILER_IS_MSVC6
     using ::strtol;
     using ::rand;
     using ::srand;
@@ -181,15 +223,13 @@ namespace lest
 # define AND_THEN          lest_AND_THEN
 #endif
 
-#define lest_SCENARIO( sketch  )  lest_CASE(    lest::text("Scenario: ") + sketch  )
+#define lest_SCENARIO( specification, sketch  )  \
+                                  lest_CASE(    specification,  lest::text("Scenario: ") + sketch  )
 #define lest_GIVEN(    context )  lest_SETUP(   lest::text(   "Given: ") + context )
 #define lest_WHEN(     story   )  lest_SECTION( lest::text(   " When: ") + story   )
 #define lest_THEN(     story   )  lest_SECTION( lest::text(   " Then: ") + story   )
 #define lest_AND_WHEN( story   )  lest_SECTION( lest::text(   "  And: ") + story   )
 #define lest_AND_THEN( story   )  lest_SECTION( lest::text(   "  And: ") + story   )
-
-#define lest_TEST \
-    lest_CASE
 
 #define lest_CASE( specification, proposition ) \
     static void lest_FUNCTION( lest::env & ); \
@@ -329,8 +369,10 @@ struct result
     const bool passed;
     const text decomposition;
 
-    result( bool passed, text decomposition )
-    : passed( passed ), decomposition( decomposition ) {}
+    template< typename T >
+    result( T const & passed, text decomposition )
+    : passed( !!passed ), decomposition( decomposition ) {}
+
     operator bool() { return ! passed; }
 };
 
@@ -357,7 +399,9 @@ struct message : std::runtime_error
     const location where;
     const comment note;
 
+#if ! lest_CPP11_OR_GREATER
     ~message() throw() {}
+#endif
 
     message( text kind, location where, text expr, text note = "" )
     : std::runtime_error( expr ), kind( kind ), where( where ), note( note ) {}
@@ -426,7 +470,7 @@ class approx
 {
 public:
     explicit approx ( double magnitude )
-    : epsilon_  ( std::numeric_limits<float>::epsilon() * 100 )
+    : epsilon_  ( 100.0 * static_cast<double>( std::numeric_limits<float>::epsilon() ) )
     , scale_    ( 1.0 )
     , magnitude_( magnitude ) {}
 
@@ -454,6 +498,11 @@ public:
     friend bool operator == ( approx const & lhs, double rhs ) { return  operator==( rhs, lhs ); }
     friend bool operator != ( double lhs, approx const & rhs ) { return !operator==( lhs, rhs ); }
     friend bool operator != ( approx const & lhs, double rhs ) { return !operator==( rhs, lhs ); }
+
+    friend bool operator <= ( double lhs, approx const & rhs ) { return lhs < rhs.magnitude_ || lhs == rhs; }
+    friend bool operator <= ( approx const & lhs, double rhs ) { return lhs.magnitude_ < rhs || lhs == rhs; }
+    friend bool operator >= ( double lhs, approx const & rhs ) { return lhs > rhs.magnitude_ || lhs == rhs; }
+    friend bool operator >= ( approx const & lhs, double rhs ) { return lhs.magnitude_ > rhs || lhs == rhs; }
 
 private:
     double epsilon_;
@@ -551,7 +600,8 @@ auto to_string( std::tuple<TS...> const & tuple ) -> std::string
 {
     return "{ " + make_tuple_string<std::tuple<TS...>, sizeof...(TS)>::make( tuple ) + "}";
 }
-#endif
+
+#endif // lest_CPP11_OR_GREATER
 
 template <typename L, typename R>
 std::string to_string( L const & lhs, std::string op, R const & rhs )
@@ -787,6 +837,7 @@ struct action
 
 private:
     action( action const & );
+    void operator=(action const & );
 };
 
 struct print : action
@@ -851,10 +902,12 @@ struct count : action
 #if lest_FEATURE_TIME
 
 #if lest_PLATFORM_IS_WINDOWS
-# if lest_COMPILER_IS_MSVC6
+# if ! lest_CPP11_OR_GREATER && ! lest_COMPILER_MSVC_VERSION
+    typedef unsigned long uint64_t;
+# elif lest_COMPILER_MSVC_VERSION >= 6 && lest_COMPILER_MSVC_VERSION < 10
     typedef /*un*/signed __int64 uint64_t;
 # else
-    typedef unsigned long long uint64_t;
+    using ::uint64_t;
 # endif
 #else
 # if ! lest_CPP11_OR_GREATER
@@ -865,20 +918,20 @@ struct count : action
 #if lest_PLATFORM_IS_WINDOWS
     inline uint64_t current_ticks()
     {
-        static uint64_t hz = 0, hzo = 0;
-        if ( ! hz )
+        static LARGE_INTEGER hz = {{ 0,0 }}, hzo = {{ 0,0 }};
+        if ( ! hz.QuadPart )
         {
-            QueryPerformanceFrequency( (LARGE_INTEGER *) &hz  );
-            QueryPerformanceCounter  ( (LARGE_INTEGER *) &hzo );
+            QueryPerformanceFrequency( &hz  );
+            QueryPerformanceCounter  ( &hzo );
         }
-        uint64_t t; QueryPerformanceCounter( (LARGE_INTEGER *) &t );
+        LARGE_INTEGER t = {{ 0,0 }}; QueryPerformanceCounter( &t );
 
-        return ( ( t - hzo ) * 1000000 ) / hz;
+        return uint64_t( ( ( t.QuadPart - hzo.QuadPart ) * 1000000 ) / hz.QuadPart );
     }
 #else
     inline uint64_t current_ticks()
     {
-        timeval t; gettimeofday( &t, NULL );
+        timeval t; gettimeofday( &t, lest_nullptr );
         return static_cast<uint64_t>( t.tv_sec ) * 1000000ull + static_cast<uint64_t>( t.tv_usec );
     }
 #endif
@@ -891,7 +944,7 @@ struct timer
 
     double elapsed_seconds() const
     {
-        return ( current_ticks() - start_ticks ) / 1e6;
+        return static_cast<double>( current_ticks() - start_ticks ) / 1e6;
     }
 };
 
@@ -1020,7 +1073,7 @@ inline void shuffle( tests & specification, options option )
 #if lest_CPP11_OR_GREATER
     std::shuffle( specification.begin(), specification.end(), std::mt19937( option.seed ) );
 #else
-    lest::srand( option.seed );
+    lest::srand( static_cast<unsigned int>( option.seed ) );
 
     rng generator;
     std::random_shuffle( specification.begin(), specification.end(), generator );
@@ -1029,7 +1082,7 @@ inline void shuffle( tests & specification, options option )
 
 inline int stoi( text num )
 {
-    return lest::strtol( num.c_str(), NULL, 10 );
+    return static_cast<int>( lest::strtol( num.c_str(), lest_nullptr, 10 ) );
 }
 
 inline bool is_number( text arg )
@@ -1044,10 +1097,10 @@ inline seed_t seed( text opt, text arg )
     // std::time_t: implementation dependent
 
     if ( arg == "time" )
-        return static_cast<seed_t>( time( NULL ) );
+        return static_cast<seed_t>( time( lest_nullptr ) );
 
     if ( is_number( arg ) )
-        return lest::stoi( arg );
+        return static_cast<seed_t>( lest::stoi( arg ) );
 
     throw std::runtime_error( "expecting 'time' or positive number with option '" + opt + "', got '" + arg + "' (try option --help)" );
 }
@@ -1258,5 +1311,11 @@ int run(  C const & specification, std::ostream & os = std::cout )
 }
 
 } // namespace lest
+
+#ifdef __clang__
+# pragma clang diagnostic pop
+#elif defined __GNUC__
+# pragma GCC   diagnostic pop
+#endif
 
 #endif // LEST_LEST_HPP_INCLUDED
