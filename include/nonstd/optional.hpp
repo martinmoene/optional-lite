@@ -121,7 +121,7 @@ namespace nonstd {
 
 // Presence of language and library features:
 
-#define optional_HAVE(FEATURE) ( defined optional_HAVE_##FEATURE && optional_HAVE_##FEATURE )
+#define optional_HAVE(FEATURE) ( !!optional_HAVE_##FEATURE )
 
 // Presence of C++11 language features:
 
@@ -244,7 +244,7 @@ namespace nonstd {
 
 #if optional_HAVE( TYPE_TRAITS )
 # include <type_traits>
-#elif optional_HAVE_TR1_TYPE_TRAITS
+#elif optional_HAVE( TR1_TYPE_TRAITS )
 # include <tr1/type_traits>
 #endif
 
