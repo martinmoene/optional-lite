@@ -6,6 +6,10 @@
 
 #include "optional-main.t.h"
 
+#ifndef  optional_HAVE
+# define optional_HAVE(FEATURE) ( optional_HAVE_##FEATURE )
+#endif
+
 #define optional_PRESENT( x ) \
     std::cout << #x << ": " << x << "\n"
 
