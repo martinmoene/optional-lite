@@ -907,7 +907,7 @@ public:
     }
 
 private:
-    static void this_type_does_not_support_comparisons() {}
+    void this_type_does_not_support_comparisons() const {}
 
     template< typename V >
     void initialize( V const & value )
