@@ -34,13 +34,19 @@ CASE( "optional-lite version" "[.version]" )
 
 CASE( "compiler version" "[.compiler]" )
 {
-#if optional_COMPILER_GNUC_VERSION
+#ifdef optional_COMPILER_CLANG_VERSION
+    optional_PRESENT( optional_COMPILER_CLANG_VERSION );
+#else
+    optional_ABSENT(  optional_COMPILER_CLANG_VERSION );
+#endif
+
+#ifdef optional_COMPILER_GNUC_VERSION
     optional_PRESENT( optional_COMPILER_GNUC_VERSION );
 #else
     optional_ABSENT(  optional_COMPILER_GNUC_VERSION );
 #endif
 
-#if optional_COMPILER_MSVC_VERSION
+#ifdef optional_COMPILER_MSVC_VERSION
     optional_PRESENT( optional_COMPILER_MSVC_VERSION );
 #else
     optional_ABSENT(  optional_COMPILER_MSVC_VERSION );

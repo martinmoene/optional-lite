@@ -113,10 +113,18 @@ namespace nonstd {
 # define optional_COMPILER_MSVC_VERSION   0
 #endif
 
+#define optional_COMPILER_VERSION( major, minor, patch )  ( 10 * (10 * major + minor ) + patch )
+
 #if defined __GNUC__
-# define optional_COMPILER_GNUC_VERSION  __GNUC__
+# define optional_COMPILER_GNUC_VERSION   optional_COMPILER_VERSION(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__)
 #else
-# define optional_COMPILER_GNUC_VERSION    0
+# define optional_COMPILER_GNUC_VERSION   0
+#endif
+
+#if defined __clang__
+# define optional_COMPILER_CLANG_VERSION  optional_COMPILER_VERSION(__clang_major__, __clang_minor__, __clang_patchlevel__)
+#else
+# define optional_COMPILER_CLANG_VERSION  0
 #endif
 
 #if optional_BETWEEN(optional_COMPILER_MSVC_VERSION, 7, 14 )
