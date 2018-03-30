@@ -108,7 +108,7 @@ namespace nonstd {
 #define optional_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
 
 #if defined(_MSC_VER) && !defined(__clang__)
-# define optional_COMPILER_MSVC_VERSION   (_MSC_VER / 100 - 5 - (_MSC_VER < 1900))
+# define optional_COMPILER_MSVC_VERSION   (_MSC_VER / 10 - 10 * ( 5 + (_MSC_VER < 1900)) )
 #else
 # define optional_COMPILER_MSVC_VERSION   0
 #endif
@@ -127,12 +127,12 @@ namespace nonstd {
 # define optional_COMPILER_CLANG_VERSION  0
 #endif
 
-#if optional_BETWEEN(optional_COMPILER_MSVC_VERSION, 7, 14 )
+#if optional_BETWEEN(optional_COMPILER_MSVC_VERSION, 70, 140 )
 # pragma warning( push )
 # pragma warning( disable: 4345 )   // initialization behavior changed
 #endif
 
-#if optional_BETWEEN(optional_COMPILER_MSVC_VERSION, 7, 15 )
+#if optional_BETWEEN(optional_COMPILER_MSVC_VERSION, 70, 150 )
 # pragma warning( push )
 # pragma warning( disable: 4814 )   // in C++14 'constexpr' will not imply 'const'
 #endif
@@ -143,18 +143,18 @@ namespace nonstd {
 
 // Presence of C++11 language features:
 
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 10
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 100
 # define optional_HAVE_AUTO  1
 # define optional_HAVE_NULLPTR  1
 # define optional_HAVE_STATIC_ASSERT  1
 #endif
 
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 12
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 120
 # define optional_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  1
 # define optional_HAVE_INITIALIZER_LIST  1
 #endif
 
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 14
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 140
 # define optional_HAVE_ALIAS_TEMPLATE  1
 # define optional_HAVE_CONSTEXPR_11  1
 # define optional_HAVE_ENUM_CLASS  1
@@ -184,34 +184,34 @@ namespace nonstd {
 # define optional_HAVE_TR1_ADD_POINTER  1
 #endif
 
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 9
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 90
 # define optional_HAVE_TYPE_TRAITS  1
 # define optional_HAVE_STD_ADD_POINTER  1
 #endif
 
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 11
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 110
 # define optional_HAVE_ARRAY  1
 #endif
 
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 12
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 120
 # define optional_HAVE_CONDITIONAL  1
 #endif
 
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 14 || (optional_COMPILER_MSVC_VERSION >= 9 && _HAS_CPP0X)
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 140 || (optional_COMPILER_MSVC_VERSION >= 90 && _HAS_CPP0X)
 # define optional_HAVE_CONTAINER_DATA_METHOD  1
 #endif
 
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 12
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 120
 # define optional_HAVE_REMOVE_CV  1
 #endif
 
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 14
+#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 140
 # define optional_HAVE_SIZED_TYPES  1
 #endif
 
 // For the rest, consider VC14 as C++11 for optional-lite:
 
-#if optional_COMPILER_MSVC_VERSION >= 14
+#if optional_COMPILER_MSVC_VERSION >= 140
 # undef  optional_CPP11_OR_GREATER
 # define optional_CPP11_OR_GREATER  1
 #endif
