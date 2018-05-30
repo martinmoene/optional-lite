@@ -105,56 +105,56 @@ Synopsis
 [Algorithms for *optional lite*](#algorithms-for-optional-lite)  
 [Macros to control alignment](#macros-to-control-alignment)  
 
-### Types in namespace nonstd
+### Types and values in namespace nonstd
 
-| Purpose               | Type | Object |
-|-----------------------|------|--------|
-| To be, or not         | template< typename T ><br>class optional; |&nbsp;|
-| Disengaging           | struct nullopt_t;                | nullopt_t nullopt; |
-| Error reporting       | class bad_optional_access;       |&nbsp;  |
-| In-place construction | struct in_place_tag              | &nbsp; |
-| &nbsp;                | in_place                         | select type or index for in-place construction |
-| &nbsp;                | in_place_type                    | select type for in-place construction |
-| &emsp;(variant)       | in_place_index                   | select index for in-place construction |
-| &nbsp;                | nonstd_lite_in_place_type_t( T)  | macro for alias template in_place_type_t&lt;T>  |
-| &emsp;(variant)       | nonstd_lite_in_place_index_t( T )| macro for alias template in_place_index_t&lt;T> |
+| Purpose               | Type / value | Object |
+|-----------------------|--------------|--------|
+| To be, or not         | template< typename T ><br>class **optional**; |&nbsp;|
+| Disengaging           | struct **nullopt_t**;                | nullopt_t nullopt; |
+| Error reporting       | class **bad_optional_access**;       |&nbsp;  |
+| In-place construction | struct **in_place_tag**              | &nbsp; |
+| &nbsp;                | **in_place**                         | select type or index for in-place construction |
+| &nbsp;                | **in_place_type**                    | select type for in-place construction |
+| &emsp;(variant)       | **in_place_index**                   | select index for in-place construction |
+| &nbsp;                | **nonstd_lite_in_place_type_t**( T)  | macro for alias template in_place_type_t&lt;T>  |
+| &emsp;(variant)       | **nonstd_lite_in_place_index_t**( T )| macro for alias template in_place_index_t&lt;T> |
 
 ### Interface of *optional lite*
 
 | Kind         | Std  | Method                                       | Result |
 |--------------|------|---------------------------------------------|--------|
-| Construction |&nbsp;| optional() noexcept                          | default construct a nulled object |
-| &nbsp;       |&nbsp;| optional( nullopt_t ) noexcept               | explicitly construct a nulled object |
-| &nbsp;       |&nbsp;| optional( optional const & rhs )             | move-construct from an other optional |
-| &nbsp;       | C++11| optional( optional && rhs ) noexcept(...)    | move-construct from an other optional |
-| &nbsp;       |&nbsp;| optional( value_type const & value )         | copy-construct from a value |
-| &nbsp;       | C++11| optional( value_type && value )              | move-construct from a value |
-| &nbsp;       | C++11| explicit optional( in_place_type_t&lt;T>, Args&&... args ) | in-place-construct type T |
-| &nbsp;       | C++11| explicit optional( in_place_type_t&lt;T>, std::initializer_list&lt;U> il, Args&&... args ) | in-place-construct type T |
-| Destruction  |&nbsp;| ~optional()                                  | destruct current content, if any |
-| Assignment   |&nbsp;| optional & operator=( nullopt_t )            | null the object;<br>destruct current content, if any |
-| &nbsp;       |&nbsp;| optional & operator=( optional const & rhs ) | copy-assign from other optional;<br>destruct current content, if any |
-| &nbsp;       | C++11| optional & operator=( optional && rhs )      | move-assign from other optional;<br>destruct current content, if any |
-| &nbsp;       | C++11| template< class U, ...><br>optional & operator=( U && v ) | move-assign from a value;<br>destruct current content, if any |
-| &nbsp;       | C++11| template< class... Args ><br>void emplace( Args&&... args ) |  emplace type T |
-| &nbsp;       | C++11| template< class U, class... Args ><br>void emplace( std::initializer_list&lt;U> il, Args&&... args ) |  emplace type T |
-| Swap         |&nbsp;| void swap( optional & rhs ) noexcept(...)    | swap with rhs |
-| Content      |&nbsp;| value_type const * operator ->() const       | pointer to current content (const);<br>must contain value |
-| &nbsp;       |&nbsp;| value_type * operator ->()                   | pointer to current content (non-const);<br>must contain value |
-| &nbsp;       |&nbsp;| value_type const & operator *() &            | the current content (const ref);<br>must contain value |
-| &nbsp;       |&nbsp;| value_type & operator *() &                  | the current content (non-const ref);<br>must contain value |
-| &nbsp;       | C++11| value_type const & operator *() &&           | the current content (const ref);<br>must contain value |
-| &nbsp;       | C++11| value_type & operator *() &&                 | the current content (non-const ref);<br>must contain value |
-| State        |&nbsp;| operator bool() const                        | true if content is present |
-| &nbsp;       |&nbsp;| bool has_value() const                       | true if content is present |
-| &nbsp;       |&nbsp;| value_type const & value() &                 | the current content (const ref);<br>throws bad_optional_access if nulled |
-| &nbsp;       |&nbsp;| value_type & value() &                       | the current content (non-const ref);<br>throws bad_optional_access if nulled |
-| &nbsp;       | C++11| value_type const & value() &&                | the current content (const ref);<br>throws bad_optional_access if nulled |
-| &nbsp;       | C++11| value_type & value() &&                      | the current content (non-const ref);<br>throws bad_optional_access if nulled |
-| &nbsp;       |<C++11| value_type value_or( value_type const & default_value ) const | the value, or default_value if nulled<br>value_type must be copy-constructible |
-| &nbsp;       | C++11| value_type value_or( value_type && default_value ) &  | the value, or default_value if nulled<br>value_type must be copy-constructible |
-| &nbsp;       | C++11| value_type value_or( value_type && default_value ) && | the value, or default_value if nulled<br>value_type must be copy-constructible |
-| Modifiers    |&nbsp;| void reset() noexcept                        | make empty |
+| Construction |&nbsp;| **optional**() noexcept                          | default construct a nulled object |
+| &nbsp;       |&nbsp;| **optional**( nullopt_t ) noexcept               | explicitly construct a nulled object |
+| &nbsp;       |&nbsp;| **optional**( optional const & rhs )             | move-construct from an other optional |
+| &nbsp;       | C++11| **optional**( optional && rhs ) noexcept(...)    | move-construct from an other optional |
+| &nbsp;       |&nbsp;| **optional**( value_type const & value )         | copy-construct from a value |
+| &nbsp;       | C++11| **optional**( value_type && value )              | move-construct from a value |
+| &nbsp;       | C++11| **explicit optional**( in_place_type_t&lt;T>, Args&&... args ) | in-place-construct type T |
+| &nbsp;       | C++11| **explicit optional**( in_place_type_t&lt;T>, std::initializer_list&lt;U> il, Args&&... args ) | in-place-construct type T |
+| Destruction  |&nbsp;| **~optional**()                                  | destruct current content, if any |
+| Assignment   |&nbsp;| optional & **operator=**( nullopt_t )            | null the object;<br>destruct current content, if any |
+| &nbsp;       |&nbsp;| optional & **operator=**( optional const & rhs ) | copy-assign from other optional;<br>destruct current content, if any |
+| &nbsp;       | C++11| optional & **operator=**( optional && rhs )      | move-assign from other optional;<br>destruct current content, if any |
+| &nbsp;       | C++11| template< class U, ...><br>**optional & operator=( U && v ) | move-assign from a value;<br>destruct current content, if any |
+| &nbsp;       | C++11| template< class... Args ><br>void **emplace**( Args&&... args ) |  emplace type T |
+| &nbsp;       | C++11| template< class U, class... Args ><br>void **emplace**( std::initializer_list&lt;U> il, Args&&... args ) |  emplace type T |
+| Swap         |&nbsp;| void **swap**( optional & rhs ) noexcept(...)    | swap with rhs |
+| Content      |&nbsp;| value_type const \* **operator ->**() const       | pointer to current content (const);<br>must contain value |
+| &nbsp;       |&nbsp;| value_type \* **operator ->**()                   | pointer to current content (non-const);<br>must contain value |
+| &nbsp;       |&nbsp;| value_type const & **operator \***() &            | the current content (const ref);<br>must contain value |
+| &nbsp;       |&nbsp;| value_type & **operator \***() &                  | the current content (non-const ref);<br>must contain value |
+| &nbsp;       | C++11| value_type const & **operator \***() &&           | the current content (const ref);<br>must contain value |
+| &nbsp;       | C++11| value_type & **operator \***() &&                 | the current content (non-const ref);<br>must contain value |
+| State        |&nbsp;| operator **bool**() const                        | true if content is present |
+| &nbsp;       |&nbsp;| bool **has_value**() const                       | true if content is present |
+| &nbsp;       |&nbsp;| value_type const & **value**() &                 | the current content (const ref);<br>throws bad_optional_access if nulled |
+| &nbsp;       |&nbsp;| value_type & **value**() &                       | the current content (non-const ref);<br>throws bad_optional_access if nulled |
+| &nbsp;       | C++11| value_type const & **value**() &&                | the current content (const ref);<br>throws bad_optional_access if nulled |
+| &nbsp;       | C++11| value_type & **value**() &&                      | the current content (non-const ref);<br>throws bad_optional_access if nulled |
+| &nbsp;       |<C++11| value_type **value_or**( value_type const & default_value ) const | the value, or default_value if nulled<br>value_type must be copy-constructible |
+| &nbsp;       | C++11| value_type **value_or**( value_type && default_value ) &  | the value, or default_value if nulled<br>value_type must be copy-constructible |
+| &nbsp;       | C++11| value_type **value_or**( value_type && default_value ) && | the value, or default_value if nulled<br>value_type must be copy-constructible |
+| Modifiers    |&nbsp;| void **reset**() noexcept                        | make empty |
 
 
 ### Algorithms for *optional lite*
@@ -162,45 +162,45 @@ Synopsis
 | Kind                     | Std  | Function |
 |--------------------------|------|----------|
 | Relational operators     |&nbsp;| &nbsp;   | 
-| ==                       |&nbsp;| template< typename T ><br>bool operator==( optional<T> const & x, optional<T> const & y ) |
-| !=                       |&nbsp;| template< typename T ><br>bool operator!=( optional<T> const & x, optional<T> const & y ) |
-| <                        |&nbsp;| template< typename T ><br>bool operator<( optional<T> const & x, optional<T> const & y )  |
-| >                        |&nbsp;| template< typename T ><br>bool operator>( optional<T> const & x, optional<T> const & y )  |
-| <=                       |&nbsp;| template< typename T ><br>bool operator<=( optional<T> const & x, optional<T> const & y ) |
-| >=                       |&nbsp;| template< typename T ><br>bool operator>=( optional<T> const & x, optional<T> const & y ) |
+| ==                       |&nbsp;| template< typename T ><br>bool **operator==**( optional<T> const & x, optional<T> const & y ) |
+| !=                       |&nbsp;| template< typename T ><br>bool **operator!=**( optional<T> const & x, optional<T> const & y ) |
+| <                        |&nbsp;| template< typename T ><br>bool **operator<**( optional<T> const & x, optional<T> const & y )  |
+| >                        |&nbsp;| template< typename T ><br>bool **operator>**( optional<T> const & x, optional<T> const & y )  |
+| <=                       |&nbsp;| template< typename T ><br>bool **operator<=*( optional<T> const & x, optional<T> const & y ) |
+| >=                       |&nbsp;| template< typename T ><br>bool **operator>=*( optional<T> const & x, optional<T> const & y ) |
 | Comparison with nullopt  |&nbsp;| &nbsp;   | 
-| ==                       |&nbsp;| template< typename T ><br>bool operator==( optional<T> const & x, nullopt_t ) noexcept |
-| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator==( nullopt_t, optional<T> const & x ) noexcept |
-| !=                       |&nbsp;| template< typename T ><br>bool operator!=( optional<T> const & x, nullopt_t ) noexcept |
-| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator!=( nullopt_t, optional<T> const & x ) noexcept |
-| <                        |&nbsp;| template< typename T ><br>bool operator<( optional<T> const &, nullopt_t ) noexcept    |
-| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator<( nullopt_t, optional<T> const & x ) noexcept  |
-| <=                       |&nbsp;| template< typename T ><br>bool operator<=( optional<T> const & x, nullopt_t ) noexcept |
-| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator<=( nullopt_t, optional<T> const & ) noexcept   |
-| >                        |&nbsp;| template< typename T ><br>bool operator>( optional<T> const & x, nullopt_t ) noexcept  |
-| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator>( nullopt_t, optional<T> const & ) noexcept    |
-| >=                       |&nbsp;| template< typename T ><br>bool operator>=( optional<T> const &, nullopt_t ) noexcept   |
-| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator>=( nullopt_t, optional<T> const & x ) noexcept |
+| ==                       |&nbsp;| template< typename T ><br>bool **operator==**( optional<T> const & x, nullopt_t ) noexcept |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator==**( nullopt_t, optional<T> const & x ) noexcept |
+| !=                       |&nbsp;| template< typename T ><br>bool **operator!=**( optional<T> const & x, nullopt_t ) noexcept |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator!=**( nullopt_t, optional<T> const & x ) noexcept |
+| <                        |&nbsp;| template< typename T ><br>bool **operator<**( optional<T> const &, nullopt_t ) noexcept    |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator<**( nullopt_t, optional<T> const & x ) noexcept  |
+| <=                       |&nbsp;| template< typename T ><br>bool **operator<=**( optional<T> const & x, nullopt_t ) noexcept |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator<=**( nullopt_t, optional<T> const & ) noexcept   |
+| >                        |&nbsp;| template< typename T ><br>bool **operator>**( optional<T> const & x, nullopt_t ) noexcept  |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator>**( nullopt_t, optional<T> const & ) noexcept    |
+| >=                       |&nbsp;| template< typename T ><br>bool **operator>=**( optional<T> const &, nullopt_t ) noexcept   |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator>=**( nullopt_t, optional<T> const & x ) noexcept |
 | Comparison with T        |&nbsp;| &nbsp;   | 
-| ==                       |&nbsp;| template< typename T ><br>bool operator==( optional<T> const & x, const T& v )  |
-| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator==( T const & v, optional<T> const & x ) |
-| !=                       |&nbsp;| template< typename T ><br>bool operator!=( optional<T> const & x, const T& v )  |
-| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator!=( T const & v, optional<T> const & x ) |
-| <                        |&nbsp;| template< typename T ><br>bool operator<( optional<T> const & x, const T& v )   |
-| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator<( T const & v, optional<T> const & x )  |
-| <=                       |&nbsp;| template< typename T ><br>bool operator<=( optional<T> const & x, const T& v )  |
-| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator<=( T const & v, optional<T> const & x ) |
-| >                        |&nbsp;| template< typename T ><br>bool operator>( optional<T> const & x, const T& v )   |
-| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator>( T const & v, optional<T> const & x )  |
-| >=                       |&nbsp;| template< typename T ><br>bool operator>=( optional<T> const & x, const T& v )  |
-| &nbsp;                   |&nbsp;| template< typename T ><br>bool operator>=( T const & v, optional<T> const & x ) |
+| ==                       |&nbsp;| template< typename T ><br>bool **operator==**( optional<T> const & x, const T& v )  |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator==**( T const & v, optional<T> const & x ) |
+| !=                       |&nbsp;| template< typename T ><br>bool **operator!=**( optional<T> const & x, const T& v )  |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator!=**( T const & v, optional<T> const & x ) |
+| <                        |&nbsp;| template< typename T ><br>bool **operator<**( optional<T> const & x, const T& v )   |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator<**( T const & v, optional<T> const & x )  |
+| <=                       |&nbsp;| template< typename T ><br>bool **operator<=**( optional<T> const & x, const T& v )  |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator<=**( T const & v, optional<T> const & x ) |
+| >                        |&nbsp;| template< typename T ><br>bool **operator>**( optional<T> const & x, const T& v )   |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator>**( T const & v, optional<T> const & x )  |
+| >=                       |&nbsp;| template< typename T ><br>bool **operator>=**( optional<T> const & x, const T& v )  |
+| &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator>=**( T const & v, optional<T> const & x ) |
 | Specialized algorithms   |&nbsp;| &nbsp;   | 
-| swap                     |&nbsp;| template< typename T ><br>void swap( optional<T> & x, optional<T> & y ) noexcept(...) |
-| create                   |<C++11| template< typename T ><br>optional&lt;T> make_optional( T const & v )      |
-| &nbsp;                   | C++11| template< class T ><br>optional< typename std::decay&lt;T>::type > make_optional( T && v ) |
-| &nbsp;                   | C++11| template< class T, class...Args ><br>optional&lt;T> make_optional( Args&&... args ) |
-| &nbsp;                   | C++11| template< class T, class U, class... Args ><br>optional&lt;T> make_optional( std::initializer_list&lt;U> il, Args&&... args ) |
-| hash                     | C++11| template< class T ><br>class hash< nonstd::optional&lt;T> > |
+| swap                     |&nbsp;| template< typename T ><br>void **swap**( optional<T> & x, optional<T> & y ) noexcept(...) |
+| create                   |<C++11| template< typename T ><br>optional&lt;T> **make_optional**( T const & v )      |
+| &nbsp;                   | C++11| template< class T ><br>optional< typename std::decay&lt;T>::type > **make_optional**( T && v ) |
+| &nbsp;                   | C++11| template< class T, class...Args ><br>optional&lt;T> **make_optional**( Args&&... args ) |
+| &nbsp;                   | C++11| template< class T, class U, class... Args ><br>optional&lt;T> **make_optional**( std::initializer_list&lt;U> il, Args&&... args ) |
+| hash                     | C++11| template< class T ><br>class **hash**< nonstd::optional&lt;T> > |
 
 
 ### Macros to control alignment
