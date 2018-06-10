@@ -12,7 +12,7 @@ cmake_minimum_required( VERSION 3.0 )
 option( OPTIONAL_LITE_OPT_BUILD_TESTS    "Build and perform optional-lite tests" ON )
 option( OPTIONAL_LITE_OPT_BUILD_EXAMPLES "Build optional-lite examples" OFF )
 
-project( optional_lite )
+project( optional_lite LANGUAGES CXX )
 
 set( package_name "optional-lite" )
 set( include_source_dir "${PROJECT_SOURCE_DIR}/include" )
