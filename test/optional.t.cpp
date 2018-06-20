@@ -885,7 +885,7 @@ CASE("storage_t: Show sizeof various optionals"
 // Issues:
 //
 
-CASE( "optional: isocpp-lib: CH 3, p0032r2 -- let's not have too clever tags" "[.issue #1]" )
+CASE( "optional: isocpp-lib: CH 3, p0032r2 -- let's not have too clever tags" "[.issue-1]" )
 {
     EXPECT( false );
 #if 0
@@ -904,6 +904,31 @@ CASE( "optional: isocpp-lib: CH 3, p0032r2 -- let's not have too clever tags" "[
     EXPECT(      *a );
     EXPECT_NOT( **a );
 #endif
+}
+
+namespace issue18 {
+
+struct S
+{
+    static int & dtor_count() { static int i = 0; return i; };
+    S( char c, int i ) {}
+    ~S() { ++dtor_count(); }
+};
+} // issue18
+
+CASE( "optional: emplace does not construct in-place (destructor called while 'emplacing')" "[.issue-18]" )
+{
+    using issue18::S;
+    {        
+        nonstd::optional<S> os;
+
+        EXPECT( S::dtor_count() == 0 );
+
+        os.emplace( 'c', 42 );
+
+        EXPECT( S::dtor_count() == 0 );
+    }
+    EXPECT( S::dtor_count() == 1 );
 }
 
 // end of file
