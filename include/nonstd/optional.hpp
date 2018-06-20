@@ -530,6 +530,18 @@ private:
         ::new( value_ptr() ) value_type( std::move( v ) );
     }
 
+    template< class... Args >
+    void emplace( Args&&... args )
+    {
+        ::new( value_ptr() ) value_type( std::forward<Args>(args)... );
+    }
+
+    template< class U, class... Args >
+    void emplace( std::initializer_list<U> il, Args&&... args )
+    {
+        ::new( value_ptr() ) value_type( il, std::forward<Args>(args)... );
+    }
+
 #endif
 
     void destruct_value()
@@ -752,15 +764,20 @@ public:
     template< class... Args >
     void emplace( Args&&... args )
     {
+        assert( ! has_value()  );
         *this = nullopt;
-        initialize( T( std::forward<Args>(args)...) );
+        contained.emplace( std::forward<Args>(args)...  );
+        has_value_ = true;
     }
+
 
     template< class U, class... Args >
     void emplace( std::initializer_list<U> il, Args&&... args )
     {
+        assert( ! has_value()  );
         *this = nullopt;
-        initialize( T( il, std::forward<Args>(args)...) );
+        contained.emplace( il, std::forward<Args>(args)...  );
+        has_value_ = true;
     }
 
 #endif // optional_CPP11_OR_GREATER
@@ -926,6 +943,7 @@ private:
         contained.construct_value( std::move( value ) );
         has_value_ = true;
     }
+
 #endif
 
 private:

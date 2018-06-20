@@ -410,11 +410,7 @@ CASE( "optional: Allows to copy-emplace content from arguments (C++11)" )
 
     EXPECT( a->first        == 'a' );
     EXPECT( a->second.value ==  7  );
-#if optional_HAVE_STD_OPTIONAL
     EXPECT( a->second.state == copy_constructed );
-#else
-    EXPECT( a->second.state == move_constructed );
-#endif
     EXPECT(         s.state != moved_from       );
 #else
     EXPECT( !!"optional: in-place construction is not available (no C++11)" );
@@ -452,11 +448,7 @@ CASE( "optional: Allows to copy-emplace content from intializer-list and argumen
     EXPECT( a->vec[2]  ==  9  );
     EXPECT( a->c       == 'a' );
     EXPECT( a->s.value ==  7  );
-#if optional_HAVE_STD_OPTIONAL
     EXPECT( a->s.state == copy_constructed );
-#else
-    EXPECT( a->s.state == move_constructed );
-#endif
     EXPECT(    s.state != moved_from       );
 #else
     EXPECT( !!"optional: in-place construction is not available (no C++11)" );
@@ -911,13 +903,14 @@ namespace issue18 {
 struct S
 {
     static int & dtor_count() { static int i = 0; return i; };
-    S( char c, int i ) {}
+    S( char /*c*/, int /*i*/ ) {}
     ~S() { ++dtor_count(); }
 };
 } // issue18
 
 CASE( "optional: emplace does not construct in-place (destructor called while 'emplacing')" "[.issue-18]" )
 {
+#if optional_CPP11_OR_GREATER
     using issue18::S;
     {        
         nonstd::optional<S> os;
@@ -929,6 +922,9 @@ CASE( "optional: emplace does not construct in-place (destructor called while 'e
         EXPECT( S::dtor_count() == 0 );
     }
     EXPECT( S::dtor_count() == 1 );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
 }
 
 // end of file
