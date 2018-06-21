@@ -764,7 +764,6 @@ public:
     template< class... Args >
     void emplace( Args&&... args )
     {
-        assert( ! has_value()  );
         *this = nullopt;
         contained.emplace( std::forward<Args>(args)...  );
         has_value_ = true;
@@ -774,7 +773,6 @@ public:
     template< class U, class... Args >
     void emplace( std::initializer_list<U> il, Args&&... args )
     {
-        assert( ! has_value()  );
         *this = nullopt;
         contained.emplace( il, std::forward<Args>(args)...  );
         has_value_ = true;
