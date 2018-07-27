@@ -326,9 +326,8 @@ For more information on constructed unions and alignment, see [8-12].
 Other implementations of optional
 ---------------------------------
 - Isabella Muerte. [MNMLSTC Core](https://github.com/mnmlstc/core) (C++11).
-- Andrzej Krzemieński. [optional (nullable) objects for C++14](xxxx). Reference implementation.
-- Simon Brand. [C++11/14/17 std::optional with functional-style extensions](xxxx).
-
+- Andrzej Krzemieński. [optional (nullable) objects for C++14](https://github.com/akrzemi1/Optional). Reference implementation.
+- Simon Brand. [C++11/14/17 std::optional with functional-style extensions](https://github.com/TartanLlama/optional).
 
 Notes and references
 --------------------
