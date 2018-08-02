@@ -3,7 +3,7 @@
 //
 // https://github.com/martinmoene/optional-lite
 //
-// Distributed under the Boost Software License, Version 1.0. 
+// Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
@@ -11,22 +11,28 @@
 #ifndef NONSTD_OPTIONAL_LITE_HPP
 #define NONSTD_OPTIONAL_LITE_HPP
 
-#define  optional_lite_VERSION "3.0.0"
+#define  optional_lite_VERSION "3.1.0"
 
-// Compiler detection (C++20 is speculative):
-// Note: MSVC supports C++14 since it supports C++17.
+// C++ language version detection (C++20 is speculative):
+// Note: VC14.0/1900 (VS2015) lacks too much from C++14.
 
-#ifdef _MSVC_LANG
-# define optional_MSVC_LANG  _MSVC_LANG
-#else
-# define optional_MSVC_LANG  0
+#ifndef   optional_CPLUSPLUS
+# ifdef  _MSVC_LANG
+#  define optional_CPLUSPLUS  (_MSC_VER == 1900 ? 201103L : _MSVC_LANG )
+# else
+#  define optional_CPLUSPLUS  __cplusplus
+# endif
 #endif
 
-#define optional_CPP11             (__cplusplus == 201103L )
-#define optional_CPP11_OR_GREATER  (__cplusplus >= 201103L || optional_MSVC_LANG >= 201103L )
-#define optional_CPP14_OR_GREATER  (__cplusplus >= 201402L || optional_MSVC_LANG >= 201703L )
-#define optional_CPP17_OR_GREATER  (__cplusplus >= 201703L || optional_MSVC_LANG >= 201703L )
-#define optional_CPP20_OR_GREATER  (__cplusplus >= 202000L || optional_MSVC_LANG >= 202000L )
+#define optional_CPP98_OR_GREATER  ( optional_CPLUSPLUS >= 199711L )
+#define optional_CPP11_OR_GREATER  ( optional_CPLUSPLUS >= 201103L )
+#define optional_CPP14_OR_GREATER  ( optional_CPLUSPLUS >= 201402L )
+#define optional_CPP17_OR_GREATER  ( optional_CPLUSPLUS >= 201703L )
+#define optional_CPP20_OR_GREATER  ( optional_CPLUSPLUS >= 202000L )
+
+// C++ language version (represent 98 as 3):
+
+#define optional_CPLUSPLUS_V  ( optional_CPLUSPLUS / 100 - (optional_CPLUSPLUS > 200000 ? 2000 : 1994) )
 
 // use C++17 std::optional if available:
 

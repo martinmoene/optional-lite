@@ -103,7 +103,7 @@ Synopsis
 [Types in namespace nonstd](#types-in-namespace-nonstd)  
 [Interface of *optional lite*](#interface-of-optional-lite)  
 [Algorithms for *optional lite*](#algorithms-for-optional-lite)  
-[Macros to control alignment](#macros-to-control-alignment)  
+[Configuration](#configuration)  
 
 ### Types and values in namespace nonstd
 
@@ -203,7 +203,13 @@ Synopsis
 | hash                     | C++11| template< class T ><br>class **hash**< nonstd::optional&lt;T> > |
 
 
-### Macros to control alignment
+### Configuration
+
+#### Standard selection macro
+\-D<b>optional\_CPLUSPLUS</b>=199711L
+Define this macro to override the auto-detection of the supported C++ standard, if your compiler does not set the `__cplusplus` macro correctly.
+
+#### Macros to control alignment
 
 If *optional lite* is compiled as C++11 or later, C++11 alignment facilities are used for storage of the underlying object. When compiled as pre-C++11, *optional lite* tries to determine proper alignment itself. If this doesn't work out, you can control alignment via the following macros. See also section [Implementation notes](#implementation-notes).
 
