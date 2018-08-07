@@ -579,12 +579,12 @@ private:
 
     value_type const && value() const optional_refref_qual
     {
-        return * value_ptr();
+        return std::move( value() );
     }
 
     value_type && value() optional_refref_qual
     {
-        return * value_ptr();
+        return std::move( value() );
     }
 
 #endif
@@ -829,14 +829,12 @@ public:
 
     optional_constexpr value_type const && operator *() const optional_refref_qual
     {
-        return assert( has_value() ),
-            std::move( contained.value() );
+        return std::move( **this );
     }
 
     optional_constexpr14 value_type && operator *() optional_refref_qual
     {
-        return assert( has_value() ),
-            std::move( contained.value() );
+        return std::move( **this );
     }
 
 #endif
@@ -878,18 +876,12 @@ public:
 
     optional_constexpr14 value_type const && value() const optional_refref_qual
     {
-        if ( ! has_value() )
-            throw bad_optional_access();
-
-        return std::move( contained.value() );
+        return std::move( value() );
     }
 
     optional_constexpr14 value_type && value() optional_refref_qual
     {
-        if ( ! has_value() )
-            throw bad_optional_access();
-
-        return std::move( contained.value() );
+        return std::move( value() );
     }
 
 #endif
