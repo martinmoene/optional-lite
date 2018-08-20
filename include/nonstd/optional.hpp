@@ -445,7 +445,7 @@ template< typename T >
 struct alignment_of
 {
     enum { value = alignment_logic<
-        sizeof( alignment_of_hack<T> ) - sizeof(T), sizeof(T) >::value, };
+        static_cast<unsigned>(sizeof( alignment_of_hack<T> ) - sizeof(T)), static_cast<unsigned>(sizeof(T)) >::value, };
 };
 
 template< typename List, size_t N >
