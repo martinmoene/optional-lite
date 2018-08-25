@@ -424,10 +424,10 @@ union max_align_t
 #define optional_ALIGN_AS( to_align ) \
     typename type_of_size< alignment_types, alignment_of< to_align >::value >::type
 
-template <typename T>
+template< typename T >
 struct alignment_of;
 
-template <typename T>
+template< typename T >
 struct alignment_of_hack
 {
     char c;
@@ -435,7 +435,7 @@ struct alignment_of_hack
     alignment_of_hack();
 };
 
-template <size_t A, size_t S>
+template< size_t A, size_t S >
 struct alignment_logic
 {
     enum { value = A < S ? A : S };
