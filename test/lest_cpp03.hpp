@@ -139,6 +139,20 @@
 #define lest_CPP17_OR_GREATER  (__cplusplus >= 201703L || lest_MSVC_LANG >= 201703L )
 #define lest_CPP20_OR_GREATER  (__cplusplus >= 202000L || lest_MSVC_LANG >= 202000L )
 
+#ifndef __has_cpp_attribute
+#define __has_cpp_attribute(name) 0
+#endif
+
+// Check, if unsued attributes are supported, do nothing, if they are not supported:
+
+#if __has_cpp_attribute(maybe_unused) && lest_CPP17_OR_GREATER
+#define lest_MAYBE_UNUSED(ARG) [[maybe_unused]] ARG
+#elif defined __GNUC__
+#define lest_MAYBE_UNUSED(ARG) ARG __attribute((unused))
+#else
+#define lest_MAYBE_UNUSED(ARG)
+#endif
+
 // Presence of language and library features:
 
 #define lest_HAVE(FEATURE) ( lest_HAVE_##FEATURE )
@@ -251,7 +265,7 @@ namespace lest
 #define lest_CASE( specification, proposition ) \
     static void lest_FUNCTION( lest::env & ); \
     namespace { lest::add_test lest_REGISTRAR( specification, lest::test( proposition, lest_FUNCTION ) ); } \
-    static void lest_FUNCTION( lest::env & lest_env )
+    static void lest_FUNCTION(lest_MAYBE_UNUSED( lest::env & lest_env ))
 
 #define lest_ADD_TEST( specification, test ) \
     specification.push_back( test )
