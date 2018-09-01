@@ -11,7 +11,14 @@
 #ifndef NONSTD_OPTIONAL_LITE_HPP
 #define NONSTD_OPTIONAL_LITE_HPP
 
-#define  optional_lite_VERSION "3.1.0"
+#define optional_lite_MAJOR  3
+#define optional_lite_MINOR  1
+#define optional_lite_PATCH  0
+
+#define optional_lite_VERSION  optional_STRINGIFY(optional_lite_MAJOR) "." optional_STRINGIFY(optional_lite_MINOR) "." optional_STRINGIFY(optional_lite_PATCH)
+
+#define optional_STRINGIFY(  x )  optional_STRINGIFY_( x )
+#define optional_STRINGIFY_( x )  #x
 
 // C++ language version detection (C++20 is speculative):
 // Note: VC14.0/1900 (VS2015) lacks too much from C++14.
