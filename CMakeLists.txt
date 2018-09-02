@@ -7,6 +7,10 @@
 
 cmake_minimum_required( VERSION 3.5 )
 
+# optional-lite version, updated by script/update-version.py:
+
+set( optional_lite_version "3.1.0" )
+
 # Enable building and performing of tests and building of examples:
 
 option( OPTIONAL_LITE_OPT_BUILD_TESTS    "Build and perform optional-lite tests" ON )
