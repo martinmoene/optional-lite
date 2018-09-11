@@ -37,7 +37,7 @@ enum State
     /* 7 */ value_copy_assigned,
     /* 8 */ value_move_assigned,
     /* 9 */ moved_from,
-    /*10 */ value_constructed,
+    /*10 */ value_constructed
 };
 
 struct V
@@ -173,6 +173,29 @@ CASE( "optional: Allows to copy-construct from empty optional" )
     EXPECT( !b );
 }
 
+CASE( "optional: Allows to move-construct from empty optional (C++11)" )
+{
+    optional<int> b(( optional<int>( nullopt ) ));
+
+    EXPECT( !b );
+}
+
+CASE( "optional: Allows to copy-construct from empty optional, converting" )
+{
+    optional<char> a;
+
+    optional<int> b( a );
+
+    EXPECT( !b );
+}
+
+CASE( "optional: Allows to move-construct from empty optional, converting (C++11)" )
+{
+    optional<int> b(( optional<char>( nullopt ) ));
+
+    EXPECT( !b );
+}
+
 CASE( "optional: Allows to copy-construct from non-empty optional" )
 {
     optional<int> a( 7 );
@@ -183,12 +206,33 @@ CASE( "optional: Allows to copy-construct from non-empty optional" )
     EXPECT( *b == 7 );
 }
 
-CASE( "optional: Allows to move-construct from optional (C++11)" )
+CASE( "optional: Allows to move-construct from non-empty optional (C++11)" )
 {
 #if optional_CPP11_OR_GREATER
     optional<int> b( optional<int>( 7 ) );
 
     EXPECT( *b == 7 );
+#else
+    EXPECT( !!"optional: move-construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to copy-construct from non-empty optional, converting" )
+{
+    optional<short> a( 7 );
+
+    optional<int> b( a );
+
+    EXPECT(  b      );
+    EXPECT( *b == 7 );
+}
+
+CASE( "optional: Allows to move-construct from non-empty optional, converting (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    optional<int> b( optional<char>( '7' ) );
+
+    EXPECT( *b == '7' );
 #else
     EXPECT( !!"optional: move-construction is not available (no C++11)" );
 #endif
@@ -202,6 +246,14 @@ CASE( "optional: Allows to copy-construct from literal value" )
     EXPECT( *a == 7 );
 }
 
+CASE( "optional: Allows to copy-construct from literal value, converting" )
+{
+    optional<int> a = '7';
+
+    EXPECT(  a        );
+    EXPECT( *a == '7' );
+}
+
 CASE( "optional: Allows to copy-construct from value" )
 {
     const int i = 7;
@@ -209,6 +261,15 @@ CASE( "optional: Allows to copy-construct from value" )
 
     EXPECT(  a      );
     EXPECT( *a == 7 );
+}
+
+CASE( "optional: Allows to copy-construct from value, converting" )
+{
+    const char i = '7';
+    optional<int> a( i );
+
+    EXPECT(  a        );
+    EXPECT( *a == '7' );
 }
 
 CASE( "optional: Allows to move-construct from value (C++11)" )
@@ -222,6 +283,39 @@ CASE( "optional: Allows to move-construct from value (C++11)" )
     EXPECT(  s.state == moved_from       );
 #else
     EXPECT( !!"optional: move-construction is not available (no C++11)" );
+#endif
+}
+
+namespace {
+
+    struct Type{};
+
+    struct Convert
+    {
+        Convert( Type ) {}
+    };
+
+    void use( nonstd::optional< Convert > ) {}
+}
+
+CASE( "optional: Allows to implicitly move-construct from literal value (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    use( Type{} );
+//  EXPECT( ... );
+#else
+    EXPECT( !!"optional: forward-construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to implicitly copy-construct from value (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    Type type;
+    use( type );
+//  EXPECT( ... );
+#else
+    EXPECT( !!"optional: forward-construction is not available (no C++11)" );
 #endif
 }
 
@@ -362,6 +456,52 @@ CASE( "optional: Allows to copy-assign from/to engaged and disengaged optionals"
 
 CASE( "optional: Allows to move-assign from/to engaged and disengaged optionals (C++11)" )
 {
+}
+
+CASE( "optional: Allows to copy-assign from/to engaged and disengaged optionals, converting" )
+{
+    SETUP( "" ) {
+        optional<int>  d1;
+        optional<char> d2;
+        optional<int>  e1( 123 );
+        optional<char> e2( '7' );
+
+    SECTION( "a disengaged optional assigned an engaged optional obtains its value, converting" ) {
+        d1 = d2;
+        EXPECT( !d1 );
+    }
+    SECTION( "an engaged optional assigned an engaged optional obtains its value, converting" ) {
+        e1 = e2;
+        EXPECT(  e1 );
+        EXPECT( *e1 == '7' );
+    }
+    SECTION( "a disengaged optional assigned a disengaged optional remains empty, converting" ) {
+        d1 = d2;
+        EXPECT( !d1 );
+    }}
+}
+
+CASE( "optional: Allows to move-assign from/to engaged and disengaged optionals, converting (C++11)" )
+{
+    SETUP( "" ) {
+        optional<int>  d1;
+        optional<char> d2;
+        optional<int>  e1( 123 );
+        optional<char> e2( '7' );
+
+    SECTION( "a disengaged optional assigned an engaged optional obtains its value, converting" ) {
+        d1 = optional<char>();
+        EXPECT( !d1 );
+    }
+    SECTION( "an engaged optional assigned an engaged optional obtains its value, converting" ) {
+        d1 = optional<char>( '7' );
+        EXPECT(  d1 );
+        EXPECT( *d1 == '7' );
+    }
+    SECTION( "a disengaged optional assigned a disengaged optional remains empty, converting" ) {
+        d1 = optional<char>();
+        EXPECT( !d1 );
+    }}
 }
 
 CASE( "optional: Allows to copy-assign from literal value" )
@@ -912,7 +1052,7 @@ CASE( "optional: emplace does not construct in-place (destructor called while 'e
 {
 #if optional_CPP11_OR_GREATER
     using issue18::S;
-    {        
+    {
         nonstd::optional<S> os;
 
         EXPECT( S::dtor_count() == 0 );
