@@ -295,7 +295,7 @@ namespace {
         Convert( Type ) {}
     };
 
-    void use( nonstd::optional< Convert > ) {}
+    lest_MAYBE_UNUSED() void use( nonstd::optional< Convert > ) {}
 }
 
 CASE( "optional: Allows to implicitly move-construct from literal value (C++11)" )
