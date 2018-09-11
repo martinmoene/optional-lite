@@ -282,6 +282,9 @@ namespace nonstd {
 # define optional_REQUIRES_T(...) \
     , typename = typename std::enable_if<__VA_ARGS__>::type
 
+# define optional_REQUIRES_R(R, ...) \
+    typename std::enable_if<__VA_ARGS__, R>::type
+
 #endif
 
 // type traits needed:
@@ -729,7 +732,10 @@ public:
     // 2 - copy-construct
     optional_constexpr14 optional( optional const & other
 #if optional_CPP11_OR_GREATER
-//      optional_REQUIRES( std::is_copy_constructible<T>::value )
+        optional_REQUIRES(
+            true
+//          std::is_copy_constructible<T>::value
+        )
 #endif
     )
     : has_value_( other.has_value() )
@@ -742,7 +748,10 @@ public:
 
     // 3 (C++11) - move-construct from optional
     optional_constexpr14 optional( optional && other
-//      optional_REQUIRES( std::is_move_constructible<T>::value )
+        optional_REQUIRES(
+            true
+//          std::is_move_constructible<T>::value
+        )
     ) noexcept( std::is_nothrow_move_constructible<T>::value )
     : has_value_( other.has_value() )
     {
@@ -755,15 +764,13 @@ public:
     explicit optional( optional<U> const & other
         optional_REQUIRES(
             std::is_constructible<T, U const &>::value
-            // T is not constructible or convertible from any expression of type (possibly const)
-            // std::optional<U>, i.e., the following 8 type traits are all false:
             && !std::is_constructible<T, optional<U> &          >::value
-            && !std::is_constructible<T, optional<U> const &    >::value
             && !std::is_constructible<T, optional<U> &&         >::value
+            && !std::is_constructible<T, optional<U> const &    >::value
             && !std::is_constructible<T, optional<U> const &&   >::value
             && !std::is_convertible<     optional<U> &       , T>::value
-            && !std::is_convertible<     optional<U> const & , T>::value
             && !std::is_convertible<     optional<U> &&      , T>::value
+            && !std::is_convertible<     optional<U> const & , T>::value
             && !std::is_convertible<     optional<U> const &&, T>::value
             && !std::is_convertible<               U const & , T>::value /*=> explicit */
         )
@@ -781,15 +788,13 @@ public:
 #if optional_CPP11_OR_GREATER
         optional_REQUIRES(
             std::is_constructible<T, U const &>::value
-            // T is not constructible or convertible from any expression of type (possibly const)
-            // std::optional<U>, i.e., the following 8 type traits are all false:
             && !std::is_constructible<T, optional<U> &          >::value
-            && !std::is_constructible<T, optional<U> const &    >::value
             && !std::is_constructible<T, optional<U> &&         >::value
+            && !std::is_constructible<T, optional<U> const &    >::value
             && !std::is_constructible<T, optional<U> const &&   >::value
             && !std::is_convertible<     optional<U> &       , T>::value
-            && !std::is_convertible<     optional<U> const & , T>::value
             && !std::is_convertible<     optional<U> &&      , T>::value
+            && !std::is_convertible<     optional<U> const & , T>::value
             && !std::is_convertible<     optional<U> const &&, T>::value
             &&  std::is_convertible<               U const & , T>::value /*=> non-explicit */
         )
@@ -808,15 +813,13 @@ public:
     optional( optional<U> && other
         optional_REQUIRES(
             std::is_constructible<T, U const &>::value
-            // T is not constructible or convertible from any expression of type (possibly const)
-            // std::optional<U>, i.e., the following 8 type traits are all false:
             && !std::is_constructible<T, optional<U> &          >::value
-            && !std::is_constructible<T, optional<U> const &    >::value
             && !std::is_constructible<T, optional<U> &&         >::value
+            && !std::is_constructible<T, optional<U> const &    >::value
             && !std::is_constructible<T, optional<U> const &&   >::value
             && !std::is_convertible<     optional<U> &       , T>::value
-            && !std::is_convertible<     optional<U> const & , T>::value
             && !std::is_convertible<     optional<U> &&      , T>::value
+            && !std::is_convertible<     optional<U> const & , T>::value
             && !std::is_convertible<     optional<U> const &&, T>::value
             && !std::is_convertible<                     U &&, T>::value /*=> explicit */
         )
@@ -832,15 +835,13 @@ public:
     optional( optional<U> && other
         optional_REQUIRES(
             std::is_constructible<T, U const &>::value
-            // T is not constructible or convertible from any expression of type (possibly const)
-            // std::optional<U>, i.e., the following 8 type traits are all false:
             && !std::is_constructible<T, optional<U> &          >::value
-            && !std::is_constructible<T, optional<U> const &    >::value
             && !std::is_constructible<T, optional<U> &&         >::value
+            && !std::is_constructible<T, optional<U> const &    >::value
             && !std::is_constructible<T, optional<U> const &&   >::value
             && !std::is_convertible<     optional<U> &       , T>::value
-            && !std::is_convertible<     optional<U> const & , T>::value
             && !std::is_convertible<     optional<U> &&      , T>::value
+            && !std::is_convertible<     optional<U> const & , T>::value
             && !std::is_convertible<     optional<U> const &&, T>::value
             &&  std::is_convertible<                     U &&, T>::value /*=> non-explicit */
         )
@@ -852,14 +853,22 @@ public:
     }
 
     // 6 (C++11) - in-place construct
-    template< typename... Args >
+    template< typename... Args
+        optional_REQUIRES_T(
+            std::is_constructible<T, Args&&...>::value
+        )
+    >
     optional_constexpr explicit optional( nonstd_lite_in_place_type_t(T), Args&&... args )
     : has_value_( true )
     , contained( T( std::forward<Args>(args)...) )
     {}
 
     // 7 (C++11) - in-place construct,  initializer-list
-    template< typename U, typename... Args >
+    template< typename U, typename... Args
+        optional_REQUIRES_T(
+            std::is_constructible<T, std::initializer_list<U>&, Args&&...>::value
+        )
+    >
     optional_constexpr explicit optional( nonstd_lite_in_place_type_t(T), std::initializer_list<U> il, Args&&... args )
     : has_value_( true )
     , contained( T( il, std::forward<Args>(args)...) )
@@ -921,10 +930,20 @@ public:
     }
 
     // 2 (C++98and later) - copy-assign from optional
-// Overload (2) is defined as deleted unless std::is_copy_constructible_v<T> and std::is_copy_assignable_v<T> are both true.
-    optional & operator=( optional const & other )
 #if optional_CPP11_OR_GREATER
-        noexcept( std::is_nothrow_move_assignable<T>::value && std::is_nothrow_move_constructible<T>::value )
+    optional_REQUIRES_R(
+        optional &,
+        true
+//      std::is_copy_constructible<T>::value
+//      && std::is_copy_assignable<T>::value
+    )
+    operator=( optional const & other )
+        noexcept(
+            std::is_nothrow_move_assignable<T>::value
+            && std::is_nothrow_move_constructible<T>::value
+        )
+#else
+    optional & operator=( optional const & other )
 #endif
     {
         if      ( has_value() == true  && other.has_value() == false ) reset();
@@ -936,8 +955,13 @@ public:
 #if optional_CPP11_OR_GREATER
 
     // 3 (C++11) - move-assign from optional
-// Overload (3) does not participate in overload resolution unless std::is_move_constructible_v<T> and std::is_move_assignable_v<T> are both true.
-    optional & operator=( optional && other ) noexcept
+    optional_REQUIRES_R(
+        optional &,
+        true
+//      std::is_move_constructible<T>::value
+//      && std::is_move_assignable<T>::value
+    )
+    operator=( optional && other ) noexcept
     {
         if      ( has_value() == true  && other.has_value() == false ) reset();
         else if ( has_value() == false && other.has_value() == true  ) initialize( std::move( *other ) );
@@ -946,15 +970,16 @@ public:
     }
 
     // 4 (C++11) - move-assign from value
-    template< typename U = T
-        optional_REQUIRES_T(
+    template< typename U = T >
+        optional_REQUIRES_R(
+            optional &,
             std::is_constructible<T , U>::value
             && std::is_assignable<T&, U>::value
+            && !std::is_same<typename std20::remove_cvref<U>::type, in_place_t>::value
             && !std::is_same<typename std20::remove_cvref<U>::type, optional<T>>::value
-//          && ( T is not a scalar type || std::is_same< typename std::decay<U>::type, T )
+//          && !(std::is_scalar<T>::value && std::is_same<T, typename std::decay<U>::type>::value)
         )
-    >
-    optional & operator=( U && value )
+    operator=( U && value )
     {
         if ( has_value() ) contained.value() = std::forward<U>( value );
         else               initialize( T( std::forward<U>( value ) ) );
@@ -975,28 +1000,29 @@ public:
 #endif // optional_CPP11_OR_GREATER
 
     // 5 (C++98 and later) - converting copy-assign from optional
-    template< typename U
+    template< typename U >
 #if optional_CPP11_OR_GREATER
-        optional_REQUIRES_T(
+        optional_REQUIRES_R(
+            optional&,
             std::is_constructible<  T , U const &>::value
             &&  std::is_assignable< T&, U const &>::value
-            && !std::is_constructible<T, optional<U>       &    >::value
+            && !std::is_constructible<T, optional<U> &          >::value
+            && !std::is_constructible<T, optional<U> &&         >::value
             && !std::is_constructible<T, optional<U> const &    >::value
-            && !std::is_constructible<T, optional<U>       &&   >::value
             && !std::is_constructible<T, optional<U> const &&   >::value
-            && !std::is_convertible<     optional<U>       & , T>::value
+            && !std::is_convertible<     optional<U> &       , T>::value
+            && !std::is_convertible<     optional<U> &&      , T>::value
             && !std::is_convertible<     optional<U> const & , T>::value
-            && !std::is_convertible<     optional<U>       &&, T>::value
             && !std::is_convertible<     optional<U> const &&, T>::value
-            && !std::is_assignable<  T&, optional<U>       &    >::value
+            && !std::is_assignable<  T&, optional<U> &          >::value
+            && !std::is_assignable<  T&, optional<U> &&         >::value
             && !std::is_assignable<  T&, optional<U> const &    >::value
-            && !std::is_assignable<  T&, optional<U>       &&   >::value
             && !std::is_assignable<  T&, optional<U> const &&   >::value
-//    For overload (5), std::is_constructible_v<T, const U&> and std::is_assignable_v<T&, const U&> are both true.
         )
+#else
+    optional&
 #endif // optional_CPP11_OR_GREATER
-    >
-    optional& operator=( optional<U> const & other )
+    operator=( optional<U> const & other )
     {
         return *this = optional( other );
     }
@@ -1004,45 +1030,55 @@ public:
 #if optional_CPP11_OR_GREATER
 
     // 6 (C++11) -  converting move-assign from optional
-    template< typename U
-        optional_REQUIRES_T(
+    template< typename U >
+        optional_REQUIRES_R(
+            optional&,
             std::is_constructible<  T , U>::value
             &&  std::is_assignable< T&, U>::value
-            && !std::is_constructible<T, optional<U>       &    >::value
+            && !std::is_constructible<T, optional<U> &          >::value
+            && !std::is_constructible<T, optional<U> &&         >::value
             && !std::is_constructible<T, optional<U> const &    >::value
-            && !std::is_constructible<T, optional<U>       &&   >::value
             && !std::is_constructible<T, optional<U> const &&   >::value
-            && !std::is_convertible<     optional<U>       & , T>::value
+            && !std::is_convertible<     optional<U> &       , T>::value
+            && !std::is_convertible<     optional<U> &&      , T>::value
             && !std::is_convertible<     optional<U> const & , T>::value
-            && !std::is_convertible<     optional<U>       &&, T>::value
             && !std::is_convertible<     optional<U> const &&, T>::value
-            && !std::is_assignable<  T&, optional<U>       &    >::value
+            && !std::is_assignable<  T&, optional<U> &          >::value
+            && !std::is_assignable<  T&, optional<U> &&         >::value
             && !std::is_assignable<  T&, optional<U> const &    >::value
-            && !std::is_assignable<  T&, optional<U>       &&   >::value
             && !std::is_assignable<  T&, optional<U> const &&   >::value
         )
-    >
-    optional& operator=( optional<U> && other )
+    operator=( optional<U> && other )
     {
         return *this = optional( std::move( other ) );
     }
 
     // 7 (C++11) - emplace
-    template< typename... Args >
-    void emplace( Args&&... args )
+    template< typename... Args
+        optional_REQUIRES_T(
+            std::is_constructible<T, Args&&...>::value
+        )
+    >
+    T& emplace( Args&&... args )
     {
         *this = nullopt;
         contained.emplace( std::forward<Args>(args)...  );
         has_value_ = true;
+        return contained.value();
     }
 
     // 8 (C++11) - emplace, initializer-list
-    template< typename U, typename... Args >
-    void emplace( std::initializer_list<U> il, Args&&... args )
+    template< typename U, typename... Args
+        optional_REQUIRES_T(
+            std::is_constructible<T, std::initializer_list<U>&, Args&&...>::value
+        )
+    >
+    T& emplace( std::initializer_list<U> il, Args&&... args )
     {
         *this = nullopt;
         contained.emplace( il, std::forward<Args>(args)...  );
         has_value_ = true;
+        return contained.value();
     }
 
 #endif // optional_CPP11_OR_GREATER
@@ -1051,7 +1087,10 @@ public:
 
     void swap( optional & other )
 #if optional_CPP11_OR_GREATER
-    noexcept( std::is_nothrow_move_constructible<T>::value && noexcept( std::swap( std::declval<T&>(), std::declval<T&>() ) ) )
+        noexcept(
+            std::is_nothrow_move_constructible<T>::value
+            && noexcept( std::swap( std::declval<T&>(), std::declval<T&>() ) )
+        )
 #endif
     {
         using std::swap;
