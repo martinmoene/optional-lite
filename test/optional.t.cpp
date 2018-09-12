@@ -333,6 +333,8 @@ CASE( "optional: Allows to move-construct from value (C++11)" )
 #endif
 }
 
+#if optional_CPP11_OR_GREATER
+
 namespace {
 
     struct Type{};
@@ -344,6 +346,8 @@ namespace {
 
     void use( nonstd::optional< Convert > ) {}
 }
+
+#endif
 
 CASE( "optional: Allows to implicitly move-construct from literal value (C++11)" )
 {
