@@ -266,9 +266,9 @@ CASE( "optional: Allows to move-construct from non-empty optional (C++11)" )
 
 CASE( "optional: Allows to copy-construct from non-empty optional, converting" )
 {
-    optional<short> a( 7 );
+    optional<int> a( 7 );
 
-    optional<int> b( a );
+    optional<long> b( a );
 
     EXPECT(  b      );
     EXPECT( *b == 7 );
