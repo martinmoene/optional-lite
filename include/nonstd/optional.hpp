@@ -276,14 +276,14 @@ namespace nonstd {
 
 #if optional_CPP11_OR_GREATER
 
-# define optional_REQUIRES(...) \
-    , typename std::enable_if<__VA_ARGS__, void*>::type = 0
-
 # define optional_REQUIRES_T(...) \
     , typename = typename std::enable_if<__VA_ARGS__>::type
 
 # define optional_REQUIRES_R(R, ...) \
     typename std::enable_if<__VA_ARGS__, R>::type
+
+# define optional_REQUIRES_A(...) \
+    , typename std::enable_if<__VA_ARGS__, void*>::type = 0
 
 #endif
 
@@ -732,9 +732,8 @@ public:
     // 2 - copy-construct
     optional_constexpr14 optional( optional const & other
 #if optional_CPP11_OR_GREATER
-        optional_REQUIRES(
-            true
-//          std::is_copy_constructible<T>::value
+        optional_REQUIRES_A(
+            true || std::is_copy_constructible<T>::value
         )
 #endif
     )
@@ -748,9 +747,8 @@ public:
 
     // 3 (C++11) - move-construct from optional
     optional_constexpr14 optional( optional && other
-        optional_REQUIRES(
-            true
-//          std::is_move_constructible<T>::value
+        optional_REQUIRES_A(
+            true || std::is_move_constructible<T>::value
         )
     ) noexcept( std::is_nothrow_move_constructible<T>::value )
     : has_value_( other.has_value() )
@@ -762,7 +760,7 @@ public:
     // 4 (C++11) - explicit converting copy-construct from optional
     template< typename U >
     explicit optional( optional<U> const & other
-        optional_REQUIRES(
+        optional_REQUIRES_A(
             std::is_constructible<T, U const &>::value
             && !std::is_constructible<T, optional<U> &          >::value
             && !std::is_constructible<T, optional<U> &&         >::value
@@ -786,7 +784,7 @@ public:
     template< typename U >
     optional( optional<U> const & other
 #if optional_CPP11_OR_GREATER
-        optional_REQUIRES(
+        optional_REQUIRES_A(
             std::is_constructible<T, U const &>::value
             && !std::is_constructible<T, optional<U> &          >::value
             && !std::is_constructible<T, optional<U> &&         >::value
@@ -811,7 +809,7 @@ public:
     // 5a (C++11) - explicit converting move-construct from optional
     template< typename U >
     optional( optional<U> && other
-        optional_REQUIRES(
+        optional_REQUIRES_A(
             std::is_constructible<T, U const &>::value
             && !std::is_constructible<T, optional<U> &          >::value
             && !std::is_constructible<T, optional<U> &&         >::value
@@ -833,7 +831,7 @@ public:
     // 5a (C++11) - non-explicit converting move-construct from optional
     template< typename U >
     optional( optional<U> && other
-        optional_REQUIRES(
+        optional_REQUIRES_A(
             std::is_constructible<T, U const &>::value
             && !std::is_constructible<T, optional<U> &          >::value
             && !std::is_constructible<T, optional<U> &&         >::value
@@ -877,7 +875,7 @@ public:
     // 8a (C++11) - explicit move construct from value
     template< typename U = value_type >
     optional_constexpr explicit optional( U && value
-        optional_REQUIRES(
+        optional_REQUIRES_A(
             std::is_constructible<T, U&&>::value
             && !std::is_same<typename std20::remove_cvref<U>::type, in_place_t>::value
             && !std::is_same<typename std20::remove_cvref<U>::type, optional<T>>::value
@@ -891,7 +889,7 @@ public:
     // 8a (C++11) - non-explicit move construct from value
     template< typename U = value_type >
     optional_constexpr optional( U && value
-        optional_REQUIRES(
+        optional_REQUIRES_A(
             std::is_constructible<T, U&&>::value
             && !std::is_same<typename std20::remove_cvref<U>::type, in_place_t>::value
             && !std::is_same<typename std20::remove_cvref<U>::type, optional<T>>::value

@@ -89,6 +89,46 @@ inline std::ostream & operator<<( std::ostream & os, S const & s )
     return os << "[S:" << to_string( s.value ) << "]";
 }
 
+struct NoDefault
+{
+    NoDefault( NoDefault const & ) {}
+    NoDefault & operator=( NoDefault const & ) { return *this; }
+
+#if optional_CPP11_OR_GREATER
+    NoDefault( NoDefault && ) = default;
+    NoDefault & operator=( NoDefault && ) = default;
+#endif
+
+private:
+    NoDefault();
+};
+
+struct CopyOnly
+{
+    CopyOnly( CopyOnly const & ) {}
+    CopyOnly & operator=( CopyOnly const & ) { return *this; }
+
+private:
+    CopyOnly();
+#if optional_CPP11_OR_GREATER
+    CopyOnly( CopyOnly && ) = delete;
+    CopyOnly & operator=( CopyOnly && ) = delete;
+#endif
+};
+
+struct MoveOnly
+{
+#if optional_CPP11_OR_GREATER
+    MoveOnly( MoveOnly && ) = default;
+    MoveOnly & operator=( MoveOnly && ) = default;
+#endif
+
+private:
+    MoveOnly();
+    MoveOnly( MoveOnly const & );
+    MoveOnly & operator=( MoveOnly const & );
+};
+
 struct NoDefaultCopyMove
 {
     std::string text;
@@ -97,10 +137,10 @@ struct NoDefaultCopyMove
 private:
     NoDefaultCopyMove();
     NoDefaultCopyMove( NoDefaultCopyMove const & );
-    void operator=   ( NoDefaultCopyMove const & );
+    NoDefaultCopyMove & operator=( NoDefaultCopyMove const & );
 #if optional_CPP11_OR_GREATER
     NoDefaultCopyMove( NoDefaultCopyMove && ) = delete;
-    void operator=   ( NoDefaultCopyMove && ) = delete;
+    NoDefaultCopyMove & operator=( NoDefaultCopyMove && ) = delete;
 #endif
 };
 
@@ -158,10 +198,17 @@ CASE( "optional: Allows to explicitly construct a disengaged, empty optional via
 
 CASE( "optional: Allows to default construct an empty optional with a non-default-constructible" )
 {
-//  FAILS: NoDefaultCopyMove x;
-    optional<NoDefaultCopyMove> a;
+//  FAILS: NoDefault nd;
+//  FAILS: NoDefaultCopyMove ndcm;
+    optional<NoDefault> ond;
+    optional<CopyOnly> oco;
+    optional<MoveOnly> omo;
+    optional<NoDefaultCopyMove> ondcm;
 
-    EXPECT( !a );
+    EXPECT( !ond );
+    EXPECT( !oco );
+    EXPECT( !omo );
+    EXPECT( !ondcm );
 }
 
 CASE( "optional: Allows to copy-construct from empty optional" )
