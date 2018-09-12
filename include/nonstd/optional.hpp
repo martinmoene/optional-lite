@@ -1473,7 +1473,7 @@ optional<T> make_optional( T const & v )
 
 #endif // optional_CPP11_OR_GREATER
 
-} // namespace optional
+} // namespace optional_lite
 
 using namespace optional_lite;
 
