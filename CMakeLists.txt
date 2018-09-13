@@ -42,4 +42,6 @@ if ( OPTIONAL_LITE_OPT_BUILD_EXAMPLES )
     add_subdirectory( example )
 endif()
 
+install(DIRECTORY include/nonstd DESTINATION include)
+
 # end of file
