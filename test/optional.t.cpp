@@ -344,7 +344,7 @@ namespace {
         Convert( Type ) {}
     };
 
-    void use( nonstd::optional< Convert > ) {}
+    lest_MAYBE_UNUSED() void use( nonstd::optional< Convert > ) {}
 }
 
 #endif
