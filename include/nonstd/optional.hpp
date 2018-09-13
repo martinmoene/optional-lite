@@ -299,7 +299,7 @@ namespace nonstd {
     typename std::enable_if<__VA_ARGS__, R>::type
 
 # define optional_REQUIRES_A(...) \
-    , typename std::enable_if<__VA_ARGS__, void*>::type = 0
+    , typename std::enable_if<__VA_ARGS__, void*>::type = optional_nullptr
 
 #endif
 
@@ -307,7 +307,7 @@ namespace nonstd {
 // in_place: code duplicated in any-lite, expected-lite, optional-lite, variant-lite:
 //
 
-#if   ! nonstd_lite_HAVE_IN_PLACE_TYPES
+#ifndef nonstd_lite_HAVE_IN_PLACE_TYPES
 #define nonstd_lite_HAVE_IN_PLACE_TYPES  1
 
 // C++17 std::in_place in <utility>:
@@ -1485,29 +1485,29 @@ void swap( optional<T> & x, optional<T> & y )
 #if optional_CPP11_OR_GREATER
 
 template< typename T >
-optional_constexpr optional< typename std::decay<T>::type > make_optional( T && v )
+optional_constexpr optional< typename std::decay<T>::type > make_optional( T && value )
 {
-    return optional< typename std::decay<T>::type >( std::forward<T>( v ) );
+    return optional< typename std::decay<T>::type >( std::forward<T>( value ) );
 }
 
 template< typename T, typename...Args >
 optional_constexpr optional<T> make_optional( Args&&... args )
 {
-    return optional<T>( in_place, std::forward<Args>(args)...);
+    return optional<T>( nonstd_lite_in_place(T), std::forward<Args>(args)...);
 }
 
 template< typename T, typename U, typename... Args >
 optional_constexpr optional<T> make_optional( std::initializer_list<U> il, Args&&... args )
 {
-    return optional<T>( in_place, il, std::forward<Args>(args)...);
+    return optional<T>( nonstd_lite_in_place(T), il, std::forward<Args>(args)...);
 }
 
 #else
 
 template< typename T >
-optional<T> make_optional( T const & v )
+optional<T> make_optional( T const & value )
 {
-    return optional<T>( v );
+    return optional<T>( value );
 }
 
 #endif // optional_CPP11_OR_GREATER
