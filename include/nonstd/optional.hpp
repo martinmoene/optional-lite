@@ -20,6 +20,16 @@
 #define optional_STRINGIFY(  x )  optional_STRINGIFY_( x )
 #define optional_STRINGIFY_( x )  #x
 
+// optional-lite configuration:
+
+#define optional_OPTIONAL_DEFAULT  0
+#define optional_OPTIONAL_NONSTD   1
+#define optional_OPTIONAL_STD      2
+
+#if !defined( optional_CONFIG_SELECT_OPTIONAL )
+# define optional_CONFIG_SELECT_OPTIONAL  ( optional_HAVE_STD_OPTIONAL ? optional_OPTIONAL_STD : optional_OPTIONAL_NONSTD )
+#endif
+
 // C++ language version detection (C++20 is speculative):
 // Note: VC14.0/1900 (VS2015) lacks too much from C++14.
 
@@ -41,17 +51,19 @@
 
 #define optional_CPLUSPLUS_V  ( optional_CPLUSPLUS / 100 - (optional_CPLUSPLUS > 200000 ? 2000 : 1994) )
 
-// use C++17 std::optional if available:
+// Use C++17 std::optional if available and requested:
 
-#if defined( __has_include )
-# define optional_HAS_INCLUDE( arg )  __has_include( arg )
+#if optional_CPP17_OR_GREATER && defined(__has_include ) && __has_include( <optional> )
+# define optional_HAVE_STD_OPTIONAL  1
 #else
-# define optional_HAS_INCLUDE( arg )  0
+# define optional_HAVE_STD_OPTIONAL  0
 #endif
 
-#define optional_HAVE_STD_OPTIONAL  ( optional_CPP17_OR_GREATER && optional_HAS_INCLUDE( <optional> ) )
+#define optional_USES_STD_OPTIONAL  ( (optional_CONFIG_SELECT_OPTIONAL == optional_OPTIONAL_STD) || ((optional_CONFIG_SELECT_OPTIONAL == optional_OPTIONAL_DEFAULT) && optional_HAVE_STD_OPTIONAL) )
 
-#if optional_HAVE_STD_OPTIONAL
+// Using std::optional:
+
+#if optional_USES_STD_OPTIONAL
 
 #include <optional>
 
@@ -80,7 +92,7 @@ namespace nonstd {
     using std::swap;
 }
 
-#else // C++17 std::optional
+#else // optional_USES_STD_OPTIONAL
 
 #include <cassert>
 #include <stdexcept>
@@ -321,7 +333,7 @@ struct remove_cvref
 }} // namespace nonstd::optional_lite
 
 //
-// in_place: code duplicated in any-lite, optional-lite, variant-lite:
+// in_place: code duplicated in any-lite, expected-lite, optional-lite, variant-lite:
 //
 
 #ifndef nonstd_lite_HAVE_IN_PLACE_TYPES
@@ -1505,6 +1517,6 @@ public:
 # pragma GCC   diagnostic pop
 #endif
 
-#endif // have C++17 std::optional
+#endif // optional_USES_STD_OPTIONAL
 
 #endif // NONSTD_OPTIONAL_LITE_HPP

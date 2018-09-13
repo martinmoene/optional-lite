@@ -16,6 +16,9 @@ set( optional_lite_version "3.1.0" )
 option( OPTIONAL_LITE_OPT_BUILD_TESTS    "Build and perform optional-lite tests" ON )
 option( OPTIONAL_LITE_OPT_BUILD_EXAMPLES "Build optional-lite examples" OFF )
 
+option( OPTIONAL_LITE_OPT_SELECT_STD     "Select std::optional"    OFF )
+option( OPTIONAL_LITE_OPT_SELECT_NONSTD  "Select nonstd::optional" OFF )
+
 project( optional_lite LANGUAGES CXX )
 
 set( package_name "optional-lite" )

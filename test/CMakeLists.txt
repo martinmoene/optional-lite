@@ -46,7 +46,7 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang" )
     set( HAS_STD_FLAGS  TRUE )
     set( HAS_CPP98_FLAG TRUE )
 
-    set( OPTIONS     -Wall -Wextra -Wconversion -Wno-missing-braces -fno-elide-constructors )
+    set( OPTIONS     -Wall -Wextra -Wconversion -Wsign-conversion -Wno-missing-braces -fno-elide-constructors )
     set( DEFINITIONS ${DEFCMN} )
 
     # GNU: available -std flags depends on version
@@ -145,6 +145,20 @@ else()
     if( HAS_CPPLATEST_FLAG )
         make_target( ${MAIN_BASE}-cpplatest.t latest )
     endif()
+endif()
+
+# with C++17, honour explicit request for std::optional or nonstd::optional:
+
+if( HAS_CPP17_FLAG )
+    set( WHICH optional_OPTIONAL_DEFAULT )
+
+    if( OPTIONAL_LITE_OPT_SELECT_STD )
+        set( WHICH optional_OPTIONAL_STD )
+    elseif( OPTIONAL_LITE_OPT_SELECT_NONSTD )
+        set( WHICH optional_OPTIONAL_NONSTD )
+    endif()
+
+    target_compile_definitions( ${MAIN_BASE}-cpp17.t PRIVATE optional_CONFIG_SELECT_OPTIONAL=${WHICH} )
 endif()
 
 # configure unit tests via CTest:
