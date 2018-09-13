@@ -23,12 +23,23 @@ lest::tests & specification()
     return tests;
 }
 
-CASE( "optional-lite version" "[.version]" )
+CASE( "optional-lite version" "[.optional][.version]" )
 {
     optional_PRESENT( optional_lite_MAJOR );
     optional_PRESENT( optional_lite_MINOR );
     optional_PRESENT( optional_lite_PATCH );
     optional_PRESENT( optional_lite_VERSION );
+}
+
+CASE( "any configuration" "[.optional][.config]" )
+{
+    optional_PRESENT( optional_HAVE_STD_OPTIONAL );
+    optional_PRESENT( optional_USES_STD_OPTIONAL );
+    optional_PRESENT( optional_CONFIG_SELECT_OPTIONAL );
+    optional_PRESENT( optional_OPTIONAL_DEFAULT );
+    optional_PRESENT( optional_OPTIONAL_NONSTD );
+    optional_PRESENT( optional_OPTIONAL_STD );
+    optional_PRESENT( optional_CPLUSPLUS );
 }
 
 CASE( "__cplusplus" "[.stdc++]" )

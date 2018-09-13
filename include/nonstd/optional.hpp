@@ -299,47 +299,39 @@ namespace nonstd {
 
 #endif
 
-// type traits needed:
-
-namespace nonstd { namespace optional_lite {
-
-namespace detail {
-
-#if optional_HAVE( CONDITIONAL )
-    using std::conditional;
-#else
-    template< bool B, typename T, typename F > struct conditional              { typedef T type; };
-    template<         typename T, typename F > struct conditional<false, T, F> { typedef F type; };
-#endif // optional_HAVE_CONDITIONAL
-
-} // namespace detail
-
-#if optional_CPP11_OR_GREATER
-
-namespace std20 {
-
-// type traits C++20:
-
-template< typename T >
-struct remove_cvref
-{
-    typedef typename std::remove_cv< typename std::remove_reference<T>::type >::type type;
-};
-
-} // namespace std20
-
-#endif // optional_CPP11_OR_GREATER
-
-}} // namespace nonstd::optional_lite
-
 //
 // in_place: code duplicated in any-lite, expected-lite, optional-lite, variant-lite:
 //
 
-#ifndef nonstd_lite_HAVE_IN_PLACE_TYPES
+#if   ! nonstd_lite_HAVE_IN_PLACE_TYPES
+#define nonstd_lite_HAVE_IN_PLACE_TYPES  1
+
+// C++17 std::in_place in <utility>:
+
+#if optional_CPP17_OR_GREATER
 
 namespace nonstd {
 
+using std::in_place;
+using std::in_place_type;
+using std::in_place_index;
+using std::in_place_t;
+using std::in_place_type_t;
+using std::in_place_index_t;
+
+#define nonstd_lite_in_place_t(      T)  std::in_place_t
+#define nonstd_lite_in_place_type_t( T)  std::in_place_type_t<T>
+#define nonstd_lite_in_place_index_t(T)  std::in_place_index_t<I>
+
+#define nonstd_lite_in_place(      T)    std::in_place_t{}
+#define nonstd_lite_in_place_type( T)    std::in_place_type_t<T>{}
+#define nonstd_lite_in_place_index(T)    std::in_place_index_t<I>{}
+
+} // namespace nonstd
+
+#else // optional_CPP17_OR_GREATER
+
+namespace nonstd {
 namespace detail {
 
 template< class T >
@@ -378,13 +370,17 @@ inline in_place_t in_place_index( detail::in_place_index_tag<I> = detail::in_pla
 
 // mimic templated typedef:
 
+#define nonstd_lite_in_place_t(      T)  nonstd::in_place_t(&)( nonstd::detail::in_place_type_tag<T>  )
 #define nonstd_lite_in_place_type_t( T)  nonstd::in_place_t(&)( nonstd::detail::in_place_type_tag<T>  )
 #define nonstd_lite_in_place_index_t(T)  nonstd::in_place_t(&)( nonstd::detail::in_place_index_tag<I> )
 
-#define nonstd_lite_HAVE_IN_PLACE_TYPES  1
+#define nonstd_lite_in_place(      T)    nonstd::in_place_type<T>
+#define nonstd_lite_in_place_type( T)    nonstd::in_place_type<T>
+#define nonstd_lite_in_place_index(T)    nonstd::in_place_index<I>
 
 } // namespace nonstd
 
+#endif // optional_CPP17_OR_GREATER
 #endif // nonstd_lite_HAVE_IN_PLACE_TYPES
 
 //
@@ -392,6 +388,33 @@ inline in_place_t in_place_index( detail::in_place_index_tag<I> = detail::in_pla
 //
 
 namespace nonstd { namespace optional_lite {
+
+namespace detail {
+
+#if optional_HAVE( CONDITIONAL )
+    using std::conditional;
+#else
+    template< bool B, typename T, typename F > struct conditional              { typedef T type; };
+    template<         typename T, typename F > struct conditional<false, T, F> { typedef F type; };
+#endif // optional_HAVE_CONDITIONAL
+
+} // namespace detail
+
+#if optional_CPP11_OR_GREATER
+
+namespace std20 {
+
+// type traits C++20:
+
+template< typename T >
+struct remove_cvref
+{
+    typedef typename std::remove_cv< typename std::remove_reference<T>::type >::type type;
+};
+
+} // namespace std20
+
+#endif // optional_CPP11_OR_GREATER
 
 /// class optional
 
@@ -868,7 +891,7 @@ public:
             std::is_constructible<T, Args&&...>::value
         )
     >
-    optional_constexpr explicit optional( nonstd_lite_in_place_type_t(T), Args&&... args )
+    optional_constexpr explicit optional( nonstd_lite_in_place_t(T), Args&&... args )
     : has_value_( true )
     , contained( T( std::forward<Args>(args)...) )
     {}
@@ -879,7 +902,7 @@ public:
             std::is_constructible<T, std::initializer_list<U>&, Args&&...>::value
         )
     >
-    optional_constexpr explicit optional( nonstd_lite_in_place_type_t(T), std::initializer_list<U> il, Args&&... args )
+    optional_constexpr explicit optional( nonstd_lite_in_place_t(T), std::initializer_list<U> il, Args&&... args )
     : has_value_( true )
     , contained( T( il, std::forward<Args>(args)...) )
     {}
@@ -889,7 +912,7 @@ public:
     optional_constexpr explicit optional( U && value
         optional_REQUIRES_A(
             std::is_constructible<T, U&&>::value
-            && !std::is_same<typename std20::remove_cvref<U>::type, in_place_t>::value
+            && !std::is_same<typename std20::remove_cvref<U>::type, nonstd_lite_in_place_t(U)>::value
             && !std::is_same<typename std20::remove_cvref<U>::type, optional<T>>::value
             && !std::is_convertible<U&&, T>::value /*=> explicit */
         )
@@ -903,7 +926,7 @@ public:
     optional_constexpr optional( U && value
         optional_REQUIRES_A(
             std::is_constructible<T, U&&>::value
-            && !std::is_same<typename std20::remove_cvref<U>::type, in_place_t>::value
+            && !std::is_same<typename std20::remove_cvref<U>::type, nonstd_lite_in_place_t(U)>::value
             && !std::is_same<typename std20::remove_cvref<U>::type, optional<T>>::value
             && std::is_convertible<U&&, T>::value /*=> non-explicit */
         )
@@ -985,7 +1008,7 @@ public:
             optional &,
             std::is_constructible<T , U>::value
             && std::is_assignable<T&, U>::value
-            && !std::is_same<typename std20::remove_cvref<U>::type, in_place_t>::value
+            && !std::is_same<typename std20::remove_cvref<U>::type, nonstd_lite_in_place_t(U)>::value
             && !std::is_same<typename std20::remove_cvref<U>::type, optional<T>>::value
 //          && !(std::is_scalar<T>::value && std::is_same<T, typename std::decay<U>::type>::value)
         )

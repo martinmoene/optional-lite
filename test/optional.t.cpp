@@ -394,7 +394,7 @@ CASE( "optional: Allows to in-place copy-construct from value (C++11)" )
 
     EXPECT( a->first        == 'a' );
     EXPECT( a->second.value ==  7  );
-#if optional_HAVE_STD_OPTIONAL
+#if optional_USES_STD_OPTIONAL
     EXPECT( a->second.state == copy_constructed );
 #else
     EXPECT( a->second.state == move_constructed );
@@ -433,7 +433,7 @@ CASE( "optional: Allows to in-place copy-construct from initializer-list (C++11)
     EXPECT( a->vec[2]  ==  9 );
     EXPECT( a->c       == 'a');
     EXPECT( a->s.value ==  7 );
-#if optional_HAVE_STD_OPTIONAL
+#if optional_USES_STD_OPTIONAL
     EXPECT( a->s.state == copy_constructed );
 #else
     EXPECT( a->s.state == move_constructed );
@@ -933,7 +933,7 @@ CASE( "make_optional: Allows to in-place copy-construct optional from arguments 
 
     EXPECT( a->first        == 'a' );
     EXPECT( a->second.value ==  7  );
-#if optional_HAVE_STD_OPTIONAL
+#if optional_USES_STD_OPTIONAL
     EXPECT( a->second.state == copy_constructed );
 #else
     EXPECT( a->second.state == move_constructed );
@@ -972,7 +972,7 @@ CASE( "make_optional: Allows to in-place copy-construct optional from initialize
     EXPECT( a->vec[2]  ==  9  );
     EXPECT( a->c       == 'a' );
     EXPECT( a->s.value ==  7  );
-#if optional_HAVE_STD_OPTIONAL
+#if optional_USES_STD_OPTIONAL
     EXPECT( a->s.state == copy_constructed );
 #else
     EXPECT( a->s.state == move_constructed );
@@ -1048,7 +1048,7 @@ CASE("storage_t: Show sizeof various optionals"
      "[.]" )
 {
     std::cout <<
-#ifndef optional_HAVE_STD_OPTIONAL
+#if !optional_USES_STD_OPTIONAL
         "sizeof( nonstd::optional_lite::detail::storage_t<char> ): " <<
          sizeof( nonstd::optional_lite::detail::storage_t<char> )    << "\n" <<
 #endif
