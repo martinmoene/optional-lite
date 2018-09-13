@@ -58,7 +58,7 @@ In a nutshell
 ---------------
 **optional lite** is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library aims to provide a [C++17-like optional](http://en.cppreference.com/w/cpp/utility/optional) for use with C++98 and later. If available, std::optional is used. There's also a simpler version, [*optional bare*](https://github.com/martinmoene/optional-bare). Unlike *optional lite*, *optional bare* is limited to default-constructible and copyable types. 
 
-**Features and properties of optional lite** are ease of installation (single header), freedom of dependencies other than the standard library and control over object alignment (if needed). *optional lite* shares the approach to in-place tags with [any-lite](https://github.com/martinmoene/any-lite) and with [variant-lite](https://github.com/martinmoene/variant-lite) and these libraries can be used together.
+**Features and properties of optional lite** are ease of installation (single header), freedom of dependencies other than the standard library and control over object alignment (if needed). *optional lite* shares the approach to in-place tags with [any-lite](https://github.com/martinmoene/any-lite), [expected-lite](https://github.com/martinmoene/expected-lite) and with [variant-lite](https://github.com/martinmoene/variant-lite) and these libraries can be used together.
 
 **Not provided** are reference-type optionals. *optional lite* doesn't handle overloaded *address of* operators.
 
