@@ -53,10 +53,14 @@
 
 // Use C++17 std::optional if available and requested:
 
-#if optional_CPP17_OR_GREATER && defined(__has_include ) && __has_include( <optional> )
-# define optional_HAVE_STD_OPTIONAL  1
+#if optional_CPP17_OR_GREATER && defined(__has_include )
+# if __has_include( <optional> )
+#  define optional_HAVE_STD_OPTIONAL  1
+# else
+#  define optional_HAVE_STD_OPTIONAL  0
+# endif
 #else
-# define optional_HAVE_STD_OPTIONAL  0
+# define  optional_HAVE_STD_OPTIONAL  0
 #endif
 
 #define optional_USES_STD_OPTIONAL  ( (optional_CONFIG_SELECT_OPTIONAL == optional_OPTIONAL_STD) || ((optional_CONFIG_SELECT_OPTIONAL == optional_OPTIONAL_DEFAULT) && optional_HAVE_STD_OPTIONAL) )
