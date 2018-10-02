@@ -341,7 +341,7 @@ namespace detail {
 template< class T >
 struct in_place_type_tag {};
 
-template< std::size_t I >
+template< std::size_t K >
 struct in_place_index_tag {};
 
 } // namespace detail
@@ -354,8 +354,8 @@ inline in_place_t in_place( detail::in_place_type_tag<T> = detail::in_place_type
     return in_place_t();
 }
 
-template< std::size_t I >
-inline in_place_t in_place( detail::in_place_index_tag<I> = detail::in_place_index_tag<I>() )
+template< std::size_t K >
+inline in_place_t in_place( detail::in_place_index_tag<K> = detail::in_place_index_tag<K>() )
 {
     return in_place_t();
 }
@@ -366,8 +366,8 @@ inline in_place_t in_place_type( detail::in_place_type_tag<T> = detail::in_place
     return in_place_t();
 }
 
-template< std::size_t I >
-inline in_place_t in_place_index( detail::in_place_index_tag<I> = detail::in_place_index_tag<I>() )
+template< std::size_t K >
+inline in_place_t in_place_index( detail::in_place_index_tag<K> = detail::in_place_index_tag<K>() )
 {
     return in_place_t();
 }
