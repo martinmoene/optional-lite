@@ -13,7 +13,7 @@
 
 #define optional_lite_MAJOR  3
 #define optional_lite_MINOR  1
-#define optional_lite_PATCH  0
+#define optional_lite_PATCH  1
 
 #define optional_lite_VERSION  optional_STRINGIFY(optional_lite_MAJOR) "." optional_STRINGIFY(optional_lite_MINOR) "." optional_STRINGIFY(optional_lite_PATCH)
 
