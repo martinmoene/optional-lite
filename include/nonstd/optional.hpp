@@ -325,11 +325,11 @@ using std::in_place_index_t;
 
 #define nonstd_lite_in_place_t(      T)  std::in_place_t
 #define nonstd_lite_in_place_type_t( T)  std::in_place_type_t<T>
-#define nonstd_lite_in_place_index_t(T)  std::in_place_index_t<I>
+#define nonstd_lite_in_place_index_t(K)  std::in_place_index_t<K>
 
 #define nonstd_lite_in_place(      T)    std::in_place_t{}
 #define nonstd_lite_in_place_type( T)    std::in_place_type_t<T>{}
-#define nonstd_lite_in_place_index(T)    std::in_place_index_t<I>{}
+#define nonstd_lite_in_place_index(K)    std::in_place_index_t<K>{}
 
 } // namespace nonstd
 
@@ -376,11 +376,11 @@ inline in_place_t in_place_index( detail::in_place_index_tag<K> = detail::in_pla
 
 #define nonstd_lite_in_place_t(      T)  nonstd::in_place_t(&)( nonstd::detail::in_place_type_tag<T>  )
 #define nonstd_lite_in_place_type_t( T)  nonstd::in_place_t(&)( nonstd::detail::in_place_type_tag<T>  )
-#define nonstd_lite_in_place_index_t(T)  nonstd::in_place_t(&)( nonstd::detail::in_place_index_tag<I> )
+#define nonstd_lite_in_place_index_t(K)  nonstd::in_place_t(&)( nonstd::detail::in_place_index_tag<K> )
 
 #define nonstd_lite_in_place(      T)    nonstd::in_place_type<T>
 #define nonstd_lite_in_place_type( T)    nonstd::in_place_type<T>
-#define nonstd_lite_in_place_index(T)    nonstd::in_place_index<I>
+#define nonstd_lite_in_place_index(K)    nonstd::in_place_index<K>
 
 } // namespace nonstd
 
