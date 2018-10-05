@@ -19,9 +19,11 @@
 		<Unit filename="../../LICENSE.txt" />
 		<Unit filename="../../README.md" />
 		<Unit filename="../../appveyor.yml" />
-		<Unit filename="../../examples/01-to_int.cpp" />
-		<Unit filename="../../examples/02-nodefltctor.cpp" />
-		<Unit filename="../../examples/04-any-optional-variant.cpp" />
+		<Unit filename="../../example/01-to_int.cpp" />
+		<Unit filename="../../example/02-nodefltctor.cpp" />
+		<Unit filename="../../example/04-any-optional-variant.cpp" />
+		<Unit filename="../../example/BUCK" />
+		<Unit filename="../../extra/gdb/nonstd_optional_printer.py" />
 		<Unit filename="../../include/nonstd/optional.hpp" />
 		<Unit filename="../../script/update-version.py" />
 		<Unit filename="../../test/CMakeLists.txt" />
