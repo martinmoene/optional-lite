@@ -118,10 +118,10 @@ namespace nonstd {
 
 // Compiler warning suppression:
 
-#if defined (__clang__)
+#if defined(__clang__)
 # pragma clang diagnostic push
 # pragma clang diagnostic ignored "-Wundef"
-#elif defined (__GNUC__)
+#elif defined(__GNUC__)
 # pragma GCC   diagnostic push
 # pragma GCC   diagnostic ignored "-Wundef"
 #endif
@@ -137,13 +137,13 @@ namespace nonstd {
 
 #define optional_COMPILER_VERSION( major, minor, patch )  ( 10 * (10 * major + minor ) + patch )
 
-#if defined (__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__)
 # define optional_COMPILER_GNUC_VERSION   optional_COMPILER_VERSION(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__)
 #else
 # define optional_COMPILER_GNUC_VERSION   0
 #endif
 
-#if defined (__clang__)
+#if defined(__clang__)
 # define optional_COMPILER_CLANG_VERSION  optional_COMPILER_VERSION(__clang_major__, __clang_minor__, __clang_patchlevel__)
 #else
 # define optional_COMPILER_CLANG_VERSION  0
@@ -1538,9 +1538,9 @@ public:
 
 #endif // optional_CPP11_OR_GREATER
 
-#if defined (__clang__)
+#if defined(__clang__)
 # pragma clang diagnostic pop
-#elif defined (__GNUC__)
+#elif defined(__GNUC__)
 # pragma GCC   diagnostic pop
 #endif
 
