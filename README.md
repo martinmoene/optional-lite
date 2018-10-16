@@ -136,8 +136,8 @@ Synopsis
 | &nbsp;       |&nbsp;| optional & **operator=**( optional const & rhs ) | copy-assign from other optional;<br>destruct current content, if any |
 | &nbsp;       | C++11| optional & **operator=**( optional && rhs )      | move-assign from other optional;<br>destruct current content, if any |
 | &nbsp;       | C++11| template< class U, ...><br>**optional & operator=( U && v ) | move-assign from a value;<br>destruct current content, if any |
-| &nbsp;       | C++11| template< class... Args ><br>void **emplace**( Args&&... args ) |  emplace type T |
-| &nbsp;       | C++11| template< class U, class... Args ><br>void **emplace**( std::initializer_list&lt;U> il, Args&&... args ) |  emplace type T |
+| &nbsp;       | C++11| template< class... Args ><br>T & **emplace**( Args&&... args ) |  emplace type T |
+| &nbsp;       | C++11| template< class U, class... Args ><br>T & **emplace**( std::initializer_list&lt;U> il, Args&&... args ) |  emplace type T |
 | Swap         |&nbsp;| void **swap**( optional & rhs ) noexcept(...)    | swap with rhs |
 | Content      |&nbsp;| value_type const \* **operator ->**() const       | pointer to current content (const);<br>must contain value |
 | &nbsp;       |&nbsp;| value_type \* **operator ->**()                   | pointer to current content (non-const);<br>must contain value |
