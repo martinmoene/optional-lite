@@ -13,7 +13,7 @@ set( optional_lite_version "3.1.1" )
 
 # Enable building and performing of tests and building of examples:
 
-option( OPTIONAL_LITE_OPT_BUILD_TESTS    "Build and perform optional-lite tests" ON )
+option( OPTIONAL_LITE_OPT_BUILD_TESTS    "Build and perform optional-lite tests" OFF )
 option( OPTIONAL_LITE_OPT_BUILD_EXAMPLES "Build optional-lite examples" OFF )
 
 option( OPTIONAL_LITE_OPT_SELECT_STD     "Select std::optional"    OFF )
@@ -36,7 +36,7 @@ target_include_directories(
 
 # Installation:
 
-install( 
+install(
     DIRECTORY ${CMAKE_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} )
 
 # If requested, build and perform tests, build examples:
