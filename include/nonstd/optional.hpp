@@ -1232,7 +1232,7 @@ public:
     }
 
     template< typename U >
-    optional_constexpr value_type value_or( U && v ) const optional_refref_qual
+    optional_constexpr value_type value_or( U && v ) optional_refref_qual
     {
         return has_value() ? std::move( contained.value() ) : static_cast<T>(std::forward<U>( v ) );
     }
