@@ -782,6 +782,16 @@ CASE( "optional: Allows to obtain value or default via value_or()" )
 
 CASE( "optional: Allows to obtain moved-value or moved-default via value_or() (C++11)" )
 {
+    SETUP( "" ) {
+        optional<int> d;
+        optional<int> e( 42 );
+
+    SECTION( "value_or( 7 ) yields value for non-empty optional" ) {
+        EXPECT( optional<int>( 42 ).value_or( 7 ) == 42 );
+    }
+    SECTION( "value_or( 7 ) yields default for empty optional" ) {
+        EXPECT( optional<int>().value_or( 7 ) == 7 );
+    }}
 }
 
 CASE( "optional: Throws bad_optional_access at disengaged access" )
