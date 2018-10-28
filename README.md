@@ -1,6 +1,6 @@
 optional lite - A single-file header-only version of a C++17-like optional, a nullable object for C++98, C++11 and later
 ====================================================
-[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)  [![Standard](https://img.shields.io/badge/c%2B%2B-98/11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-BSL-blue.svg)](https://opensource.org/licenses/BSL-1.0) [![Build Status](https://travis-ci.org/martinmoene/optional-lite.svg?branch=master)](https://travis-ci.org/martinmoene/optional-lite) [![Build status](https://ci.appveyor.com/api/projects/status/1oq5gjm7bufrv6ib?svg=true)](https://ci.appveyor.com/project/martinmoene/optional-lite) [![Version](https://badge.fury.io/gh/martinmoene%2Foptional-lite.svg)](https://github.com/martinmoene/optional-lite/releases) [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/optional-lite/master/include/nonstd/optional.hpp) [![Conan](https://img.shields.io/badge/conan-download-blue.svg)](https://bintray.com/agauniyal/nonstd-lite/optional-lite%3Anonstd-lite/_latestVersion) [![Try it online](https://img.shields.io/badge/try%20it-online-blue.svg)](https://wandbox.org/permlink/5lJEycDPjE6e02fV)
+[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)  [![Standard](https://img.shields.io/badge/c%2B%2B-98/11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-BSL-blue.svg)](https://opensource.org/licenses/BSL-1.0) [![Build Status](https://travis-ci.org/martinmoene/optional-lite.svg?branch=master)](https://travis-ci.org/martinmoene/optional-lite) [![Build status](https://ci.appveyor.com/api/projects/status/1oq5gjm7bufrv6ib?svg=true)](https://ci.appveyor.com/project/martinmoene/optional-lite) [![Version](https://badge.fury.io/gh/martinmoene%2Foptional-lite.svg)](https://github.com/martinmoene/optional-lite/releases) [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/optional-lite/master/include/nonstd/optional.hpp) [![Conan](https://img.shields.io/badge/conan-download-blue.svg)](https://bintray.com/martinmoene/nonstd-lite/optional-lite%3Anonstd-lite/_latestVersion) [![Try it online](https://img.shields.io/badge/try%20it-online-blue.svg)](https://wandbox.org/permlink/5lJEycDPjE6e02fV)
 
 **Contents**  
 - [Example usage](#example-usage)
@@ -84,12 +84,12 @@ Or, if you use the [conan package manager](https://www.conan.io/), follow these 
 
 1. Add *nonstd-lite* to the conan remotes:
 
-        conan remote add nonstd-lite https://api.bintray.com/conan/agauniyal/nonstd-lite
+        conan remote add nonstd-lite https://api.bintray.com/conan/martinmoene/nonstd-lite
 
 2. Add a reference to *optional-lite* to the *requires* section of your project's `conanfile.txt` file:
 
         [requires]
-        optional-lite/2.3.0@nonstd-lite/stable
+        optional-lite/3.1.1@nonstd-lite/testing
 
 3. Run conan's install command:
 
