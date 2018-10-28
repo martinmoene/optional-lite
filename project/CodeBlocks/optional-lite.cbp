@@ -19,6 +19,7 @@
 		<Unit filename="../../LICENSE.txt" />
 		<Unit filename="../../README.md" />
 		<Unit filename="../../appveyor.yml" />
+		<Unit filename="../../conanfile.py" />
 		<Unit filename="../../example/01-to_int.cpp" />
 		<Unit filename="../../example/02-nodefltctor.cpp" />
 		<Unit filename="../../example/04-any-optional-variant.cpp" />
