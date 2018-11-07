@@ -7,7 +7,7 @@
 // optional lite is inspired on std::optional by Fernando Cacciola and Andrzej Krzemienski
 // and on expected lite by Martin Moene.
 
-#include "optional-main.t.h"
+#include "optional-main.t.hpp"
 
 using nonstd::optional;
 using nonstd::nullopt;

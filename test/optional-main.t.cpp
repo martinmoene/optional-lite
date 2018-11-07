@@ -5,7 +5,7 @@
 // Distributed under the Boost Software License, Version 1.0. 
 // (See accompanying file LICENSE.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include "optional-main.t.h"
+#include "optional-main.t.hpp"
 
 #ifndef  optional_HAVE
 # define optional_HAVE(FEATURE) ( optional_HAVE_##FEATURE )
@@ -31,7 +31,7 @@ CASE( "optional-lite version" "[.optional][.version]" )
     optional_PRESENT( optional_lite_VERSION );
 }
 
-CASE( "any configuration" "[.optional][.config]" )
+CASE( "optional-lite configuration" "[.optional][.config]" )
 {
     optional_PRESENT( optional_HAVE_STD_OPTIONAL );
     optional_PRESENT( optional_USES_STD_OPTIONAL );
