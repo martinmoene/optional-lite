@@ -211,7 +211,7 @@ namespace nonstd {
 #endif
 
 // half-open range [lo..hi):
-#define optional_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
+#define optional_BETWEEN( v, lo, hi ) ( (lo) <= (v) && (v) < (hi) )
 
 #if defined(_MSC_VER ) && !defined(__clang__)
 # define optional_COMPILER_MSVC_VER      (_MSC_VER )
