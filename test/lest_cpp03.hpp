@@ -27,7 +27,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#define  lest_VERSION "1.33.2"
+#define  lest_VERSION "1.33.4"
 
 #ifndef  lest_FEATURE_COLOURISE
 # define lest_FEATURE_COLOURISE 0
@@ -908,7 +908,11 @@ inline bool select( text name, texts include )
 
 inline int indefinite( int repeat ) { return repeat == -1; }
 
-typedef unsigned long seed_t;
+#if lest_CPP11_OR_GREATER
+typedef typename std::mt19937::result_type seed_t;
+#else
+typedef unsigned int seed_t;
+#endif
 
 struct options
 {
@@ -943,12 +947,13 @@ struct env
 
     env & operator()( text test )
     {
-        testing = test; return *this;
+        clear(); testing = test; return *this;
     }
 
     bool abort() { return opt.abort; }
     bool pass()  { return opt.pass; }
 
+    void clear() { ctx.clear(); }
     void pop()   { ctx.pop_back(); }
     void push( text proposition ) { ctx.push_back( proposition ); }
 
@@ -1240,7 +1245,7 @@ inline void shuffle( tests & specification, options option )
 #if lest_CPP11_OR_GREATER
     std::shuffle( specification.begin(), specification.end(), std::mt19937( option.seed ) );
 #else
-    lest::srand( static_cast<unsigned int>( option.seed ) );
+    lest::srand( option.seed );
 
     rng generator;
     std::random_shuffle( specification.begin(), specification.end(), generator );
