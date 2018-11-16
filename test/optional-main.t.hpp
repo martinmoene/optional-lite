@@ -12,12 +12,23 @@
 
 #include "optional.hpp"
 
+// Compiler warning suppression for usage of lest:
+
+#ifdef __clang__
+# pragma clang diagnostic ignored "-Wstring-conversion"
+# pragma clang diagnostic ignored "-Wunused-parameter"
+# pragma clang diagnostic ignored "-Wunused-template"
+# pragma clang diagnostic ignored "-Wunused-function"
+# pragma clang diagnostic ignored "-Wunused-member-function"
+#elif defined __GNUC__
+# pragma GCC   diagnostic ignored "-Wunused-parameter"
+# pragma GCC   diagnostic ignored "-Wunused-function"
+#endif
+
 #include <iosfwd>
 namespace lest { template<typename T> std::ostream & operator<<( std::ostream & os, nonstd::optional<T> const & v ); }
 
 #include "lest_cpp03.hpp"
-
-using namespace nonstd;
 
 #define CASE( name ) lest_CASE( specification(), name )
 

@@ -9,10 +9,7 @@
 
 #include "optional-main.t.hpp"
 
-using nonstd::optional;
-using nonstd::nullopt;
-using nonstd::bad_optional_access;
-using nonstd::make_optional;
+using namespace nonstd;
 
 #if optional_USES_STD_OPTIONAL && defined(__APPLE__)
 # define opt_value( o ) *o
@@ -138,7 +135,7 @@ private:
 struct NoDefaultCopyMove
 {
     std::string text;
-    NoDefaultCopyMove( std::string text ) : text( text ) {}
+    NoDefaultCopyMove( std::string txt ) : text( txt ) {}
 
 private:
     NoDefaultCopyMove();
@@ -157,11 +154,11 @@ struct InitList
     char c;
     S s;
 
-    InitList( std::initializer_list<int> il, char c, S const & s )
-    : vec( il ), c( c ), s( s ) {}
+    InitList( std::initializer_list<int> il, char k, S const & t )
+    : vec( il ), c( k ), s( t ) {}
 
-    InitList( std::initializer_list<int> il, char c, S && s )
-    : vec( il ), c( c ), s( std::move( s ) ) {}
+    InitList( std::initializer_list<int> il, char k, S && t )
+    : vec( il ), c( k ), s( std::move( t ) ) {}
 };
 #endif
 
@@ -709,7 +706,7 @@ CASE( "optional: Allows to swap with other optional (member)" )
 
 // observers:
 
-struct Integer { int x; Integer(int x) : x(x) {} };
+struct Integer { int x; Integer(int v) : x(v) {} };
 
 CASE( "optional: Allows to obtain pointer to value via operator->()" )
 {
@@ -1113,7 +1110,7 @@ namespace issue18 {
 
 struct S
 {
-    static int & dtor_count() { static int i = 0; return i; };
+    static int & dtor_count() { static int i = 0; return i; }
     S( char /*c*/, int /*i*/ ) {}
     ~S() { ++dtor_count(); }
 };

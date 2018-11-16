@@ -49,156 +49,39 @@ CASE( "__cplusplus" "[.stdc++]" )
 
 CASE( "compiler version" "[.compiler]" )
 {
-#ifdef optional_COMPILER_CLANG_VERSION
+#if optional_USES_STD_OPTIONAL
+    std::cout << "(Compiler version not available: using std::optional)\n";
+#else
     optional_PRESENT( optional_COMPILER_CLANG_VERSION );
-#else
-    optional_ABSENT(  optional_COMPILER_CLANG_VERSION );
-#endif
-
-#ifdef optional_COMPILER_GNUC_VERSION
     optional_PRESENT( optional_COMPILER_GNUC_VERSION );
-#else
-    optional_ABSENT(  optional_COMPILER_GNUC_VERSION );
-#endif
-
-#ifdef optional_COMPILER_MSVC_VERSION
     optional_PRESENT( optional_COMPILER_MSVC_VERSION );
-#else
-    optional_ABSENT(  optional_COMPILER_MSVC_VERSION );
 #endif
 }
 
 CASE( "presence of C++ language features" "[.stdlanguage]" )
 {
-#if optional_HAVE( AUTO )
-    optional_PRESENT( optional_HAVE_AUTO );
+#if optional_USES_STD_OPTIONAL
+    std::cout << "(Presence of C++ language features not available: using std::optional)\n";
 #else
-    optional_ABSENT(  optional_HAVE_AUTO );
-#endif
-
-#if optional_HAVE( NULLPTR )
-    optional_PRESENT( optional_HAVE_NULLPTR );
-#else
-    optional_ABSENT(  optional_HAVE_NULLPTR );
-#endif
-
-#if optional_HAVE( STATIC_ASSERT )
-    optional_PRESENT( optional_HAVE_STATIC_ASSERT );
-#else
-    optional_ABSENT(  optional_HAVE_STATIC_ASSERT );
-#endif
-
-#if optional_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-    optional_PRESENT( optional_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG );
-#else
-    optional_ABSENT(  optional_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG );
-#endif
-
-#if optional_HAVE( ALIAS_TEMPLATE )
-    optional_PRESENT( optional_HAVE_ALIAS_TEMPLATE );
-#else
-    optional_ABSENT(  optional_HAVE_ALIAS_TEMPLATE );
-#endif
-
-#if optional_HAVE( CONSTEXPR_11)
     optional_PRESENT( optional_HAVE_CONSTEXPR_11 );
-#else
-    optional_ABSENT(  optional_HAVE_CONSTEXPR_11 );
-#endif
-
-#if optional_HAVE( CONSTEXPR_14 )
-    optional_PRESENT( optional_HAVE_CONSTEXPR_14 );
-#else
-    optional_ABSENT(  optional_HAVE_CONSTEXPR_14 );
-#endif
-
-#if optional_HAVE( ENUM_CLASS )
-    optional_PRESENT( optional_HAVE_ENUM_CLASS );
-#else
-    optional_ABSENT(  optional_HAVE_ENUM_CLASS );
-#endif
-
-#if optional_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-    optional_PRESENT( optional_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE );
-#else
-    optional_ABSENT(  optional_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE );
-#endif
-
-#if optional_HAVE( EXPLICIT_CONVERSION )
-    optional_PRESENT( optional_HAVE_EXPLICIT_CONVERSION );
-#else
-    optional_ABSENT(  optional_HAVE_EXPLICIT_CONVERSION );
-#endif
-
-#if optional_HAVE( INITIALIZER_LIST )
-    optional_PRESENT( optional_HAVE_INITIALIZER_LIST );
-#else
-    optional_ABSENT(  optional_HAVE_INITIALIZER_LIST );
-#endif
-
-#if optional_HAVE( IS_DEFAULT )
-    optional_PRESENT( optional_HAVE_IS_DEFAULT );
-#else
-    optional_ABSENT(  optional_HAVE_IS_DEFAULT );
-#endif
-
-#if optional_HAVE( IS_DELETE )
-    optional_PRESENT( optional_HAVE_IS_DELETE );
-#else
-    optional_ABSENT(  optional_HAVE_IS_DELETE );
-#endif
-
-#if optional_HAVE( NOEXCEPT )
     optional_PRESENT( optional_HAVE_NOEXCEPT );
-#else
-    optional_ABSENT(  optional_HAVE_NOEXCEPT );
-#endif
-
-#if optional_HAVE( REF_QUALIFIER )
+    optional_PRESENT( optional_HAVE_NULLPTR );
     optional_PRESENT( optional_HAVE_REF_QUALIFIER );
-#else
-    optional_ABSENT(  optional_HAVE_REF_QUALIFIER );
+    optional_PRESENT( optional_HAVE_CONSTEXPR_14 );
 #endif
 }
 
 CASE( "presence of C++ library features" "[.stdlibrary]" )
 {
-#if optional_HAVE( ARRAY )
-    optional_PRESENT( optional_HAVE_ARRAY );
+#if optional_USES_STD_OPTIONAL
+    std::cout << "(Presence of C++ library features not available: using std::optional)\n";
 #else
-    optional_ABSENT(  optional_HAVE_ARRAY );
-#endif
-
-#if optional_HAVE( CONDITIONAL )
     optional_PRESENT( optional_HAVE_CONDITIONAL );
-#else
-    optional_ABSENT(  optional_HAVE_CONDITIONAL );
-#endif
-
-#if optional_HAVE( CONTAINER_DATA_METHOD )
-    optional_PRESENT( optional_HAVE_CONTAINER_DATA_METHOD );
-#else
-    optional_ABSENT(  optional_HAVE_CONTAINER_DATA_METHOD );
-#endif
-
-#if optional_HAVE( REMOVE_CV )
     optional_PRESENT( optional_HAVE_REMOVE_CV );
-#else
-    optional_ABSENT(  optional_HAVE_REMOVE_CV );
-#endif
-
-#if optional_HAVE( SIZED_TYPES )
-    optional_PRESENT( optional_HAVE_SIZED_TYPES );
-#else
-    optional_ABSENT(  optional_HAVE_SIZED_TYPES );
-#endif
-
-#if optional_HAVE( TYPE_TRAITS )
     optional_PRESENT( optional_HAVE_TYPE_TRAITS );
-#else
-    optional_ABSENT(  optional_HAVE_TYPE_TRAITS );
+    optional_PRESENT( optional_HAVE_TR1_TYPE_TRAITS );
+    optional_PRESENT( optional_HAVE_TR1_ADD_POINTER );
 #endif
-
 #ifdef _HAS_CPP0X
     optional_PRESENT( _HAS_CPP0X );
 #else

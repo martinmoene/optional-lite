@@ -43,6 +43,7 @@
 
 #define optional_CPP98_OR_GREATER  ( optional_CPLUSPLUS >= 199711L )
 #define optional_CPP11_OR_GREATER  ( optional_CPLUSPLUS >= 201103L )
+#define optional_CPP11_OR_GREATER_ ( optional_CPLUSPLUS >= 201103L )
 #define optional_CPP14_OR_GREATER  ( optional_CPLUSPLUS >= 201402L )
 #define optional_CPP17_OR_GREATER  ( optional_CPLUSPLUS >= 201703L )
 #define optional_CPP20_OR_GREATER  ( optional_CPLUSPLUS >= 202000L )
@@ -213,6 +214,19 @@ namespace nonstd {
 // half-open range [lo..hi):
 #define optional_BETWEEN( v, lo, hi ) ( (lo) <= (v) && (v) < (hi) )
 
+// Compiler versions:
+//
+// MSVC++ 6.0  _MSC_VER == 1200 (Visual Studio 6.0)
+// MSVC++ 7.0  _MSC_VER == 1300 (Visual Studio .NET 2002)
+// MSVC++ 7.1  _MSC_VER == 1310 (Visual Studio .NET 2003)
+// MSVC++ 8.0  _MSC_VER == 1400 (Visual Studio 2005)
+// MSVC++ 9.0  _MSC_VER == 1500 (Visual Studio 2008)
+// MSVC++ 10.0 _MSC_VER == 1600 (Visual Studio 2010)
+// MSVC++ 11.0 _MSC_VER == 1700 (Visual Studio 2012)
+// MSVC++ 12.0 _MSC_VER == 1800 (Visual Studio 2013)
+// MSVC++ 14.0 _MSC_VER == 1900 (Visual Studio 2015)
+// MSVC++ 14.1 _MSC_VER >= 1910 (Visual Studio 2017)
+
 #if defined(_MSC_VER ) && !defined(__clang__)
 # define optional_COMPILER_MSVC_VER      (_MSC_VER )
 # define optional_COMPILER_MSVC_VERSION  (_MSC_VER / 10 - 10 * ( 5 + (_MSC_VER < 1900 ) ) )
@@ -249,80 +263,52 @@ namespace nonstd {
 
 #define optional_HAVE(FEATURE) ( optional_HAVE_##FEATURE )
 
-// Presence of C++11 language features:
-
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 100
-# define optional_HAVE_AUTO  1
-# define optional_HAVE_NULLPTR  1
-# define optional_HAVE_STATIC_ASSERT  1
+#ifdef _HAS_CPP0X
+# define optional_HAS_CPP0X  _HAS_CPP0X
+#else
+# define optional_HAS_CPP0X  0
 #endif
 
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 120
-# define optional_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  1
-# define optional_HAVE_INITIALIZER_LIST  1
-#endif
+// Unless defined otherwise below, consider VC14 as C++11 for optional-lite:
 
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 140
-# define optional_HAVE_ALIAS_TEMPLATE  1
-# define optional_HAVE_CONSTEXPR_11  1
-# define optional_HAVE_ENUM_CLASS  1
-# define optional_HAVE_EXPLICIT_CONVERSION  1
-# define optional_HAVE_IS_DEFAULT  1
-# define optional_HAVE_IS_DELETE  1
-# define optional_HAVE_NOEXCEPT  1
-# define optional_HAVE_REF_QUALIFIER  1
-#endif
-
-// Presence of C++14 language features:
-
-#if optional_CPP14_OR_GREATER
-# define optional_HAVE_CONSTEXPR_14  1
-#endif
-
-// Presence of C++17 language features:
-
-#if optional_CPP17_OR_GREATER
-# define optional_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  1
-#endif
-
-// Presence of C++ library features:
-
-#if optional_COMPILER_GNUC_VERSION
-# define optional_HAVE_TR1_TYPE_TRAITS  1
-# define optional_HAVE_TR1_ADD_POINTER  1
-#endif
-
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 90
-# define optional_HAVE_TYPE_TRAITS  1
-# define optional_HAVE_STD_ADD_POINTER  1
-#endif
-
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 110
-# define optional_HAVE_ARRAY  1
-#endif
-
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 120
-# define optional_HAVE_CONDITIONAL  1
-#endif
-
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 140 || (optional_COMPILER_MSVC_VERSION >= 90 && _HAS_CPP0X)
-# define optional_HAVE_CONTAINER_DATA_METHOD  1
-#endif
-
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 120
-# define optional_HAVE_REMOVE_CV  1
-#endif
-
-#if optional_CPP11_OR_GREATER || optional_COMPILER_MSVC_VERSION >= 140
-# define optional_HAVE_SIZED_TYPES  1
-#endif
-
-// For the rest, consider VC14 as C++11 for optional-lite:
-
-#if optional_COMPILER_MSVC_VERSION >= 140
+#if optional_COMPILER_MSVC_VER >= 1900
 # undef  optional_CPP11_OR_GREATER
 # define optional_CPP11_OR_GREATER  1
 #endif
+
+#define optional_CPP11_90   (optional_CPP11_OR_GREATER_ || optional_COMPILER_MSVC_VER >= 1500)
+#define optional_CPP11_100  (optional_CPP11_OR_GREATER_ || optional_COMPILER_MSVC_VER >= 1600)
+#define optional_CPP11_110  (optional_CPP11_OR_GREATER_ || optional_COMPILER_MSVC_VER >= 1700)
+#define optional_CPP11_120  (optional_CPP11_OR_GREATER_ || optional_COMPILER_MSVC_VER >= 1800)
+#define optional_CPP11_140  (optional_CPP11_OR_GREATER_ || optional_COMPILER_MSVC_VER >= 1900)
+#define optional_CPP11_141  (optional_CPP11_OR_GREATER_ || optional_COMPILER_MSVC_VER >= 1910)
+
+#define optional_CPP14_000  (optional_CPP14_OR_GREATER)
+#define optional_CPP17_000  (optional_CPP17_OR_GREATER)
+
+// Presence of C++11 language features:
+
+#define optional_HAVE_CONSTEXPR_11      optional_CPP11_140
+#define optional_HAVE_NOEXCEPT          optional_CPP11_140
+#define optional_HAVE_NULLPTR           optional_CPP11_100
+#define optional_HAVE_REF_QUALIFIER     optional_CPP11_140
+
+// Presence of C++14 language features:
+
+#define optional_HAVE_CONSTEXPR_14      optional_CPP14_000
+
+// Presence of C++17 language features:
+
+// no flag
+
+// Presence of C++ library features:
+
+#define optional_HAVE_CONDITIONAL       optional_CPP11_120
+#define optional_HAVE_REMOVE_CV         optional_CPP11_120
+#define optional_HAVE_TYPE_TRAITS       optional_CPP11_90
+
+#define optional_HAVE_TR1_TYPE_TRAITS   (!! optional_COMPILER_GNUC_VERSION )
+#define optional_HAVE_TR1_ADD_POINTER   (!! optional_COMPILER_GNUC_VERSION )
 
 // C++ feature usage:
 
