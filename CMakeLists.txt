@@ -7,19 +7,27 @@
 
 cmake_minimum_required( VERSION 3.5 )
 
-# optional-lite version, updated by script/update-version.py:
+# optional-lite project and version, updated by script/update-version.py:
+
+project( optional_lite LANGUAGES CXX )
 
 set( optional_lite_version "3.1.1" )
 
+# Toplevel or subproject:
+
+if ( CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR )
+    set( optional_IS_TOPLEVEL_PROJECT TRUE )
+else()
+    set( optional_IS_TOPLEVEL_PROJECT FALSE )
+endif()
+
 # Enable building and performing of tests and building of examples:
 
-option( OPTIONAL_LITE_OPT_BUILD_TESTS    "Build and perform optional-lite tests" OFF )
+option( OPTIONAL_LITE_OPT_BUILD_TESTS    "Build and perform optional-lite tests" ${optional_IS_TOPLEVEL_PROJECT} )
 option( OPTIONAL_LITE_OPT_BUILD_EXAMPLES "Build optional-lite examples" OFF )
 
 option( OPTIONAL_LITE_OPT_SELECT_STD     "Select std::optional"    OFF )
 option( OPTIONAL_LITE_OPT_SELECT_NONSTD  "Select nonstd::optional" OFF )
-
-project( optional_lite LANGUAGES CXX )
 
 include( GNUInstallDirs )
 
