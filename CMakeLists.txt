@@ -9,9 +9,14 @@ cmake_minimum_required( VERSION 3.5 )
 
 # optional-lite project and version, updated by script/update-version.py:
 
-project( optional_lite LANGUAGES CXX )
+project(
+    optional_lite
+    VERSION 3.1.1
+    DESCRIPTION "A C++17-like optional, a nullable object for C++98, C++11 and later in a single-file header-only library"
+#   HOMEPAGE_URL "https://github.com/martinmoene/optional-lite"
+    LANGUAGES CXX )
 
-set( optional_lite_version "3.1.1" )
+set( ${PROJECT_NAME}_version "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}" )
 
 # Toplevel or subproject:
 
@@ -21,7 +26,7 @@ else()
     set( optional_IS_TOPLEVEL_PROJECT FALSE )
 endif()
 
-# Enable building and performing of tests and building of examples:
+# If toplevel project, enable building and performing of tests, disable building of examples:
 
 option( OPTIONAL_LITE_OPT_BUILD_TESTS    "Build and perform optional-lite tests" ${optional_IS_TOPLEVEL_PROJECT} )
 option( OPTIONAL_LITE_OPT_BUILD_EXAMPLES "Build optional-lite examples" OFF )
