@@ -12,7 +12,7 @@ cmake_minimum_required( VERSION 3.5 )
 project(
     optional_lite
     VERSION 3.1.1
-    DESCRIPTION "A C++17-like optional, a nullable object for C++98, C++11 and later in a single-file header-only library"
+#   DESCRIPTION "A C++17-like optional, a nullable object for C++98, C++11 and later in a single-file header-only library"
 #   HOMEPAGE_URL "https://github.com/martinmoene/optional-lite"
     LANGUAGES CXX )
 
