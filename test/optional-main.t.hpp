@@ -10,7 +10,7 @@
 #ifndef TEST_OPTIONAL_LITE_H_INCLUDED
 #define TEST_OPTIONAL_LITE_H_INCLUDED
 
-#include "optional.hpp"
+#include "nonstd/optional.hpp"
 
 // Compiler warning suppression for usage of lest:
 
