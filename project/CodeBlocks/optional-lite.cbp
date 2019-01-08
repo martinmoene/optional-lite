@@ -24,6 +24,7 @@
 		<Unit filename="../../example/01-to_int.cpp" />
 		<Unit filename="../../example/02-nodefltctor.cpp" />
 		<Unit filename="../../example/04-any-optional-variant.cpp" />
+		<Unit filename="../../example/05-no-exceptions.cpp" />
 		<Unit filename="../../example/BUCK" />
 		<Unit filename="../../extra/gdb/nonstd_optional_printer.py" />
 		<Unit filename="../../include/nonstd/optional.hpp" />

@@ -22,7 +22,7 @@ Example usage
 -------------
 
 ```C++
-#include "optional.hpp"
+#include "nonstd/optional.hpp"
 
 #include <cstdlib>
 #include <iostream>
@@ -56,7 +56,7 @@ prompt>g++ -Wall -Wextra -std=c++03 -I.. -o to_int.exe to_int.cpp && to_int x1
 
 In a nutshell
 ---------------
-**optional lite** is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library aims to provide a [C++17-like optional](http://en.cppreference.com/w/cpp/utility/optional) for use with C++98 and later. If available, std::optional is used. There's also a simpler version, [*optional bare*](https://github.com/martinmoene/optional-bare). Unlike *optional lite*, *optional bare* is limited to default-constructible and copyable types. 
+**optional lite** is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library aims to provide a [C++17-like optional](http://en.cppreference.com/w/cpp/utility/optional) for use with C++98 and later. If available, std::optional is used. There's also a simpler version, [*optional bare*](https://github.com/martinmoene/optional-bare). Unlike *optional lite*, *optional bare* is limited to default-constructible and copyable types.
 
 **Features and properties of optional lite** are ease of installation (single header), freedom of dependencies other than the standard library and control over object alignment (if needed). *optional lite* shares the approach to in-place tags with [any-lite](https://github.com/martinmoene/any-lite), [expected-lite](https://github.com/martinmoene/expected-lite) and with [variant-lite](https://github.com/martinmoene/variant-lite) and these libraries can be used together.
 
@@ -68,7 +68,7 @@ For more examples, see [this answer on StackOverflow](http://stackoverflow.com/a
 License
 -------
 *optional lite* is distributed under the [Boost Software License](LICENSE.txt).
- 
+
 
 Dependencies
 ------------
@@ -161,14 +161,14 @@ Synopsis
 
 | Kind                     | Std  | Function |
 |--------------------------|------|----------|
-| Relational operators     |&nbsp;| &nbsp;   | 
+| Relational operators     |&nbsp;| &nbsp;   |
 | ==                       |&nbsp;| template< typename T ><br>bool **operator==**( optional<T> const & x, optional<T> const & y ) |
 | !=                       |&nbsp;| template< typename T ><br>bool **operator!=**( optional<T> const & x, optional<T> const & y ) |
 | <                        |&nbsp;| template< typename T ><br>bool **operator<**( optional<T> const & x, optional<T> const & y )  |
 | >                        |&nbsp;| template< typename T ><br>bool **operator>**( optional<T> const & x, optional<T> const & y )  |
 | <=                       |&nbsp;| template< typename T ><br>bool **operator<=*( optional<T> const & x, optional<T> const & y ) |
 | >=                       |&nbsp;| template< typename T ><br>bool **operator>=*( optional<T> const & x, optional<T> const & y ) |
-| Comparison with nullopt  |&nbsp;| &nbsp;   | 
+| Comparison with nullopt  |&nbsp;| &nbsp;   |
 | ==                       |&nbsp;| template< typename T ><br>bool **operator==**( optional<T> const & x, nullopt_t ) noexcept |
 | &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator==**( nullopt_t, optional<T> const & x ) noexcept |
 | !=                       |&nbsp;| template< typename T ><br>bool **operator!=**( optional<T> const & x, nullopt_t ) noexcept |
@@ -181,7 +181,7 @@ Synopsis
 | &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator>**( nullopt_t, optional<T> const & ) noexcept    |
 | >=                       |&nbsp;| template< typename T ><br>bool **operator>=**( optional<T> const &, nullopt_t ) noexcept   |
 | &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator>=**( nullopt_t, optional<T> const & x ) noexcept |
-| Comparison with T        |&nbsp;| &nbsp;   | 
+| Comparison with T        |&nbsp;| &nbsp;   |
 | ==                       |&nbsp;| template< typename T ><br>bool **operator==**( optional<T> const & x, const T& v )  |
 | &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator==**( T const & v, optional<T> const & x ) |
 | !=                       |&nbsp;| template< typename T ><br>bool **operator!=**( optional<T> const & x, const T& v )  |
@@ -194,7 +194,7 @@ Synopsis
 | &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator>**( T const & v, optional<T> const & x )  |
 | >=                       |&nbsp;| template< typename T ><br>bool **operator>=**( optional<T> const & x, const T& v )  |
 | &nbsp;                   |&nbsp;| template< typename T ><br>bool **operator>=**( T const & v, optional<T> const & x ) |
-| Specialized algorithms   |&nbsp;| &nbsp;   | 
+| Specialized algorithms   |&nbsp;| &nbsp;   |
 | swap                     |&nbsp;| template< typename T ><br>void **swap**( optional<T> & x, optional<T> & y ) noexcept(...) |
 | create                   |<C++11| template< typename T ><br>optional&lt;T> **make_optional**( T const & v )      |
 | &nbsp;                   | C++11| template< class T ><br>optional< typename std::decay&lt;T>::type > **make_optional**( T && v ) |
@@ -208,6 +208,10 @@ Synopsis
 #### Standard selection macro
 \-D<b>optional\_CPLUSPLUS</b>=199711L
 Define this macro to override the auto-detection of the supported C++ standard, if your compiler does not set the `__cplusplus` macro correctly.
+
+#### Disable exceptions
+-D<b>optional_CONFIG_NO_EXCEPTIONS</b>=0
+Define this to 1 if you want to compile without exceptions. If not defined, the header tries and detect if exceptions have been disabled (e.g. via `-fno-exceptions`). Default is undefined.
 
 #### Macros to control alignment
 
@@ -303,7 +307,7 @@ If you access data that's not properly aligned, it 1) may take longer than when 
 
 Although the C++ standard does not guarantee that all user-defined types have the alignment of some POD type, in practice it's likely they do [8, part 2].
 
-If *optional lite* is compiled as C++11 or later, C++11 alignment facilities are used for storage of the underlying object. When compiling as pre-C++11, *optional lite* tries to determine proper alignment using meta programming. If this doesn't work out, you can control alignment via three macros. 
+If *optional lite* is compiled as C++11 or later, C++11 alignment facilities are used for storage of the underlying object. When compiling as pre-C++11, *optional lite* tries to determine proper alignment using meta programming. If this doesn't work out, you can control alignment via three macros.
 
 *optional lite* uses the following rules for alignment:
 
@@ -315,7 +319,7 @@ If *optional lite* is compiled as C++11 or later, C++11 alignment facilities are
 
 4. If you define -D<b>optional_CONFIG_ALIGN_AS_FALLBACK</b>=*pod-type* the fallback type for alignment of rule 5 below becomes *pod-type*. It's your obligation to specify a type with proper alignment.
 
-5. At default, *optional lite* tries to find a POD type with the same alignment as the underlying type. 
+5. At default, *optional lite* tries to find a POD type with the same alignment as the underlying type.
 
 	The algorithm for alignment of 5. is:
 	- Determine the alignment A of the underlying type using `alignment_of<>`.
@@ -337,7 +341,7 @@ Other implementations of optional
 
 Notes and references
 --------------------
-[1] CppReference. [Optional](http://en.cppreference.com/w/cpp/utility/optional).  
+[1] CppReference. [Optional](http://en.cppreference.com/w/cpp/utility/optional).
 
 [2] ISO/IEC WG21. [N4606, section 20.6 Optional objects](http://wg21.link/n4606). July 2016.
 
@@ -355,7 +359,7 @@ Notes and references
 
 [9] Fernando Cacciola. [Boost.Optional Quick start guide](http://www.boost.org/doc/libs/1_57_0/libs/optional/doc/html/boost_optional/quick_start.html).
 
-[10] Andrei Alexandrescu. [Generic<Programming>: Discriminated Unions part 1](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2004/alexandr/alexandr.htm), [part 2](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2006/alexandr/alexandr.htm), [part 3](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2008/alexandr/alexandr.htm). April 2002. 
+[10] Andrei Alexandrescu. [Generic<Programming>: Discriminated Unions part 1](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2004/alexandr/alexandr.htm), [part 2](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2006/alexandr/alexandr.htm), [part 3](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2008/alexandr/alexandr.htm). April 2002.
 
 [11] Herb Sutter. [Style Case Study #3: Construction Unions](http://www.gotw.ca/gotw/085.htm). GotW #85. 2009
 

@@ -30,6 +30,16 @@
 # define optional_CONFIG_SELECT_OPTIONAL  ( optional_HAVE_STD_OPTIONAL ? optional_OPTIONAL_STD : optional_OPTIONAL_NONSTD )
 #endif
 
+// Control presence of exception handling (try and auto discover):
+
+#ifndef optional_CONFIG_NO_EXCEPTIONS
+# if defined(__cpp_exceptions) || defined(__EXCEPTIONS) || defined(_CPPUNWIND)
+#  define optional_CONFIG_NO_EXCEPTIONS  0
+# else
+#  define optional_CONFIG_NO_EXCEPTIONS  1
+# endif
+#endif
+
 // C++ language version detection (C++20 is speculative):
 // Note: VC14.0/1900 (VS2015) lacks too much from C++14.
 
@@ -324,7 +334,7 @@ namespace nonstd {
 # define optional_constexpr14  /*constexpr*/
 #endif
 
-#if optional_HAVE( NOEXCEPT )
+#if optional_HAVE( NOEXCEPT ) && ! optional_CONFIG_NO_EXCEPTIONS
 # define optional_noexcept  noexcept
 #else
 # define optional_noexcept  /*noexcept*/
@@ -722,12 +732,28 @@ const nullopt_t nullopt(( nullopt_t::init() ));
 
 /// optional access error
 
+#if ! optional_CONFIG_NO_EXCEPTIONS
+
 class bad_optional_access : public std::logic_error
 {
 public:
   explicit bad_optional_access()
   : logic_error( "bad optional access" ) {}
 };
+
+#endif //optional_CONFIG_NO_EXCEPTIONS
+
+namespace detail {
+
+inline void throw_bad_optional_access()
+{
+#if optional_CONFIG_NO_EXCEPTIONS
+   assert( 0 );
+#else
+   throw bad_optional_access();
+#endif
+}
+} // namespace detail
 
 /// optional
 
@@ -1184,7 +1210,7 @@ public:
     optional_constexpr14 value_type const & value() const optional_ref_qual
     {
         if ( ! has_value() )
-            throw bad_optional_access();
+            detail::throw_bad_optional_access();
 
         return contained.value();
     }
@@ -1192,7 +1218,7 @@ public:
     optional_constexpr14 value_type & value() optional_ref_qual
     {
         if ( ! has_value() )
-            throw bad_optional_access();
+            detail::throw_bad_optional_access();
 
         return contained.value();
     }
