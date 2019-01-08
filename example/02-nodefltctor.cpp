@@ -1,4 +1,4 @@
-#include "optional.hpp"
+#include "nonstd/optional.hpp"
 
 #include <iostream>
 #include <vector>
@@ -15,15 +15,15 @@ struct V
 
 int main()
 {
-    try 
+    try
     {
-        int x = 42; 
+        int x = 42;
 //      V s;        // V has no default constructor
         V t(x);     // Ok
-        
+
         std::vector< optional<V> > v(3);
         v[0] = t;
-        
+
         std::cout << "v[0].value().v: " << v[0].value().v << "\n";
         std::cout << "v[1].value().v: " << v[1].value().v << "\n";
     }
@@ -33,4 +33,4 @@ int main()
     }
 }
 
-// cl -nologo -W3 -EHsc -I.. 00-nodefltctor.cpp && 00-nodefltctor
+// cl -nologo -W3 -EHsc -I../inlcude 00-nodefltctor.cpp && 00-nodefltctor

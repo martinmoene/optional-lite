@@ -1,4 +1,4 @@
-#include "optional.hpp"
+#include "nonstd/optional.hpp"
 
 #include <cstdlib>
 #include <iostream>
@@ -24,5 +24,5 @@ int main( int argc, char * argv[] )
     else      std::cout << "'" << text << "' isn't a number";
 }
 
-// cl -nologo -W3 -EHsc -I.. to_int.cpp && to_int x1
-// g++ -Wall -Wextra -std=c++03 -I.. -o to_int.exe to_int.cpp && to_int x1
+// cl -nologo -W3 -EHsc -I../inlcude to_int.cpp && to_int x1
+// g++ -Wall -Wextra -std=c++03 -I../inlcude -o to_int.exe to_int.cpp && to_int x1

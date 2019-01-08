@@ -1,5 +1,5 @@
-#include "any.hpp"
-#include "optional.hpp"
+#include "nonstd/any.hpp"
+#include "nonstd/optional.hpp"
 #include "variant.hpp"
 
 #include <cassert>
@@ -19,7 +19,7 @@ int main()
         var =   7  ; assert(  var.value() ==  7  );
     }{
         any var;
-        
+
         assert( ! var.has_value() );
 
         var =  'v' ; assert( any_cast<char>( var ) == 'v' );
@@ -39,5 +39,5 @@ int main()
     }
 }
 
-// cl -nologo -EHsc -I../../any-lite/include/nonstd -I../../optional-lite/include/nonstd -I../../variant-lite/include/nonstd 04-any-optional-variant.cpp && 04-any-optional-variant
-// g++ -Wall -I../../any-lite/include/nonstd -I../../optional-lite/include/nonstd -I../../variant-lite/include/nonstd -o 04-any-optional-variant 04-any-optional-variant.cpp && 04-any-optional-variant
+// cl -nologo -EHsc -I../../any-lite/include -I../../optional-lite/include -I../../variant-lite/include 04-any-optional-variant.cpp && 04-any-optional-variant
+// g++ -Wall -I../../any-lite/include -I../../optional-lite/include -I../../variant-lite/include -o 04-any-optional-variant 04-any-optional-variant.cpp && 04-any-optional-variant
