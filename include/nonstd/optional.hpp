@@ -194,7 +194,6 @@ namespace nonstd {
 #else // optional_USES_STD_OPTIONAL
 
 #include <cassert>
-#include <stdexcept>
 #include <utility>
 
 // optional-lite alignment configuration:
@@ -355,6 +354,12 @@ namespace nonstd {
 #endif
 
 // additional includes:
+
+#if optional_CONFIG_NO_EXCEPTIONS
+// already included: <cassert>
+#else
+# include <stdexcept>
+#endif
 
 #if optional_CPP11_OR_GREATER
 # include <functional>
@@ -742,18 +747,6 @@ public:
 };
 
 #endif //optional_CONFIG_NO_EXCEPTIONS
-
-namespace detail {
-
-inline void throw_bad_optional_access()
-{
-#if optional_CONFIG_NO_EXCEPTIONS
-   assert( 0 );
-#else
-   throw bad_optional_access();
-#endif
-}
-} // namespace detail
 
 /// optional
 
@@ -1209,17 +1202,23 @@ public:
 
     optional_constexpr14 value_type const & value() const optional_ref_qual
     {
+#if optional_CONFIG_NO_EXCEPTIONS
+        assert( has_value() );
+#else
         if ( ! has_value() )
-            detail::throw_bad_optional_access();
-
+            throw bad_optional_access();
+#endif
         return contained.value();
     }
 
     optional_constexpr14 value_type & value() optional_ref_qual
     {
+#if optional_CONFIG_NO_EXCEPTIONS
+        assert( has_value() );
+#else
         if ( ! has_value() )
-            detail::throw_bad_optional_access();
-
+            throw bad_optional_access();
+#endif
         return contained.value();
     }
 
