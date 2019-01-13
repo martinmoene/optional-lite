@@ -333,7 +333,7 @@ namespace nonstd {
 # define optional_constexpr14  /*constexpr*/
 #endif
 
-#if optional_HAVE( NOEXCEPT ) && ! optional_CONFIG_NO_EXCEPTIONS
+#if optional_HAVE( NOEXCEPT )
 # define optional_noexcept  noexcept
 #else
 # define optional_noexcept  /*noexcept*/
