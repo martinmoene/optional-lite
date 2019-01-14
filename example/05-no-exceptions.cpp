@@ -1,7 +1,5 @@
 #include "nonstd/optional.hpp"
 
-#include <iostream>
-
 using nonstd::optional;
 
 int main()
