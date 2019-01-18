@@ -218,6 +218,8 @@ namespace nonstd {
 #elif defined(__GNUC__)
 # pragma GCC   diagnostic push
 # pragma GCC   diagnostic ignored "-Wundef"
+#elif defined(_MSC_VER )
+# pragma warning( push )
 #endif
 
 // half-open range [lo..hi):
@@ -259,12 +261,10 @@ namespace nonstd {
 #endif
 
 #if optional_BETWEEN(optional_COMPILER_MSVC_VERSION, 70, 140 )
-# pragma warning( push )
 # pragma warning( disable: 4345 )   // initialization behavior changed
 #endif
 
 #if optional_BETWEEN(optional_COMPILER_MSVC_VERSION, 70, 150 )
-# pragma warning( push )
 # pragma warning( disable: 4814 )   // in C++14 'constexpr' will not imply 'const'
 #endif
 
@@ -1555,6 +1555,8 @@ public:
 # pragma clang diagnostic pop
 #elif defined(__GNUC__)
 # pragma GCC   diagnostic pop
+#elif defined(_MSC_VER )
+# pragma warning( pop )
 #endif
 
 #endif // optional_USES_STD_OPTIONAL
