@@ -29,6 +29,7 @@
 		<Unit filename="../../extra/gdb/nonstd_optional_printer.py" />
 		<Unit filename="../../include/nonstd/optional.hpp" />
 		<Unit filename="../../script/update-version.py" />
+		<Unit filename="../../script/upload-conan.py" />
 		<Unit filename="../../test/CMakeLists.txt" />
 		<Unit filename="../../test/Makefile" />
 		<Unit filename="../../test/lest_cpp03.hpp" />
