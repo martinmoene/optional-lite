@@ -374,7 +374,12 @@ Notes and references
 
 Appendix
 --------
-### A.1 Optional Lite test specification
+
+### A.1 Compile-time information
+
+The version of *optional lite* is available via tag `[.version]`. The following tags are available for information on the compiler and on the C++ standard library used: `[.compiler]`, `[.stdc++]`, `[.stdlanguage]` and `[.stdlibrary]`.
+
+### A.2 Optional Lite test specification
 
 ```
 union: A C++03 union can only contain POD types
