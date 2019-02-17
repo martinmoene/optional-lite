@@ -209,6 +209,12 @@ Synopsis
 \-D<b>optional\_CPLUSPLUS</b>=199711L
 Define this macro to override the auto-detection of the supported C++ standard, if your compiler does not set the `__cplusplus` macro correctly.
 
+#### Select `std::optional` or `nonstd::optional`
+At default, *optional lite* uses `std::optional` if it is available and lets you use it via namespace `nonstd`. You can however override this default and explicitly request to use `std::optional` or optional lite's `nonstd::optional` as `nonstd::optional` via the following macros.
+
+-D<b>optional\_CONFIG\_SELECT\_OPTIONAL</b>=variant_OPTIONAL_DEFAULT  
+Define this to `variant_OPTIONAL_STD` to select `std::optional` as `nonstd::optional`. Define this to `variant_OPTIONAL_NONSTD` to select `nonstd::optional` as `nonstd::optional`. Default is undefined, which has the same effect as defining to `variant_OPTIONAL_DEFAULT`.
+
 #### Disable exceptions
 -D<b>optional_CONFIG_NO_EXCEPTIONS</b>=0
 Define this to 1 if you want to compile without exceptions. If not defined, the header tries and detect if exceptions have been disabled (e.g. via `-fno-exceptions`). Default is undefined.
