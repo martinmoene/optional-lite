@@ -212,8 +212,8 @@ Define this macro to override the auto-detection of the supported C++ standard, 
 #### Select `std::optional` or `nonstd::optional`
 At default, *optional lite* uses `std::optional` if it is available and lets you use it via namespace `nonstd`. You can however override this default and explicitly request to use `std::optional` or optional lite's `nonstd::optional` as `nonstd::optional` via the following macros.
 
--D<b>optional\_CONFIG\_SELECT\_OPTIONAL</b>=variant_OPTIONAL_DEFAULT  
-Define this to `variant_OPTIONAL_STD` to select `std::optional` as `nonstd::optional`. Define this to `variant_OPTIONAL_NONSTD` to select `nonstd::optional` as `nonstd::optional`. Default is undefined, which has the same effect as defining to `variant_OPTIONAL_DEFAULT`.
+-D<b>optional\_CONFIG\_SELECT\_OPTIONAL</b>=optional_OPTIONAL_DEFAULT  
+Define this to `optional_OPTIONAL_STD` to select `std::optional` as `nonstd::optional`. Define this to `optional_OPTIONAL_NONSTD` to select `nonstd::optional` as `nonstd::optional`. Default is undefined, which has the same effect as defining to `optional_OPTIONAL_DEFAULT`.
 
 #### Disable exceptions
 -D<b>optional_CONFIG_NO_EXCEPTIONS</b>=0
