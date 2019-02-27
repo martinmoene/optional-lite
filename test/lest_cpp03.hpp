@@ -27,7 +27,11 @@
 #include <cstdlib>
 #include <ctime>
 
-#define  lest_VERSION "1.33.5"
+#define lest_MAJOR  1
+#define lest_MINOR  34
+#define lest_PATCH  1
+
+#define  lest_VERSION  lest_STRINGIFY(lest_MAJOR) "." lest_STRINGIFY(lest_MINOR) "." lest_STRINGIFY(lest_PATCH)
 
 #ifndef  lest_FEATURE_COLOURISE
 # define lest_FEATURE_COLOURISE 0
@@ -101,6 +105,11 @@
 # define lest_SUPPRESS_WUNUSED    /*empty*/
 # define lest_RESTORE_WARNINGS    /*empty*/
 #endif
+
+// Stringify:
+
+#define lest_STRINGIFY(  x )  lest_STRINGIFY_( x )
+#define lest_STRINGIFY_( x )  #x
 
 // Compiler versions:
 
