@@ -803,7 +803,7 @@ public:
             contained.construct_value( std::move( other.contained.value() ) );
     }
 
-    // 4 (C++11) - explicit converting copy-construct from optional
+    // 4a (C++11) - explicit converting copy-construct from optional
     template< typename U >
     explicit optional( optional<U> const & other
         optional_REQUIRES_A(
@@ -822,11 +822,11 @@ public:
     : has_value_( other.has_value() )
     {
         if ( other.has_value() )
-            contained.construct_value( other.contained.value() );
+            contained.construct_value( T{ other.contained.value() } );
     }
 #endif // optional_CPP11_OR_GREATER
 
-    // 4 (C++98 and later) - non-explicit converting copy-construct from optional
+    // 4b (C++98 and later) - non-explicit converting copy-construct from optional
     template< typename U >
     optional( optional<U> const & other
 #if optional_CPP11_OR_GREATER
@@ -856,7 +856,7 @@ public:
     template< typename U >
     optional( optional<U> && other
         optional_REQUIRES_A(
-            std::is_constructible<T, U const &>::value
+            std::is_constructible<T, U &&>::value
             && !std::is_constructible<T, optional<U> &          >::value
             && !std::is_constructible<T, optional<U> &&         >::value
             && !std::is_constructible<T, optional<U> const &    >::value
@@ -871,14 +871,14 @@ public:
     : has_value_( other.has_value() )
     {
         if ( other.has_value() )
-            contained.construct_value( std::move( other.contained.value() ) );
+            contained.construct_value( T{ other.contained.value() } );
     }
 
     // 5a (C++11) - non-explicit converting move-construct from optional
     template< typename U >
     optional( optional<U> && other
         optional_REQUIRES_A(
-            std::is_constructible<T, U const &>::value
+            std::is_constructible<T, U &&>::value
             && !std::is_constructible<T, optional<U> &          >::value
             && !std::is_constructible<T, optional<U> &&         >::value
             && !std::is_constructible<T, optional<U> const &    >::value
@@ -929,7 +929,7 @@ public:
         )
     )
     : has_value_( true )
-    , contained( std::forward<U>( value ) )
+    , contained( T{ std::forward<U>( value ) } )
     {}
 
     // 8a (C++11) - non-explicit move construct from value
@@ -1543,7 +1543,7 @@ struct hash< nonstd::optional<T> >
 public:
     std::size_t operator()( nonstd::optional<T> const & v ) const optional_noexcept
     {
-        return bool( v ) ? hash<T>()( *v ) : 0;
+        return bool( v ) ? std::hash<T>{}( *v ) : 0;
     }
 };
 

@@ -21,6 +21,15 @@ namespace {
 
 struct nonpod { nonpod(){} };
 
+struct Integer  { int x;          Integer (int v) : x(v) {} };
+struct Explicit { int x; explicit Explicit(int v) : x(v) {} };
+
+bool operator==( Integer  a, Integer  b ) { return a.x == b.x; }
+bool operator==( Explicit a, Explicit b ) { return a.x == b.x; }
+
+std::ostream & operator<<( std::ostream & os, Integer  i ) { return os << "Integer:"  << i.x; }
+std::ostream & operator<<( std::ostream & os, Explicit e ) { return os << "Explicit:" << e.x; }
+
 // ensure comparison of pointers for lest:
 
 // const void * lest_nullptr = 0;
@@ -185,14 +194,14 @@ CASE( "union: A C++03 union can only contain POD types" )
 
 // construction:
 
-CASE( "optional: Allows to default construct an empty optional" )
+CASE( "optional: Allows to default construct an empty optional (1a)" )
 {
     optional<int> a;
 
     EXPECT( !a );
 }
 
-CASE( "optional: Allows to explicitly construct a disengaged, empty optional via nullopt" )
+CASE( "optional: Allows to explicitly construct a disengaged, empty optional via nullopt (1b)" )
 {
     optional<int> a( nullopt );
 
@@ -214,7 +223,7 @@ CASE( "optional: Allows to default construct an empty optional with a non-defaul
     EXPECT( !ondcm );
 }
 
-CASE( "optional: Allows to copy-construct from empty optional" )
+CASE( "optional: Allows to copy-construct from empty optional (2)" )
 {
     optional<int> a;
 
@@ -223,30 +232,68 @@ CASE( "optional: Allows to copy-construct from empty optional" )
     EXPECT( !b );
 }
 
-CASE( "optional: Allows to move-construct from empty optional (C++11)" )
+CASE( "optional: Allows to move-construct from empty optional (C++11, 3)" )
 {
-    optional<int> b(( optional<int>( nullopt ) ));
+#if optional_CPP11_OR_GREATER
+    optional<int> a;
+
+    optional<int> b( std::move( a ) );
+
+    EXPECT( !b );
+#else
+    EXPECT( !!"optional: move-construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to copy-construct from empty optional, explicit converting (4a)" )
+{
+#if optional_CPP11_OR_GREATER
+    optional<int> a;
+
+    optional<Explicit> b{ a };
+
+    EXPECT( !b );
+#else
+    EXPECT( !!"optional: move-construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to copy-construct from empty optional, non-explicit converting (4b)" )
+{
+    optional<int> a;
+
+    optional<Integer> b( a );
 
     EXPECT( !b );
 }
 
-CASE( "optional: Allows to copy-construct from empty optional, converting" )
+CASE( "optional: Allows to move-construct from empty optional, explicit converting (5a)" )
 {
-    optional<char> a;
+#if optional_CPP11_OR_GREATER
+    optional<int> a;
 
-    optional<int> b( a );
+    optional<Explicit> b{ std::move( a ) };
 
     EXPECT( !b );
+#else
+    EXPECT( !!"optional: move-construction is not available (no C++11)" );
+#endif
 }
 
-CASE( "optional: Allows to move-construct from empty optional, converting (C++11)" )
+CASE( "optional: Allows to move-construct from empty optional, non-explicit converting (5a)" )
 {
-    optional<int> b(( optional<char>( nullopt ) ));
+#if optional_CPP11_OR_GREATER
+    optional<int> a;
+
+    optional<Integer> b( std::move( a ) );
 
     EXPECT( !b );
+#else
+    EXPECT( !!"optional: move-construction is not available (no C++11)" );
+#endif
 }
 
-CASE( "optional: Allows to copy-construct from non-empty optional" )
+CASE( "optional: Allows to copy-construct from non-empty optional (2)" )
 {
     optional<int> a( 7 );
 
@@ -256,33 +303,67 @@ CASE( "optional: Allows to copy-construct from non-empty optional" )
     EXPECT( *b == 7 );
 }
 
-CASE( "optional: Allows to move-construct from non-empty optional (C++11)" )
+CASE( "optional: Allows to copy-construct from non-empty optional, explicit converting (4a)" )
 {
 #if optional_CPP11_OR_GREATER
-    optional<int> b( optional<int>( 7 ) );
+    optional<int> a( 7 );
 
+    optional<Explicit> b{ a };
+
+    EXPECT(  b                );
+    EXPECT( *b == Explicit{7} );
+#else
+    EXPECT( !!"optional: move-construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to copy-construct from non-empty optional, non-explicit converting (4b)" )
+{
+    optional<int> a( 7 );
+
+    optional<Integer> b( a );
+
+    EXPECT(  b               );
+    EXPECT( *b == Integer(7) );
+}
+
+CASE( "optional: Allows to move-construct from non-empty optional (3)" )
+{
+#if optional_CPP11_OR_GREATER
+    optional<int> a( 7 );
+
+    optional<int> b( std::move( a ) );
+
+    EXPECT(  b      );
     EXPECT( *b == 7 );
 #else
     EXPECT( !!"optional: move-construction is not available (no C++11)" );
 #endif
 }
 
-CASE( "optional: Allows to copy-construct from non-empty optional, converting" )
-{
-    optional<int> a( 7 );
-
-    optional<long> b( a );
-
-    EXPECT(  b      );
-    EXPECT( *b == 7 );
-}
-
-CASE( "optional: Allows to move-construct from non-empty optional, converting (C++11)" )
+CASE( "optional: Allows to move-construct from non-empty optional, explicit converting (5a)" )
 {
 #if optional_CPP11_OR_GREATER
-    optional<int> b( optional<char>( '7' ) );
+    optional<int> a( 7 );
 
-    EXPECT( *b == '7' );
+    optional<Explicit> b{ std::move( a ) };
+
+    EXPECT(  b                );
+    EXPECT( *b == Explicit{7} );
+#else
+    EXPECT( !!"optional: move-construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to move-construct from non-empty optional, non-explicit converting (5b)" )
+{
+#if optional_CPP11_OR_GREATER
+    optional<int> a( 7 );
+
+    optional<Integer> b( std::move( a ) );
+
+    EXPECT(  b               );
+    EXPECT( *b == Integer(7) );
 #else
     EXPECT( !!"optional: move-construction is not available (no C++11)" );
 #endif
@@ -331,6 +412,32 @@ CASE( "optional: Allows to move-construct from value (C++11)" )
     EXPECT( a->value == 7                );
     EXPECT( a->state == move_constructed );
     EXPECT(  s.state == moved_from       );
+#else
+    EXPECT( !!"optional: move-construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to move-construct from value, explicit converting (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    int seven = 7;
+    optional<Explicit> a{ std::move( seven ) };
+
+    EXPECT(  a                );
+    EXPECT( *a == Explicit{7} );
+#else
+    EXPECT( !!"optional: move-construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to move-construct from value, non-explicit converting (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    int seven = 7;
+    optional<Integer> a( std::move( seven ) );
+
+    EXPECT(  a               );
+    EXPECT( *a == Integer(7) );
 #else
     EXPECT( !!"optional: move-construction is not available (no C++11)" );
 #endif
@@ -510,6 +617,38 @@ CASE( "optional: Allows to copy-assign from/to engaged and disengaged optionals"
 
 CASE( "optional: Allows to move-assign from/to engaged and disengaged optionals (C++11)" )
 {
+#if optional_CPP11_OR_GREATER
+    SETUP( "" ) {
+        optional<int> d1;
+        optional<int> d2;
+        optional<int> e1( 123 );
+        optional<int> e2( 987 );
+
+    SECTION( "a disengaged optional assigned nullopt remains empty" ) {
+        d1 = std::move( nullopt );
+        EXPECT( !d1 );
+    }
+    SECTION( "a disengaged optional assigned an engaged optional obtains its value" ) {
+        d1 = std::move( e1);
+        EXPECT(  d1 );
+        EXPECT( *d1 == 123 );
+    }
+    SECTION( "an engaged optional assigned an engaged optional obtains its value" ) {
+        e1 = std::move( e2 );
+        EXPECT(  e1 );
+        EXPECT( *e1 == 987 );
+    }
+    SECTION( "an engaged optional assigned nullopt becomes empty" ) {
+        e1 = std::move( nullopt );
+        EXPECT( !e1 );
+    }
+    SECTION( "a disengaged optional assigned a disengaged optional remains empty" ) {
+        d1 = std::move( d2);
+        EXPECT( !d1 );
+    }}
+#else
+    EXPECT( !!"optional: move-assignment is not available (no C++11)" );
+#endif
 }
 
 CASE( "optional: Allows to copy-assign from/to engaged and disengaged optionals, converting" )
@@ -521,13 +660,18 @@ CASE( "optional: Allows to copy-assign from/to engaged and disengaged optionals,
         optional<char> e2( '7' );
 
     SECTION( "a disengaged optional assigned an engaged optional obtains its value, converting" ) {
-        d1 = d2;
-        EXPECT( !d1 );
+        d1 = e2;
+        EXPECT(  d1 );
+        EXPECT( *d1 == '7' );
     }
     SECTION( "an engaged optional assigned an engaged optional obtains its value, converting" ) {
         e1 = e2;
         EXPECT(  e1 );
         EXPECT( *e1 == '7' );
+    }
+    SECTION( "an engaged optional assigned a disengaged optional becomes empty, converting" ) {
+        e1 = d2;
+        EXPECT(  !e1 );
     }
     SECTION( "a disengaged optional assigned a disengaged optional remains empty, converting" ) {
         d1 = d2;
@@ -537,6 +681,7 @@ CASE( "optional: Allows to copy-assign from/to engaged and disengaged optionals,
 
 CASE( "optional: Allows to move-assign from/to engaged and disengaged optionals, converting (C++11)" )
 {
+#if optional_CPP11_OR_GREATER
     SETUP( "" ) {
         optional<int>  d1;
         optional<char> d2;
@@ -544,18 +689,26 @@ CASE( "optional: Allows to move-assign from/to engaged and disengaged optionals,
         optional<char> e2( '7' );
 
     SECTION( "a disengaged optional assigned an engaged optional obtains its value, converting" ) {
-        d1 = optional<char>();
-        EXPECT( !d1 );
-    }
-    SECTION( "an engaged optional assigned an engaged optional obtains its value, converting" ) {
-        d1 = optional<char>( '7' );
+        d1 = std::move( e2 );
         EXPECT(  d1 );
         EXPECT( *d1 == '7' );
     }
+    SECTION( "an engaged optional assigned an engaged optional obtains its value, converting" ) {
+        e1 = std::move( e2 );
+        EXPECT(  e1 );
+        EXPECT( *e1 == '7' );
+    }
+    SECTION( "an engaged optional assigned a disengaged optional becomes empty, converting" ) {
+        e1 = std::move( d2 );
+        EXPECT(  !e1 );
+    }
     SECTION( "a disengaged optional assigned a disengaged optional remains empty, converting" ) {
-        d1 = optional<char>();
+        d1 = std::move( d2 );
         EXPECT( !d1 );
     }}
+#else
+    EXPECT( !!"optional: move-assignment is not available (no C++11)" );
+#endif
 }
 
 CASE( "optional: Allows to copy-assign from literal value" )
@@ -589,7 +742,7 @@ CASE( "optional: Allows to move-assign from value (C++11)" )
     EXPECT( a->state == move_constructed );
     EXPECT(  s.state == moved_from       );
 #else
-    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+    EXPECT( !!"optional: move-assign is not available (no C++11)" );
 #endif
 }
 
@@ -706,15 +859,14 @@ CASE( "optional: Allows to swap with other optional (member)" )
 
 // observers:
 
-struct Integer { int x; Integer(int v) : x(v) {} };
-
-CASE( "optional: Allows to obtain pointer to value via operator->()" )
+CASE( "optional: Allows to obtain value via operator->()" )
 {
     SETUP( "" ) {
-        optional<Integer> e( Integer( 42 ) );
+        optional<Integer>        e( Integer( 42 ) );
+        optional<Integer> const ce( Integer( 42 ) );
 
     SECTION( "operator->() yields pointer to value (const)" ) {
-        EXPECT(  e->x == 42 );
+        EXPECT(  ce->x == 42 );
     }
     SECTION( "operator->() yields pointer to value (non-const)" ) {
         e->x = 7;
@@ -722,13 +874,33 @@ CASE( "optional: Allows to obtain pointer to value via operator->()" )
     }}
 }
 
+CASE( "optional: Allows to obtain moved-value via operator->() (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    SETUP( "" ) {
+        optional<Integer>        e( Integer( 42 ) );
+        optional<Integer> const ce( Integer( 42 ) );
+
+    SECTION( "operator->() yields pointer to value (const)" ) {
+        EXPECT(  std::move( ce )->x == 42 );
+    }
+    SECTION( "operator->() yields pointer to value (non-const)" ) {
+        e->x = 7;
+        EXPECT(  std::move( e )->x == 7 );
+    }}
+#else
+    EXPECT( !!"optional: move-semantics are not available (no C++11)" );
+#endif
+}
+
 CASE( "optional: Allows to obtain value via operator*()" )
 {
     SETUP( "" ) {
-        optional<int> e( 42 );
+        optional<int>        e( 42 );
+        optional<int> const ce( 42 );
 
     SECTION( "operator*() yields value (const)" ) {
-        EXPECT( *e == 42 );
+        EXPECT( *ce == 42 );
     }
     SECTION( "operator*() yields value (non-const)" ) {
         *e = 7;
@@ -736,8 +908,23 @@ CASE( "optional: Allows to obtain value via operator*()" )
     }}
 }
 
-CASE( "optional: Allows to obtain moved-value via operator*()" )
+CASE( "optional: Allows to obtain moved-value via operator*() (C++11)" )
 {
+#if optional_CPP11_OR_GREATER
+    SETUP( "" ) {
+        optional<int>        e( 42 );
+        optional<int> const ce( 42 );
+
+    SECTION( "operator*() yields value (const)" ) {
+        EXPECT( *(std::move( ce )) == 42 );
+    }
+    SECTION( "operator*() yields value (non-const)" ) {
+        *e = 7;
+        EXPECT( *(std::move( e )) == 7 );
+    }}
+#else
+    EXPECT( !!"optional: move-semantics are not available (no C++11)" );
+#endif
 }
 
 CASE( "optional: Allows to obtain has_value() via operator bool()" )
@@ -753,14 +940,32 @@ CASE( "optional: Allows to obtain value via value()" )
 {
     SETUP( "" ) {
         optional<int> e( 42 );
+        optional<int> const ce( 42 );
 
     SECTION( "value() yields value (const)" ) {
-        EXPECT( opt_value( e ) == 42 );
+        EXPECT( opt_value( ce ) == 42 );
     }
     SECTION( "value() yields value (non-const)" ) {
-        opt_value( e ) = 7;
-        EXPECT( opt_value( e ) == 7 );
+        EXPECT( opt_value( e ) == 42 );
     }}
+}
+
+CASE( "optional: Allows to obtain moved-value via value() (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    SETUP( "" ) {
+        optional<int> e( 42 );
+        optional<int> const ce( 42 );
+
+    SECTION( "value() yields value (const)" ) {
+        EXPECT( opt_value( std::move( ce ) ) == 42 );
+    }
+    SECTION( "value() yields value (non-const)" ) {
+        EXPECT( opt_value( std::move( e ) ) == 42 );
+    }}
+#else
+    EXPECT( !!"optional: move-semantics are not available (no C++11)" );
+#endif
 }
 
 CASE( "optional: Allows to obtain value or default via value_or()" )
@@ -779,16 +984,22 @@ CASE( "optional: Allows to obtain value or default via value_or()" )
 
 CASE( "optional: Allows to obtain moved-value or moved-default via value_or() (C++11)" )
 {
+#if optional_CPP11_OR_GREATER
     SETUP( "" ) {
         optional<int> d;
         optional<int> e( 42 );
 
-    SECTION( "value_or( 7 ) yields value for non-empty optional" ) {
-        EXPECT( optional<int>( 42 ).value_or( 7 ) == 42 );
+    SECTION("for l-values") {
+        EXPECT( d.value_or( 7 ) ==  7 );
+        EXPECT( e.value_or( 7 ) == 42 );
     }
-    SECTION( "value_or( 7 ) yields default for empty optional" ) {
-        EXPECT( optional<int>().value_or( 7 ) == 7 );
+    SECTION("for r-values") {
+        EXPECT( std::move( d ).value_or( 7 ) ==  7 );
+        EXPECT( std::move( e ).value_or( 7 ) == 42 );
     }}
+#else
+    EXPECT( !!"optional: move-semantics are not available (no C++11)" );
+#endif
 }
 
 CASE( "optional: Throws bad_optional_access at disengaged access" )
@@ -796,7 +1007,21 @@ CASE( "optional: Throws bad_optional_access at disengaged access" )
 #if optional_USES_STD_OPTIONAL && defined(__APPLE__)
     EXPECT( true );
 #else
-    EXPECT_THROWS_AS( optional<int>().value(), bad_optional_access );
+    SETUP( "" ) {
+        optional<int> d;
+        optional<int> const cd;
+
+    SECTION("for l-values") {
+        EXPECT_THROWS_AS(  d.value(), bad_optional_access );
+        EXPECT_THROWS_AS( cd.value(), bad_optional_access );
+    }
+# if optional_CPP11_OR_GREATER
+    SECTION("for r-values") {
+        EXPECT_THROWS_AS( std::move(  d ).value(), bad_optional_access );
+        EXPECT_THROWS_AS( std::move( cd ).value(), bad_optional_access );
+    }
+# endif
+    }
 #endif
 }
 
@@ -936,7 +1161,7 @@ CASE( "make_optional: Allows to move-construct optional (C++11)" )
     EXPECT( make_optional( std::move( s ) )->value == 7          );
     EXPECT(                                s.state == moved_from );
 #else
-    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+    EXPECT( !!"optional: move-construction is not available (no C++11)" );
 #endif
 }
 
@@ -1017,6 +1242,19 @@ CASE( "make_optional: Allows to in-place move-construct optional from initialize
     EXPECT( !!"optional: in-place construction is not available (no C++11)" );
 #endif
 }
+
+CASE( "std::hash<>: Allows to obtain hash (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    const auto a = optional<int>( 7 );
+    const auto b = optional<int>( 7 );
+
+    EXPECT( std::hash<optional<int>>{}( a ) == std::hash<optional<int>>{}( b ) );
+#else
+    EXPECT( !!"std::hash<>: std::hash<> is not available (no C++11)" );
+#endif
+}
+
 
 //
 // Negative tests:
