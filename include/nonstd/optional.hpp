@@ -1169,7 +1169,7 @@ public:
             contained.value();
     }
 
-#if optional_CPP11_OR_GREATER
+#if optional_HAVE( REF_QUALIFIER )  &&  ( !optional_COMPILER_GNUC_VERSION || optional_COMPILER_GNUC_VERSION >= 490 )
 
     optional_constexpr value_type const && operator *() const optional_refref_qual
     {
@@ -1222,7 +1222,7 @@ public:
         return contained.value();
     }
 
-#if optional_HAVE( REF_QUALIFIER )
+#if optional_HAVE( REF_QUALIFIER )  &&  ( !optional_COMPILER_GNUC_VERSION || optional_COMPILER_GNUC_VERSION >= 490 )
 
     optional_constexpr value_type const && value() const optional_refref_qual
     {
