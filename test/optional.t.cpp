@@ -21,13 +21,13 @@ namespace {
 
 struct nonpod { nonpod(){} };
 
-struct Integer  { int x;          Integer (int v) : x(v) {} };
+struct Implicit { int x;          Implicit(int v) : x(v) {} };
 struct Explicit { int x; explicit Explicit(int v) : x(v) {} };
 
-bool operator==( Integer  a, Integer  b ) { return a.x == b.x; }
+bool operator==( Implicit a, Implicit b ) { return a.x == b.x; }
 bool operator==( Explicit a, Explicit b ) { return a.x == b.x; }
 
-std::ostream & operator<<( std::ostream & os, Integer  i ) { return os << "Integer:"  << i.x; }
+std::ostream & operator<<( std::ostream & os, Implicit i ) { return os << "Implicit:" << i.x; }
 std::ostream & operator<<( std::ostream & os, Explicit e ) { return os << "Explicit:" << e.x; }
 
 // ensure comparison of pointers for lest:
@@ -262,7 +262,7 @@ CASE( "optional: Allows to copy-construct from empty optional, non-explicit conv
 {
     optional<int> a;
 
-    optional<Integer> b( a );
+    optional<Implicit> b( a );
 
     EXPECT( !b );
 }
@@ -285,7 +285,7 @@ CASE( "optional: Allows to move-construct from empty optional, non-explicit conv
 #if optional_CPP11_OR_GREATER
     optional<int> a;
 
-    optional<Integer> b( std::move( a ) );
+    optional<Implicit> b( std::move( a ) );
 
     EXPECT( !b );
 #else
@@ -321,10 +321,10 @@ CASE( "optional: Allows to copy-construct from non-empty optional, non-explicit 
 {
     optional<int> a( 7 );
 
-    optional<Integer> b( a );
+    optional<Implicit> b( a );
 
-    EXPECT(  b               );
-    EXPECT( *b == Integer(7) );
+    EXPECT(  b                );
+    EXPECT( *b == Implicit(7) );
 }
 
 CASE( "optional: Allows to move-construct from non-empty optional (3)" )
@@ -360,10 +360,10 @@ CASE( "optional: Allows to move-construct from non-empty optional, non-explicit 
 #if optional_CPP11_OR_GREATER
     optional<int> a( 7 );
 
-    optional<Integer> b( std::move( a ) );
+    optional<Implicit> b( std::move( a ) );
 
-    EXPECT(  b               );
-    EXPECT( *b == Integer(7) );
+    EXPECT(  b                );
+    EXPECT( *b == Implicit(7) );
 #else
     EXPECT( !!"optional: move-construction is not available (no C++11)" );
 #endif
@@ -434,10 +434,10 @@ CASE( "optional: Allows to move-construct from value, non-explicit converting (C
 {
 #if optional_CPP11_OR_GREATER
     int seven = 7;
-    optional<Integer> a( std::move( seven ) );
+    optional<Implicit> a( std::move( seven ) );
 
-    EXPECT(  a               );
-    EXPECT( *a == Integer(7) );
+    EXPECT(  a                );
+    EXPECT( *a == Implicit(7) );
 #else
     EXPECT( !!"optional: move-construction is not available (no C++11)" );
 #endif
@@ -862,8 +862,8 @@ CASE( "optional: Allows to swap with other optional (member)" )
 CASE( "optional: Allows to obtain value via operator->()" )
 {
     SETUP( "" ) {
-        optional<Integer>        e( Integer( 42 ) );
-        optional<Integer> const ce( Integer( 42 ) );
+        optional<Implicit>        e( Implicit( 42 ) );
+        optional<Implicit> const ce( Implicit( 42 ) );
 
     SECTION( "operator->() yields pointer to value (const)" ) {
         EXPECT(  ce->x == 42 );
@@ -878,8 +878,8 @@ CASE( "optional: Allows to obtain moved-value via operator->() (C++11)" )
 {
 #if optional_CPP11_OR_GREATER
     SETUP( "" ) {
-        optional<Integer>        e( Integer( 42 ) );
-        optional<Integer> const ce( Integer( 42 ) );
+        optional<Implicit>        e( Implicit( 42 ) );
+        optional<Implicit> const ce( Implicit( 42 ) );
 
     SECTION( "operator->() yields pointer to value (const)" ) {
         EXPECT(  std::move( ce )->x == 42 );
