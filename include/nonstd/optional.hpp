@@ -932,7 +932,7 @@ public:
     , contained( T{ std::forward<U>( value ) } )
     {}
 
-    // 8a (C++11) - non-explicit move construct from value
+    // 8b (C++11) - non-explicit move construct from value
     template< typename U = value_type >
     optional_constexpr optional( U && value
         optional_REQUIRES_A(

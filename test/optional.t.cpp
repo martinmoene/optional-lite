@@ -208,7 +208,7 @@ CASE( "optional: Allows to explicitly construct a disengaged, empty optional via
     EXPECT( !a );
 }
 
-CASE( "optional: Allows to default construct an empty optional with a non-default-constructible" )
+CASE( "optional: Allows to default construct an empty optional with a non-default-constructible (1a)" )
 {
 //  FAILS: NoDefault nd;
 //  FAILS: NoDefaultCopyMove ndcm;
@@ -245,7 +245,7 @@ CASE( "optional: Allows to move-construct from empty optional (C++11, 3)" )
 #endif
 }
 
-CASE( "optional: Allows to copy-construct from empty optional, explicit converting (4a)" )
+CASE( "optional: Allows to copy-construct from empty optional, explicit converting (C++11, 4a)" )
 {
 #if optional_CPP11_OR_GREATER
     optional<int> a;
@@ -267,7 +267,7 @@ CASE( "optional: Allows to copy-construct from empty optional, non-explicit conv
     EXPECT( !b );
 }
 
-CASE( "optional: Allows to move-construct from empty optional, explicit converting (5a)" )
+CASE( "optional: Allows to move-construct from empty optional, explicit converting (C++11, 5a)" )
 {
 #if optional_CPP11_OR_GREATER
     optional<int> a;
@@ -280,7 +280,7 @@ CASE( "optional: Allows to move-construct from empty optional, explicit converti
 #endif
 }
 
-CASE( "optional: Allows to move-construct from empty optional, non-explicit converting (5a)" )
+CASE( "optional: Allows to move-construct from empty optional, non-explicit converting (C++11, 5a)" )
 {
 #if optional_CPP11_OR_GREATER
     optional<int> a;
@@ -303,7 +303,7 @@ CASE( "optional: Allows to copy-construct from non-empty optional (2)" )
     EXPECT( *b == 7 );
 }
 
-CASE( "optional: Allows to copy-construct from non-empty optional, explicit converting (4a)" )
+CASE( "optional: Allows to copy-construct from non-empty optional, explicit converting (C++11, 4a)" )
 {
 #if optional_CPP11_OR_GREATER
     optional<int> a( 7 );
@@ -327,7 +327,7 @@ CASE( "optional: Allows to copy-construct from non-empty optional, non-explicit 
     EXPECT( *b == Implicit(7) );
 }
 
-CASE( "optional: Allows to move-construct from non-empty optional (3)" )
+CASE( "optional: Allows to move-construct from non-empty optional (C++11, 3)" )
 {
 #if optional_CPP11_OR_GREATER
     optional<int> a( 7 );
@@ -341,7 +341,7 @@ CASE( "optional: Allows to move-construct from non-empty optional (3)" )
 #endif
 }
 
-CASE( "optional: Allows to move-construct from non-empty optional, explicit converting (5a)" )
+CASE( "optional: Allows to move-construct from non-empty optional, explicit converting (C++11, 5a)" )
 {
 #if optional_CPP11_OR_GREATER
     optional<int> a( 7 );
@@ -355,7 +355,7 @@ CASE( "optional: Allows to move-construct from non-empty optional, explicit conv
 #endif
 }
 
-CASE( "optional: Allows to move-construct from non-empty optional, non-explicit converting (5b)" )
+CASE( "optional: Allows to move-construct from non-empty optional, non-explicit converting (C++11, 5b)" )
 {
 #if optional_CPP11_OR_GREATER
     optional<int> a( 7 );
@@ -369,44 +369,56 @@ CASE( "optional: Allows to move-construct from non-empty optional, non-explicit 
 #endif
 }
 
-CASE( "optional: Allows to copy-construct from literal value" )
+namespace {
+
+void use_optional( nonstd::optional< Implicit > ) {}
+}
+
+CASE( "optional: Allows to copy-construct from literal value (8)" )
 {
+    use_optional( 7 );
     optional<int> a = 7;
 
     EXPECT(  a      );
     EXPECT( *a == 7 );
 }
 
-CASE( "optional: Allows to copy-construct from literal value, converting" )
+CASE( "optional: Allows to copy-construct from literal value, converting (8)" )
 {
+    use_optional( '7' );
     optional<int> a = '7';
 
     EXPECT(  a        );
     EXPECT( *a == '7' );
 }
 
-CASE( "optional: Allows to copy-construct from value" )
+CASE( "optional: Allows to copy-construct from value (8)" )
 {
     const int i = 7;
+
+    use_optional( i );
     optional<int> a( i );
 
     EXPECT(  a      );
     EXPECT( *a == 7 );
 }
 
-CASE( "optional: Allows to copy-construct from value, converting" )
+CASE( "optional: Allows to copy-construct from value, converting (8)" )
 {
-    const char i = '7';
-    optional<int> a( i );
+    const char c = '7';
+
+    use_optional( c );
+    optional<int> a( c );
 
     EXPECT(  a        );
     EXPECT( *a == '7' );
 }
 
-CASE( "optional: Allows to move-construct from value (C++11)" )
+CASE( "optional: Allows to move-construct from value (C++11, 8b)" )
 {
 #if optional_CPP11_OR_GREATER
     S s( 7 );
+
     optional<S> a( std::move( s ) );
 
     EXPECT( a->value == 7                );
@@ -417,10 +429,11 @@ CASE( "optional: Allows to move-construct from value (C++11)" )
 #endif
 }
 
-CASE( "optional: Allows to move-construct from value, explicit converting (C++11)" )
+CASE( "optional: Allows to move-construct from value, explicit converting (C++11, 8a)" )
 {
 #if optional_CPP11_OR_GREATER
     int seven = 7;
+
     optional<Explicit> a{ std::move( seven ) };
 
     EXPECT(  a                );
@@ -430,7 +443,7 @@ CASE( "optional: Allows to move-construct from value, explicit converting (C++11
 #endif
 }
 
-CASE( "optional: Allows to move-construct from value, non-explicit converting (C++11)" )
+CASE( "optional: Allows to move-construct from value, non-explicit converting (C++11, 8b)" )
 {
 #if optional_CPP11_OR_GREATER
     int seven = 7;
@@ -443,44 +456,7 @@ CASE( "optional: Allows to move-construct from value, non-explicit converting (C
 #endif
 }
 
-#if optional_CPP11_OR_GREATER
-
-namespace {
-
-    struct Type{};
-
-    struct Convert
-    {
-        Convert( Type ) {}
-    };
-
-    void use( nonstd::optional< Convert > ) {}
-}
-
-#endif
-
-CASE( "optional: Allows to implicitly move-construct from literal value (C++11)" )
-{
-#if optional_CPP11_OR_GREATER
-    use( Type{} );
-//  EXPECT( ... );
-#else
-    EXPECT( !!"optional: forward-construction is not available (no C++11)" );
-#endif
-}
-
-CASE( "optional: Allows to implicitly copy-construct from value (C++11)" )
-{
-#if optional_CPP11_OR_GREATER
-    Type type;
-    use( type );
-//  EXPECT( ... );
-#else
-    EXPECT( !!"optional: forward-construction is not available (no C++11)" );
-#endif
-}
-
-CASE( "optional: Allows to in-place construct from literal value (C++11)" )
+CASE( "optional: Allows to in-place construct from literal value (C++11, 6)" )
 {
 #if optional_CPP11_OR_GREATER
     using pair_t = std::pair<char, int>;
@@ -494,7 +470,7 @@ CASE( "optional: Allows to in-place construct from literal value (C++11)" )
 #endif
 }
 
-CASE( "optional: Allows to in-place copy-construct from value (C++11)" )
+CASE( "optional: Allows to in-place copy-construct from value (C++11, 6)" )
 {
 #if optional_CPP11_OR_GREATER
     char c = 'a'; S s( 7 );
@@ -515,7 +491,7 @@ CASE( "optional: Allows to in-place copy-construct from value (C++11)" )
 #endif
 }
 
-CASE( "optional: Allows to in-place move-construct from value (C++11)" )
+CASE( "optional: Allows to in-place move-construct from value (C++11, 6)" )
 {
 #if optional_CPP11_OR_GREATER
     char c = 'a'; S s( 7 );
@@ -532,7 +508,7 @@ CASE( "optional: Allows to in-place move-construct from value (C++11)" )
 #endif
 }
 
-CASE( "optional: Allows to in-place copy-construct from initializer-list (C++11)" )
+CASE( "optional: Allows to in-place copy-construct from initializer-list (C++11, 7)" )
 {
 #if optional_CPP11_OR_GREATER
     S s( 7 );
@@ -554,7 +530,7 @@ CASE( "optional: Allows to in-place copy-construct from initializer-list (C++11)
 #endif
 }
 
-CASE( "optional: Allows to in-place move-construct from initializer-list (C++11)" )
+CASE( "optional: Allows to in-place move-construct from initializer-list (C++11, 7)" )
 {
 #if optional_CPP11_OR_GREATER
     S s( 7 );
@@ -574,7 +550,7 @@ CASE( "optional: Allows to in-place move-construct from initializer-list (C++11)
 
 // assignment:
 
-CASE( "optional: Allows to assign nullopt to disengage" )
+CASE( "optional: Allows to assign nullopt to disengage (1)" )
 {
     optional<int>  a( 7 );
 
@@ -583,7 +559,7 @@ CASE( "optional: Allows to assign nullopt to disengage" )
     EXPECT( !a );
 }
 
-CASE( "optional: Allows to copy-assign from/to engaged and disengaged optionals" )
+CASE( "optional: Allows to copy-assign from/to engaged and disengaged optionals (2)" )
 {
     SETUP( "" ) {
         optional<int> d1;
@@ -615,7 +591,7 @@ CASE( "optional: Allows to copy-assign from/to engaged and disengaged optionals"
     }}
 }
 
-CASE( "optional: Allows to move-assign from/to engaged and disengaged optionals (C++11)" )
+CASE( "optional: Allows to move-assign from/to engaged and disengaged optionals (C++11, 3)" )
 {
 #if optional_CPP11_OR_GREATER
     SETUP( "" ) {
@@ -651,7 +627,7 @@ CASE( "optional: Allows to move-assign from/to engaged and disengaged optionals 
 #endif
 }
 
-CASE( "optional: Allows to copy-assign from/to engaged and disengaged optionals, converting" )
+CASE( "optional: Allows to copy-assign from/to engaged and disengaged optionals, converting, (5)" )
 {
     SETUP( "" ) {
         optional<int>  d1;
@@ -679,7 +655,7 @@ CASE( "optional: Allows to copy-assign from/to engaged and disengaged optionals,
     }}
 }
 
-CASE( "optional: Allows to move-assign from/to engaged and disengaged optionals, converting (C++11)" )
+CASE( "optional: Allows to move-assign from/to engaged and disengaged optionals, converting (C++11, 6)" )
 {
 #if optional_CPP11_OR_GREATER
     SETUP( "" ) {
@@ -711,7 +687,7 @@ CASE( "optional: Allows to move-assign from/to engaged and disengaged optionals,
 #endif
 }
 
-CASE( "optional: Allows to copy-assign from literal value" )
+CASE( "optional: Allows to copy-assign from literal value (4)" )
 {
     optional<int> a;
 
@@ -720,7 +696,7 @@ CASE( "optional: Allows to copy-assign from literal value" )
     EXPECT( *a == 7 );
 }
 
-CASE( "optional: Allows to copy-assign from value" )
+CASE( "optional: Allows to copy-assign from value (4)" )
 {
     const int i = 7;
     optional<int> a;
@@ -730,7 +706,7 @@ CASE( "optional: Allows to copy-assign from value" )
     EXPECT( *a == i );
 }
 
-CASE( "optional: Allows to move-assign from value (C++11)" )
+CASE( "optional: Allows to move-assign from value (C++11, 4)" )
 {
 #if optional_CPP11_OR_GREATER
     S s( 7 );
@@ -746,7 +722,7 @@ CASE( "optional: Allows to move-assign from value (C++11)" )
 #endif
 }
 
-CASE( "optional: Allows to copy-emplace content from arguments (C++11)" )
+CASE( "optional: Allows to copy-emplace content from arguments (C++11, 7)" )
 {
 #if optional_CPP11_OR_GREATER
     using pair_t = std::pair<char, S>;
@@ -764,7 +740,7 @@ CASE( "optional: Allows to copy-emplace content from arguments (C++11)" )
 #endif
 }
 
-CASE( "optional: Allows to move-emplace content from arguments (C++11)" )
+CASE( "optional: Allows to move-emplace content from arguments (C++11, 7)" )
 {
 #if optional_CPP11_OR_GREATER
     using pair_t = std::pair<char, S>;
@@ -782,7 +758,7 @@ CASE( "optional: Allows to move-emplace content from arguments (C++11)" )
 #endif
 }
 
-CASE( "optional: Allows to copy-emplace content from intializer-list and arguments (C++11)" )
+CASE( "optional: Allows to copy-emplace content from intializer-list and arguments (C++11, 8)" )
 {
 #if optional_CPP11_OR_GREATER
     S s( 7 );
@@ -802,7 +778,7 @@ CASE( "optional: Allows to copy-emplace content from intializer-list and argumen
 #endif
 }
 
-CASE( "optional: Allows to move-emplace content from intializer-list and arguments (C++11)" )
+CASE( "optional: Allows to move-emplace content from intializer-list and arguments (C++11, 8)" )
 {
 #if optional_CPP11_OR_GREATER
     S s( 7 );
