@@ -371,7 +371,13 @@ CASE( "optional: Allows to move-construct from non-empty optional, non-explicit 
 
 namespace {
 
-void use_optional( nonstd::optional< Implicit > ) {}
+#if optional_CPP11_OR_GREATER
+    void use_optional( nonstd::optional<Implicit> ) {}
+#else
+    template< typename T >
+    void use_optional( T ) {}
+#endif
+
 }
 
 CASE( "optional: Allows to copy-construct from literal value (8)" )
