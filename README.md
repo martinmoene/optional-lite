@@ -389,36 +389,53 @@ The version of *optional lite* is available via tag `[.version]`. The following 
 
 ```
 union: A C++03 union can only contain POD types
-optional: Allows to default construct an empty optional
-optional: Allows to explicitly construct a disengaged, empty optional via nullopt
-optional: Allows to default construct an empty optional with a non-default-constructible
-optional: Allows to copy-construct from empty optional
-optional: Allows to copy-construct from non-empty optional
-optional: Allows to move-construct from optional (C++11)
-optional: Allows to copy-construct from literal value
-optional: Allows to copy-construct from value
-optional: Allows to move-construct from value (C++11)
-optional: Allows to in-place construct from literal value (C++11)
-optional: Allows to in-place copy-construct from value (C++11)
-optional: Allows to in-place move-construct from value (C++11)
-optional: Allows to in-place copy-construct from initializer-list (C++11)
-optional: Allows to in-place move-construct from initializer-list (C++11)
-optional: Allows to assign nullopt to disengage
-optional: Allows to copy-assign from/to engaged and disengaged optionals
-optional: Allows to move-assign from/to engaged and disengaged optionals (C++11)
-optional: Allows to copy-assign from literal value
-optional: Allows to copy-assign from value
-optional: Allows to move-assign from value (C++11)
-optional: Allows to copy-emplace content from arguments (C++11)
-optional: Allows to move-emplace content from arguments (C++11)
-optional: Allows to copy-emplace content from intializer-list and arguments (C++11)
-optional: Allows to move-emplace content from intializer-list and arguments (C++11)
+optional: Allows to default construct an empty optional (1a)
+optional: Allows to explicitly construct a disengaged, empty optional via nullopt (1b)
+optional: Allows to default construct an empty optional with a non-default-constructible (1a)
+optional: Allows to copy-construct from empty optional (2)
+optional: Allows to move-construct from empty optional (C++11, 3)
+optional: Allows to copy-construct from empty optional, explicit converting (C++11, 4a)
+optional: Allows to copy-construct from empty optional, non-explicit converting (4b)
+optional: Allows to move-construct from empty optional, explicit converting (C++11, 5a)
+optional: Allows to move-construct from empty optional, non-explicit converting (C++11, 5a)
+optional: Allows to copy-construct from non-empty optional (2)
+optional: Allows to copy-construct from non-empty optional, explicit converting (C++11, 4a)
+optional: Allows to copy-construct from non-empty optional, non-explicit converting (4b)
+optional: Allows to move-construct from non-empty optional (C++11, 3)
+optional: Allows to move-construct from non-empty optional, explicit converting (C++11, 5a)
+optional: Allows to move-construct from non-empty optional, non-explicit converting (C++11, 5b)
+optional: Allows to copy-construct from literal value (8)
+optional: Allows to copy-construct from literal value, converting (8)
+optional: Allows to copy-construct from value (8)
+optional: Allows to copy-construct from value, converting (8)
+optional: Allows to move-construct from value (C++11, 8b)
+optional: Allows to move-construct from value, explicit converting (C++11, 8a)
+optional: Allows to move-construct from value, non-explicit converting (C++11, 8b)
+optional: Allows to in-place construct from literal value (C++11, 6)
+optional: Allows to in-place copy-construct from value (C++11, 6)
+optional: Allows to in-place move-construct from value (C++11, 6)
+optional: Allows to in-place copy-construct from initializer-list (C++11, 7)
+optional: Allows to in-place move-construct from initializer-list (C++11, 7)
+optional: Allows to assign nullopt to disengage (1)
+optional: Allows to copy-assign from/to engaged and disengaged optionals (2)
+optional: Allows to move-assign from/to engaged and disengaged optionals (C++11, 3)
+optional: Allows to copy-assign from/to engaged and disengaged optionals, converting, (5)
+optional: Allows to move-assign from/to engaged and disengaged optionals, converting (C++11, 6)
+optional: Allows to copy-assign from literal value (4)
+optional: Allows to copy-assign from value (4)
+optional: Allows to move-assign from value (C++11, 4)
+optional: Allows to copy-emplace content from arguments (C++11, 7)
+optional: Allows to move-emplace content from arguments (C++11, 7)
+optional: Allows to copy-emplace content from intializer-list and arguments (C++11, 8)
+optional: Allows to move-emplace content from intializer-list and arguments (C++11, 8)
 optional: Allows to swap with other optional (member)
-optional: Allows to obtain pointer to value via operator->()
+optional: Allows to obtain value via operator->()
+optional: Allows to obtain moved-value via operator->() (C++11)
 optional: Allows to obtain value via operator*()
-optional: Allows to obtain moved-value via operator*()
+optional: Allows to obtain moved-value via operator*() (C++11)
 optional: Allows to obtain has_value() via operator bool()
 optional: Allows to obtain value via value()
+optional: Allows to obtain moved-value via value() (C++11)
 optional: Allows to obtain value or default via value_or()
 optional: Allows to obtain moved-value or moved-default via value_or() (C++11)
 optional: Throws bad_optional_access at disengaged access
@@ -432,4 +449,5 @@ make_optional: Allows to in-place copy-construct optional from arguments (C++11)
 make_optional: Allows to in-place move-construct optional from arguments (C++11)
 make_optional: Allows to in-place copy-construct optional from initializer-list and arguments (C++11)
 make_optional: Allows to in-place move-construct optional from initializer-list and arguments (C++11)
+std::hash<>: Allows to obtain hash (C++11)
 ```
