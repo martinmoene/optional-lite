@@ -1021,7 +1021,7 @@ public:
             && std::is_assignable<T&, U>::value
             && !std::is_same<typename std20::remove_cvref<U>::type, nonstd_lite_in_place_t(U)>::value
             && !std::is_same<typename std20::remove_cvref<U>::type, optional<T>>::value
-//          && !(std::is_scalar<T>::value && std::is_same<T, typename std::decay<U>::type>::value)
+            && !(std::is_scalar<T>::value && std::is_same<T, typename std::decay<U>::type>::value)
         )
     operator=( U && value )
     {
