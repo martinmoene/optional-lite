@@ -871,7 +871,7 @@ public:
     : has_value_( other.has_value() )
     {
         if ( other.has_value() )
-            contained.construct_value( T{ other.contained.value() } );
+            contained.construct_value( T{ std::move( other.contained.value() ) } );
     }
 
     // 5a (C++11) - non-explicit converting move-construct from optional
