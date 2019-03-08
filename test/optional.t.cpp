@@ -1007,6 +1007,19 @@ CASE( "optional: Throws bad_optional_access at disengaged access" )
 #endif
 }
 
+CASE( "optional: Throws bad_optional_access with non-empty what()" )
+{
+    try
+    {
+        optional<int> d;
+        int d = d.value();
+    }
+    catch( bad_optional_access const & e )
+    {
+        EXPECT( ! std::string( e.what() ).empty() );
+    }
+}
+
 // modifiers:
 
 CASE( "optional: Allows to reset content" )
