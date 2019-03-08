@@ -1012,7 +1012,7 @@ CASE( "optional: Throws bad_optional_access with non-empty what()" )
     try
     {
         optional<int> d;
-        int d = d.value();
+        int v = d.value();
     }
     catch( bad_optional_access const & e )
     {
