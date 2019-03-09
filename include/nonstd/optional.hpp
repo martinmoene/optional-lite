@@ -401,6 +401,12 @@ namespace nonstd { namespace optional_lite {
 
 namespace std11 {
 
+#if optional_CPP11_OR_GREATER
+    using std::move;
+#else
+    template< typename T > T & move( T & t ) { return t; }
+#endif
+
 #if optional_HAVE( CONDITIONAL )
     using std::conditional;
 #else
@@ -1203,8 +1209,8 @@ public:
     {
         using std::swap;
         if      ( has_value() == true  && other.has_value() == true  ) { swap( **this, *other ); }
-        else if ( has_value() == false && other.has_value() == true  ) { initialize( *other ); other.reset(); }
-        else if ( has_value() == true  && other.has_value() == false ) { other.initialize( **this ); reset(); }
+        else if ( has_value() == false && other.has_value() == true  ) { initialize( std11::move(*other) ); other.reset(); }
+        else if ( has_value() == true  && other.has_value() == false ) { other.initialize( std11::move(**this) ); reset(); }
     }
 
     // x.x.3.5, observers
