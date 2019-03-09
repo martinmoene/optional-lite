@@ -379,14 +379,17 @@ namespace nonstd {
 
 #if optional_CPP11_OR_GREATER
 
-# define optional_REQUIRES_T(...) \
-    , typename = typename std::enable_if<__VA_ARGS__>::type
+#define optional_REQUIRES_0(...) \
+    template< bool B = (__VA_ARGS__), typename std::enable_if<B, int>::type = 0 >
 
-# define optional_REQUIRES_R(R, ...) \
+#define optional_REQUIRES_T(...) \
+    , typename = typename std::enable_if< (__VA_ARGS__), nonstd::optional_lite::detail::enabler >::type
+
+#define optional_REQUIRES_R(R, ...) \
     typename std::enable_if<__VA_ARGS__, R>::type
 
-# define optional_REQUIRES_A(...) \
-    , typename std::enable_if<__VA_ARGS__, void*>::type = optional_nullptr
+#define optional_REQUIRES_A(...) \
+    , typename std::enable_if<__VA_ARGS__, void*>::type = nullptr
 
 #endif
 
@@ -396,7 +399,7 @@ namespace nonstd {
 
 namespace nonstd { namespace optional_lite {
 
-namespace detail {
+namespace std11 {
 
 #if optional_HAVE( CONDITIONAL )
     using std::conditional;
@@ -405,13 +408,68 @@ namespace detail {
     template<         typename T, typename F > struct conditional<false, T, F> { typedef F type; };
 #endif // optional_HAVE_CONDITIONAL
 
-} // namespace detail
+} // namespace std11
 
 #if optional_CPP11_OR_GREATER
 
-namespace std20 {
+/// type traits C++17:
 
-// type traits C++20:
+namespace std17 {
+
+#if optional_CPP17_OR_GREATER
+
+using std::is_swappable;
+using std::is_nothrow_swappable;
+
+#elif optional_CPP11_OR_GREATER
+
+namespace detail {
+
+using std::swap;
+
+struct is_swappable
+{
+    template< typename T, typename = decltype( swap( std::declval<T&>(), std::declval<T&>() ) ) >
+    static std::true_type test( int );
+
+    template< typename >
+    static std::false_type test(...);
+};
+
+struct is_nothrow_swappable
+{
+    // wrap noexcept(epr) in separate function as work-around for VC140 (VS2015):
+
+    template< typename T >
+    static constexpr bool test()
+    {
+        return noexcept( swap( std::declval<T&>(), std::declval<T&>() ) );
+    }
+
+    template< typename T >
+    static auto test( int ) -> std::integral_constant<bool, test<T>()>{}
+
+    template< typename >
+    static std::false_type test(...);
+};
+
+} // namespace detail
+
+// is [nothow] swappable:
+
+template< typename T >
+struct is_swappable : decltype( detail::is_swappable::test<T>(0) ){};
+
+template< typename T >
+struct is_nothrow_swappable : decltype( detail::is_nothrow_swappable::test<T>(0) ){};
+
+#endif // optional_CPP17_OR_GREATER
+
+} // namespace std17
+
+/// type traits C++20:
+
+namespace std20 {
 
 template< typename T >
 struct remove_cvref
@@ -429,6 +487,12 @@ template< typename T >
 class optional;
 
 namespace detail {
+
+// for optional_REQUIRES_T
+
+#if optional_CPP11_OR_GREATER
+enum class enabler{};
+#endif
 
 // C++11 emulation:
 
@@ -535,7 +599,7 @@ struct alignment_of
 template< typename List, size_t N >
 struct type_of_size
 {
-    typedef typename conditional<
+    typedef typename std11::conditional<
         N == sizeof( typename List::head ),
             typename List::head,
             typename type_of_size<typename List::tail, N >::type >::type type;
@@ -1133,7 +1197,7 @@ public:
 #if optional_CPP11_OR_GREATER
         noexcept(
             std::is_nothrow_move_constructible<T>::value
-            && noexcept( std::swap( std::declval<T&>(), std::declval<T&>() ) )
+            && std17::is_nothrow_swappable<T>::value
         )
 #endif
     {
@@ -1486,7 +1550,13 @@ inline optional_constexpr bool operator>=( U const & v, optional<T> const & x )
 
 // Specialized algorithms
 
-template< typename T >
+template< typename T
+#if optional_CPP11_OR_GREATER
+    optional_REQUIRES_T(
+        std::is_move_constructible<T>::value
+        && std17::is_swappable<T>::value )
+#endif
+>
 void swap( optional<T> & x, optional<T> & y )
 #if optional_CPP11_OR_GREATER
     noexcept( noexcept( x.swap(y) ) )
