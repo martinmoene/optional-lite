@@ -386,10 +386,10 @@ namespace nonstd {
     , typename = typename std::enable_if< (__VA_ARGS__), nonstd::optional_lite::detail::enabler >::type
 
 #define optional_REQUIRES_R(R, ...) \
-    typename std::enable_if<__VA_ARGS__, R>::type
+    typename std::enable_if< (__VA_ARGS__), R>::type
 
 #define optional_REQUIRES_A(...) \
-    , typename std::enable_if<__VA_ARGS__, void*>::type = nullptr
+    , typename std::enable_if< (__VA_ARGS__), void*>::type = nullptr
 
 #endif
 
