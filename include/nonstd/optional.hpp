@@ -331,7 +331,7 @@ namespace nonstd {
 #if optional_HAVE( IS_DEFAULT )
 # define optional_is_default  = default;
 #else
-# define optional_constexpr  {}
+# define optional_is_default  {}
 #endif
 
 #if optional_HAVE( CONSTEXPR_14 )
