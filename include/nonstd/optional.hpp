@@ -1086,9 +1086,9 @@ public:
     optional & operator=( optional const & other )
 #endif
     {
-        if      ( has_value() == true  && other.has_value() == false ) { reset(); }
-        else if ( has_value() == false && other.has_value() == true  ) { initialize( *other ); }
-        else if ( has_value() == true  && other.has_value() == true  ) { contained.value() = *other; }
+        if      ( (has_value() == true ) && (other.has_value() == false) ) { reset(); }
+        else if ( (has_value() == false) && (other.has_value() == true ) ) { initialize( *other ); }
+        else if ( (has_value() == true ) && (other.has_value() == true ) ) { contained.value() = *other; }
         return *this;
     }
 
@@ -1104,9 +1104,9 @@ public:
     )
     operator=( optional && other ) noexcept
     {
-        if      ( has_value() == true  && other.has_value() == false ) { reset(); }
-        else if ( has_value() == false && other.has_value() == true  ) { initialize( std::move( *other ) ); }
-        else if ( has_value() == true  && other.has_value() == true  ) { contained.value() = std::move( *other ); }
+        if      ( (has_value() == true ) && (other.has_value() == false) ) { reset(); }
+        else if ( (has_value() == false) && (other.has_value() == true ) ) { initialize( std::move( *other ) ); }
+        else if ( (has_value() == true ) && (other.has_value() == true ) ) { contained.value() = std::move( *other ); }
         return *this;
     }
 
@@ -1238,9 +1238,9 @@ public:
 #endif
     {
         using std::swap;
-        if      ( has_value() == true  && other.has_value() == true  ) { swap( **this, *other ); }
-        else if ( has_value() == false && other.has_value() == true  ) { initialize( std11::move(*other) ); other.reset(); }
-        else if ( has_value() == true  && other.has_value() == false ) { other.initialize( std11::move(**this) ); reset(); }
+        if      ( (has_value() == true ) && (other.has_value() == true ) ) { swap( **this, *other ); }
+        else if ( (has_value() == false) && (other.has_value() == true ) ) { initialize( std11::move(*other) ); other.reset(); }
+        else if ( (has_value() == true ) && (other.has_value() == false) ) { other.initialize( std11::move(**this) ); reset(); }
     }
 
     // x.x.3.5, observers
