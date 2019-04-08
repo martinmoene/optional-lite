@@ -359,6 +359,7 @@ namespace nonstd {
 #endif
 
 #if optional_HAVE( REF_QUALIFIER )
+// NOLINTNEXTLINE( bugprone-macro-parentheses )
 # define optional_ref_qual  &
 # define optional_refref_qual  &&
 #else
@@ -853,6 +854,7 @@ public:
     {}
 
     // 1b - construct explicitly empty
+    // NOLINTNEXTLINE( google-explicit-constructor, hicpp-explicit-conversions )
     optional_constexpr optional( nullopt_t /*unused*/ ) optional_noexcept
     : has_value_( false )
     , contained()
@@ -881,6 +883,7 @@ public:
         optional_REQUIRES_A(
             true || std::is_move_constructible<T>::value
         )
+        // NOLINTNEXTLINE( performance-noexcept-move-constructor )
     ) noexcept( std::is_nothrow_move_constructible<T>::value )
     : has_value_( other.has_value() )
     {
@@ -915,6 +918,7 @@ public:
 
     // 4b (C++98 and later) - non-explicit converting copy-construct from optional
     template< typename U >
+    // NOLINTNEXTLINE( google-explicit-constructor, hicpp-explicit-conversions )
     optional( optional<U> const & other
 #if optional_CPP11_OR_GREATER
         optional_REQUIRES_A(
@@ -963,6 +967,7 @@ public:
 
     // 5a (C++11) - non-explicit converting move-construct from optional
     template< typename U >
+    // NOLINTNEXTLINE( google-explicit-constructor, hicpp-explicit-conversions )
     optional( optional<U> && other
         optional_REQUIRES_A(
             std::is_constructible<T, U &&>::value
@@ -1021,6 +1026,7 @@ public:
 
     // 8b (C++11) - non-explicit move construct from value
     template< typename U = value_type >
+    // NOLINTNEXTLINE( google-explicit-constructor, hicpp-explicit-conversions )
     optional_constexpr optional( U && value
         optional_REQUIRES_A(
             std::is_constructible<T, U&&>::value
@@ -1064,6 +1070,7 @@ public:
 
     // 2 (C++98and later) - copy-assign from optional
 #if optional_CPP11_OR_GREATER
+    // NOLINTNEXTLINE( cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator )
     optional_REQUIRES_R(
         optional &,
         true
@@ -1088,6 +1095,7 @@ public:
 #if optional_CPP11_OR_GREATER
 
     // 3 (C++11) - move-assign from optional
+    // NOLINTNEXTLINE( cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator )
     optional_REQUIRES_R(
         optional &,
         true
@@ -1104,6 +1112,7 @@ public:
 
     // 4 (C++11) - move-assign from value
     template< typename U = T >
+        // NOLINTNEXTLINE( cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator )
         optional_REQUIRES_R(
             optional &,
             std::is_constructible<T , U>::value
@@ -1135,6 +1144,7 @@ public:
     // 5 (C++98 and later) - converting copy-assign from optional
     template< typename U >
 #if optional_CPP11_OR_GREATER
+        // NOLINTNEXTLINE( cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator )
         optional_REQUIRES_R(
             optional&,
             std::is_constructible<  T , U const &>::value
@@ -1164,6 +1174,7 @@ public:
 
     // 6 (C++11) -  converting move-assign from optional
     template< typename U >
+        // NOLINTNEXTLINE( cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator )
         optional_REQUIRES_R(
             optional&,
             std::is_constructible<  T , U>::value
@@ -1284,11 +1295,13 @@ public:
     }
 #endif
 
+    // NOLINTNEXTLINE( modernize-use-nodiscard )
     /*optional_nodiscard*/ optional_constexpr bool has_value() const optional_noexcept
     {
         return has_value_;
     }
 
+    // NOLINTNEXTLINE( modernize-use-nodiscard )
     /*optional_nodiscard*/ optional_constexpr14 value_type const & value() const optional_ref_qual
     {
 #if optional_CONFIG_NO_EXCEPTIONS
@@ -1317,6 +1330,7 @@ public:
 
 #if optional_HAVE( REF_QUALIFIER )  &&  ( !optional_COMPILER_GNUC_VERSION || optional_COMPILER_GNUC_VERSION >= 490 )
 
+    // NOLINTNEXTLINE( modernize-use-nodiscard )
     /*optional_nodiscard*/ optional_constexpr value_type const && value() const optional_refref_qual
     {
         return std::move( value() );
