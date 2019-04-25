@@ -1,7 +1,7 @@
 from conans import ConanFile, CMake
 
 class OptionalLiteConan(ConanFile):
-    version = "3.1.1"
+    version = "3.2.0"
     name = "optional-lite"
     description = "A single-file header-only version of a C++17-like optional, a nullable object for C++98, C++11 and later"
     license = "Boost Software License - Version 1.0. http://www.boost.org/LICENSE_1_0.txt"

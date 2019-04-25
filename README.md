@@ -1,6 +1,6 @@
 # optional lite: A single-file header-only version of a C++17-like optional, a nullable object for C++98, C++11 and later
 
-[![Language](https://img.shields.io/badge/C%2B%2B-98/11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-BSL-blue.svg)](https://opensource.org/licenses/BSL-1.0) [![Build Status](https://travis-ci.org/martinmoene/optional-lite.svg?branch=master)](https://travis-ci.org/martinmoene/optional-lite) [![Build status](https://ci.appveyor.com/api/projects/status/1oq5gjm7bufrv6ib?svg=true)](https://ci.appveyor.com/project/martinmoene/optional-lite) [![Version](https://badge.fury.io/gh/martinmoene%2Foptional-lite.svg)](https://github.com/martinmoene/optional-lite/releases) [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/optional-lite/master/include/nonstd/optional.hpp) [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://bintray.com/martinmoene/nonstd-lite/optional-lite%3Anonstd-lite/_latestVersion) [![Try it online](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/5lJEycDPjE6e02fV)
+[![Language](https://img.shields.io/badge/C%2B%2B-98/11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-BSL-blue.svg)](https://opensource.org/licenses/BSL-1.0) [![Build Status](https://travis-ci.org/martinmoene/optional-lite.svg?branch=master)](https://travis-ci.org/martinmoene/optional-lite) [![Build status](https://ci.appveyor.com/api/projects/status/1oq5gjm7bufrv6ib?svg=true)](https://ci.appveyor.com/project/martinmoene/optional-lite) [![Version](https://badge.fury.io/gh/martinmoene%2Foptional-lite.svg)](https://github.com/martinmoene/optional-lite/releases) [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/optional-lite/master/include/nonstd/optional.hpp) [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://bintray.com/martinmoene/nonstd-lite/optional-lite%3Anonstd-lite/_latestVersion) [![Try it online](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/bfZdDT4WerPNZi6b)
 
 **Contents**  
 - [Example usage](#example-usage)
@@ -440,6 +440,7 @@ optional: Allows to obtain moved-value via value() (C++11)
 optional: Allows to obtain value or default via value_or()
 optional: Allows to obtain moved-value or moved-default via value_or() (C++11)
 optional: Throws bad_optional_access at disengaged access
+optional: Throws bad_optional_access with non-empty what()
 optional: Allows to reset content
 optional: Allows to swaps engage state and values (non-member)
 optional: Provides relational operators

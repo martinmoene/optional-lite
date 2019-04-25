@@ -19,6 +19,7 @@
 		<Unit filename="../../LICENSE.txt" />
 		<Unit filename="../../README.md" />
 		<Unit filename="../../appveyor.yml" />
+		<Unit filename="../../cmake/optional-lite-config-version.cmake.in" />
 		<Unit filename="../../cmake/optional-lite-config.cmake.in" />
 		<Unit filename="../../conanfile.py" />
 		<Unit filename="../../example/01-to_int.cpp" />
