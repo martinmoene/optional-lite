@@ -7,9 +7,9 @@ class OptionalLiteConan(ConanFile):
     license = "Boost Software License - Version 1.0. http://www.boost.org/LICENSE_1_0.txt"
     url = "https://github.com/martinmoene/optional-lite.git"
     exports_sources = "include/nonstd/*", "CMakeLists.txt", "cmake/*", "LICENSE.txt"
+    settings = "compiler", "build_type", "arch"
     build_policy = "missing"
     author = "Martin Moene"
-    settings = "compiler", "build_type", "arch"
 
     def build(self):
         """Avoid warning on build step"""
