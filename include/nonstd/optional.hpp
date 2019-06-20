@@ -1659,7 +1659,10 @@ optional<T> make_optional( T const & value )
 using optional_lite::optional;
 using optional_lite::nullopt_t;
 using optional_lite::nullopt;
+
+#if ! optional_CONFIG_NO_EXCEPTIONS
 using optional_lite::bad_optional_access;
+#endif
 
 using optional_lite::make_optional;
 
