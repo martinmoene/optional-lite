@@ -29,8 +29,8 @@ int main()
     }
     catch( std::exception const & e )
     {
-        std::cout << "Error: " << e.what();
+        std::cout << "Error: " << e.what() << "\n";
     }
 }
 
-// cl -nologo -W3 -EHsc -I../inlcude 00-nodefltctor.cpp && 00-nodefltctor
+// cl -nologo -W3 -EHsc -I../include 00-nodefltctor.cpp && 00-nodefltctor

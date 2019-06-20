@@ -6,7 +6,7 @@ int main()
 {
     optional<int> v;
 
-    int x = v.value();  // asserts (normally throws)
+    v.value();  // asserts (normally throws)
 }
 
 // cl -nologo -I../include 05-no-exceptions.cpp && 05-no-exceptions
