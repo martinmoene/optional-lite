@@ -302,6 +302,7 @@ namespace nonstd {
 #define optional_HAVE_NOEXCEPT          optional_CPP11_140
 #define optional_HAVE_NULLPTR           optional_CPP11_100
 #define optional_HAVE_REF_QUALIFIER     optional_CPP11_140
+#define optional_HAVE_INITIALIZER_LIST  optional_CPP11_140
 
 // Presence of C++14 language features:
 
