@@ -267,7 +267,7 @@ Windows   | Clang/LLVM | ?        |
 GNU/Linux | Clang/LLVM | 3.5.0, 3.6.0, 7.0.0 |
 &nbsp;    | GCC        | 4.8.4, 5, 6, 8 |
 &nbsp;    | ICC        | 19       |
-OS X      | ?          | ?        |
+macOS     | Xcode      | 8.3, 9, 10, 11 |
 
 
 Building the tests
