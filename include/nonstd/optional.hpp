@@ -522,12 +522,6 @@ class optional;
 
 namespace detail {
 
-// for optional_REQUIRES_T
-
-#if optional_CPP11_OR_GREATER
-enum class enabler{};
-#endif
-
 // C++11 emulation:
 
 struct nulltype{};
