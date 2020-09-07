@@ -82,6 +82,12 @@ CASE( "presence of C++ library features" "[.stdlibrary]" )
     optional_PRESENT( optional_HAVE_TYPE_TRAITS );
     optional_PRESENT( optional_HAVE_TR1_TYPE_TRAITS );
     optional_PRESENT( optional_HAVE_TR1_ADD_POINTER );
+    optional_PRESENT( optional_HAVE_IS_ASSIGNABLE );
+    optional_PRESENT( optional_HAVE_IS_MOVE_CONSTRUCTIBLE );
+    optional_PRESENT( optional_HAVE_IS_NOTHROW_MOVE_ASSIGNABLE );
+    optional_PRESENT( optional_HAVE_IS_NOTHROW_MOVE_CONSTRUCTIBLE );
+    optional_PRESENT( optional_HAVE_IS_TRIVIALLY_COPY_CONSTRUCTIBLE );
+    optional_PRESENT( optional_HAVE_IS_TRIVIALLY_MOVE_CONSTRUCTIBLE );
 #endif
 #ifdef _HAS_CPP0X
     optional_PRESENT( _HAS_CPP0X );
