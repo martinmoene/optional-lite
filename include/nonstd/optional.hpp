@@ -293,10 +293,20 @@ namespace nonstd {
 #define optional_CPP11_140  (optional_CPP11_OR_GREATER_ || optional_COMPILER_MSVC_VER >= 1900)
 #define optional_CPP11_141  (optional_CPP11_OR_GREATER_ || optional_COMPILER_MSVC_VER >= 1910)
 
-#define optional_CPP11_140_490  ((optional_CPP11_OR_GREATER_ && optional_COMPILER_GNUC_VERSION >= 490) || (optional_COMPILER_MSVC_VER >= 1910))
-
 #define optional_CPP14_000  (optional_CPP14_OR_GREATER)
 #define optional_CPP17_000  (optional_CPP17_OR_GREATER)
+
+// gcc >= 4.9, msvc >= vc14.1 (vs17):
+#define optional_CPP11_140_G490     ((optional_CPP11_OR_GREATER_ && optional_COMPILER_GNUC_VERSION >= 490) || (optional_COMPILER_MSVC_VER >= 1910))
+
+// clang >= 3.5, msvc >= vc11 (vs12):
+#define optional_CPP11_110_C350     ( optional_CPP11_110 && !optional_BETWEEN( optional_COMPILER_CLANG_VERSION, 1, 350 ) )
+
+// clang >= 3.5, gcc >= 5.0, msvc >= vc11 (vs12):
+#define optional_CPP11_110_C350_G500 \
+    (  optional_CPP11_110 && \
+    !( optional_BETWEEN( optional_COMPILER_CLANG_VERSION, 1, 350 ) \
+    || optional_BETWEEN( optional_COMPILER_GNUC_VERSION , 1, 500 ) ) )
 
 // Presence of C++11 language features:
 
@@ -304,7 +314,7 @@ namespace nonstd {
 #define optional_HAVE_IS_DEFAULT        optional_CPP11_140
 #define optional_HAVE_NOEXCEPT          optional_CPP11_140
 #define optional_HAVE_NULLPTR           optional_CPP11_100
-#define optional_HAVE_REF_QUALIFIER     optional_CPP11_140_490
+#define optional_HAVE_REF_QUALIFIER     optional_CPP11_140_G490
 #define optional_HAVE_INITIALIZER_LIST  optional_CPP11_140
 
 // Presence of C++14 language features:
@@ -324,19 +334,12 @@ namespace nonstd {
 #define optional_HAVE_TR1_TYPE_TRAITS   (!! optional_COMPILER_GNUC_VERSION )
 #define optional_HAVE_TR1_ADD_POINTER   (!! optional_COMPILER_GNUC_VERSION )
 
-#define optional_HAVE_IS_ASSIGNABLE                     optional_CPP11_110
-#define optional_HAVE_IS_MOVE_CONSTRUCTIBLE             optional_CPP11_110
-#define optional_HAVE_IS_NOTHROW_MOVE_ASSIGNABLE        optional_CPP11_110
-#define optional_HAVE_IS_NOTHROW_MOVE_CONSTRUCTIBLE     optional_CPP11_110
-
-// clang < 3.5, gcc < 5.0, msvc < vc11 (vs12):
-#define optional_HAVE_TRIV_CPMV_CONSTRUCTABLE \
-    (  optional_CPP11_110 && \
-    !( optional_BETWEEN( optional_COMPILER_CLANG_VERSION, 1, 350 ) \
-    || optional_BETWEEN( optional_COMPILER_GNUC_VERSION , 1, 500 ) ) )
-
-#define optional_HAVE_IS_TRIVIALLY_COPY_CONSTRUCTIBLE   optional_HAVE_TRIV_CPMV_CONSTRUCTABLE
-#define optional_HAVE_IS_TRIVIALLY_MOVE_CONSTRUCTIBLE   optional_HAVE_TRIV_CPMV_CONSTRUCTABLE
+#define optional_HAVE_IS_ASSIGNABLE                     optional_CPP11_110_C350
+#define optional_HAVE_IS_MOVE_CONSTRUCTIBLE             optional_CPP11_110_C350
+#define optional_HAVE_IS_NOTHROW_MOVE_ASSIGNABLE        optional_CPP11_110_C350
+#define optional_HAVE_IS_NOTHROW_MOVE_CONSTRUCTIBLE     optional_CPP11_110_C350
+#define optional_HAVE_IS_TRIVIALLY_COPY_CONSTRUCTIBLE   optional_CPP11_110_C350_G500
+#define optional_HAVE_IS_TRIVIALLY_MOVE_CONSTRUCTIBLE   optional_CPP11_110_C350_G500
 
 // C++ feature usage:
 
