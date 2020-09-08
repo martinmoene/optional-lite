@@ -458,7 +458,7 @@ typedef bool_constant< false > false_type;
 #if optional_HAVE( IS_ASSIGNABLE )
     using std::is_assignable;
 #else
-    template< class T > struct is_assignable : std11::true_type{};
+    template< class T, class U > struct is_assignable : std11::true_type{};
 #endif
 
 #if optional_HAVE( IS_MOVE_CONSTRUCTIBLE )
