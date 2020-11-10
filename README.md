@@ -205,6 +205,10 @@ Synopsis
 
 ### Configuration
 
+#### Tweak header
+
+If the compiler supports [`__has_include()`](https://en.cppreference.com/w/cpp/preprocessor/include), *optional lite* supports the [tweak header](https://vector-of-bool.github.io/2020/10/04/lib-configuration.html) mechanism. Provide your *tweak header* as `nonstd/optional.tweak.hpp` in a folder in the include-search-path. In the tweak header, provide definitions as documented below, like `#define boolean_CPLUSPLUS 201103L`.
+
 #### Standard selection macro
 \-D<b>optional\_CPLUSPLUS</b>=199711L  
 Define this macro to override the auto-detection of the supported C++ standard, if your compiler does not set the `__cplusplus` macro correctly.
@@ -452,4 +456,5 @@ make_optional: Allows to in-place move-construct optional from arguments (C++11)
 make_optional: Allows to in-place copy-construct optional from initializer-list and arguments (C++11)
 make_optional: Allows to in-place move-construct optional from initializer-list and arguments (C++11)
 std::hash<>: Allows to obtain hash (C++11)
+tweak header: reads tweak header if supported [tweak]
 ```

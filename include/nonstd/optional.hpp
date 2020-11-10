@@ -26,6 +26,20 @@
 #define optional_OPTIONAL_NONSTD   1
 #define optional_OPTIONAL_STD      2
 
+// tweak header support:
+
+#ifdef __has_include
+# if __has_include(<nonstd/optional.tweak.hpp>)
+#  include <nonstd/optional.tweak.hpp>
+# endif
+#define optional_HAVE_TWEAK_HEADER  1
+#else
+#define optional_HAVE_TWEAK_HEADER  0
+//# pragma message("optional.hpp: Note: Tweak header not supported.")
+#endif
+
+// optional selection and configuration:
+
 #if !defined( optional_CONFIG_SELECT_OPTIONAL )
 # define optional_CONFIG_SELECT_OPTIONAL  ( optional_HAVE_STD_OPTIONAL ? optional_OPTIONAL_STD : optional_OPTIONAL_NONSTD )
 #endif
