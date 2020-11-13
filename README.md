@@ -225,7 +225,7 @@ Synopsis
 
 #### Tweak header
 
-If the compiler supports [`__has_include()`](https://en.cppreference.com/w/cpp/preprocessor/include), *optional lite* supports the [tweak header](https://vector-of-bool.github.io/2020/10/04/lib-configuration.html) mechanism. Provide your *tweak header* as `nonstd/optional.tweak.hpp` in a folder in the include-search-path. In the tweak header, provide definitions as documented below, like `#define boolean_CPLUSPLUS 201103L`.
+If the compiler supports [`__has_include()`](https://en.cppreference.com/w/cpp/preprocessor/include), *optional lite* supports the [tweak header](https://vector-of-bool.github.io/2020/10/04/lib-configuration.html) mechanism. Provide your *tweak header* as `nonstd/optional.tweak.hpp` in a folder in the include-search-path. In the tweak header, provide definitions as documented below, like `#define optional_CPLUSPLUS 201103L`.
 
 #### Standard selection macro
 \-D<b>optional\_CPLUSPLUS</b>=199711L  
