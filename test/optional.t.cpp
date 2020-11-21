@@ -1250,6 +1250,14 @@ CASE( "std::hash<>: Allows to obtain hash (C++11)" )
 #endif
 }
 
+CASE( "tweak header: reads tweak header if supported " "[tweak]" )
+{
+#if optional_HAVE_TWEAK_HEADER
+    EXPECT( OPTIONAL_TWEAK_VALUE == 42 );
+#else
+    EXPECT( !!"Tweak header is not available (optional_HAVE_TWEAK_HEADER: 0)." );
+#endif
+}
 
 //
 // Negative tests:
@@ -1368,13 +1376,47 @@ CASE( "optional: emplace does not construct in-place (destructor called while 'e
 #endif
 }
 
-CASE( "tweak header: reads tweak header if supported " "[tweak]" )
+namespace issue59 {
+
+struct S
 {
-#if optional_HAVE_TWEAK_HEADER
-    EXPECT( OPTIONAL_TWEAK_VALUE == 42 );
-#else
-    EXPECT( !!"Tweak header is not available (optional_HAVE_TWEAK_HEADER: 0)." );
+    static int & dtor_count() { static int i = 0; return i; }
+    S( int ) {}
+#if optional_CPP11_OR_GREATER
+    S( S&& ) {}
 #endif
+    ~S() { ++dtor_count(); }
+};
+} // issue59
+
+CASE( "optional: Constructor/destructor of optional type called twice" "[.issue-59]" )
+{
+    using issue59::S;
+    {
+        nonstd::optional<S> s( 7 );
+
+        EXPECT( s.has_value()        );
+        EXPECT( S::dtor_count() == 0 );
+    }
+    EXPECT( S::dtor_count() == 1 );
+}
+
+namespace issue59 {
+
+struct Type {
+    Type(int)     { std::cout << "issue59::Type: construct\n"; }
+#if optional_CPP11_OR_GREATER
+    Type(Type &&) { std::cout << "issue59::Type: move\n"     ; }
+#endif
+    ~Type()       { std::cout << "issue59::Type: destruct\n" ; }
+};
+} // issue59
+
+CASE( "optional: Constructor/destructor of optional type called twice" "[.issue-59-print]" )
+{
+    nonstd::optional<issue59::Type> t(0);
+
+    EXPECT( t.has_value() );
 }
 
 // end of file
