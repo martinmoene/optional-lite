@@ -779,6 +779,12 @@ union storage_t
     }
 
     template< class... Args >
+    storage_t( nonstd_lite_in_place_t(T), Args&&... args )
+    {
+        emplace( std::forward<Args>(args)... );
+    }
+
+    template< class... Args >
     void emplace( Args&&... args )
     {
         ::new( value_ptr() ) value_type( std::forward<Args>(args)... );
@@ -1109,7 +1115,7 @@ public:
     >
     optional_constexpr explicit optional( U && value )
     : has_value_( true )
-    , contained( T{ std::forward<U>( value ) } )
+    , contained( nonstd_lite_in_place(T), std::forward<U>( value ) )
     {}
 
     // 8b (C++11) - non-explicit move construct from value
@@ -1124,7 +1130,7 @@ public:
     // NOLINTNEXTLINE( google-explicit-constructor, hicpp-explicit-conversions )
     optional_constexpr /*non-explicit*/ optional( U && value )
     : has_value_( true )
-    , contained( std::forward<U>( value ) )
+    , contained( nonstd_lite_in_place(T), std::forward<U>( value ) )
     {}
 
 #else // optional_CPP11_OR_GREATER
