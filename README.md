@@ -464,9 +464,11 @@ optional: Allows to obtain moved-value or moved-default via value_or() (C++11)
 optional: Throws bad_optional_access at disengaged access
 optional: Throws bad_optional_access with non-empty what()
 optional: Allows to reset content
+optional: Ensure object is destructed only once (C++11)
+optional: Ensure balanced construction-destruction (C++98)
 optional: Allows to swaps engage state and values (non-member)
-optional: Provides relational operators
-optional: Provides mixed-type relational operators
+optional: Provides relational operators (non-member)
+optional: Provides mixed-type relational operators (non-member)
 make_optional: Allows to copy-construct optional
 make_optional: Allows to move-construct optional (C++11)
 make_optional: Allows to in-place copy-construct optional from arguments (C++11)

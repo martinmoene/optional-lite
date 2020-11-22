@@ -1031,6 +1031,83 @@ CASE( "optional: Allows to reset content" )
     EXPECT_NOT( a.has_value() );
 }
 
+// desctruction:
+
+namespace destruction {
+
+struct S
+{
+    static void reset() { ctor_count() = 0; dtor_count() = 0; }
+    static int & ctor_count() { static int i = 0; return i; }
+    static int & dtor_count() { static int i = 0; return i; }
+
+    S( int /*i*/             ) { ++ctor_count(); }
+    S( char /*c*/, int /*i*/ ) { ++ctor_count(); }
+    S( S const &             ) { ++ctor_count(); }
+#if optional_CPP11_OR_GREATER
+    S( S&& ) {}
+#endif
+  ~S() { ++dtor_count(); }
+};
+} // namespace destruct
+
+CASE( "optional: Ensure object is destructed only once (C++11)" )
+{
+#if optional_CPP11_OR_GREATER
+    using destruction::S;
+
+    SETUP( "- Reset ctor & dtor counts" ) {
+
+        S::reset();
+
+    SECTION( "- Destruction with direct initialize (C++11)" )
+    {
+        {
+            optional<S> s( 7 );
+
+            EXPECT( s.has_value()        );
+            EXPECT( S::dtor_count() == 0 );
+        }
+        EXPECT( S::dtor_count() == 1 );
+    }
+    SECTION( "- Destruction with emplace (C++11)" )
+    {
+        {
+            optional<S> s;
+
+            EXPECT( S::dtor_count() == 0 );
+
+            s.emplace( 'c', 42 );
+
+            EXPECT( S::dtor_count() == 0 );
+        }
+        EXPECT( S::dtor_count() == 1 );
+    }}
+#else
+        EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Ensure balanced construction-destruction (C++98)" )
+{
+    using destruction::S;
+
+    SETUP( "- Reset ctor & dtor counts" ) {
+
+        S::reset();
+
+    SECTION( "- Destruction with direct initialize (C++98)" )
+    {
+        {
+            optional<S> s( 7 );
+
+            EXPECT( s.has_value() );
+            EXPECT( S::ctor_count() == S::dtor_count() + 1 );
+        }
+        EXPECT( S::ctor_count() == S::dtor_count() );
+    }}
+}
+
 //
 // optional non-member functions:
 //
@@ -1130,12 +1207,12 @@ void relop( lest::env & lest_env )
     }
 }
 
-CASE( "optional: Provides relational operators" )
+CASE( "optional: Provides relational operators (non-member)" )
 {
     relop<int, int, int>( lest_env );
 }
 
-CASE( "optional: Provides mixed-type relational operators" )
+CASE( "optional: Provides mixed-type relational operators (non-member)" )
 {
     relop<char, int, long>( lest_env );
 }
@@ -1346,77 +1423,4 @@ CASE( "optional: isocpp-lib: CH 3, p0032r2 -- let's not have too clever tags" "[
     EXPECT_NOT( **a );
 #endif
 }
-
-namespace issue18 {
-
-struct S
-{
-    static int & dtor_count() { static int i = 0; return i; }
-    S( char /*c*/, int /*i*/ ) {}
-    ~S() { ++dtor_count(); }
-};
-} // issue18
-
-CASE( "optional: emplace does not construct in-place (destructor called while 'emplacing')" "[.issue-18]" )
-{
-#if optional_CPP11_OR_GREATER
-    using issue18::S;
-    {
-        nonstd::optional<S> os;
-
-        EXPECT( S::dtor_count() == 0 );
-
-        os.emplace( 'c', 42 );
-
-        EXPECT( S::dtor_count() == 0 );
-    }
-    EXPECT( S::dtor_count() == 1 );
-#else
-    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
-#endif
-}
-
-namespace issue59 {
-
-struct S
-{
-    static int & dtor_count() { static int i = 0; return i; }
-    S( int ) {}
-#if optional_CPP11_OR_GREATER
-    S( S&& ) {}
-#endif
-    ~S() { ++dtor_count(); }
-};
-} // issue59
-
-CASE( "optional: Constructor/destructor of optional type called twice" "[.issue-59]" )
-{
-    using issue59::S;
-    {
-        nonstd::optional<S> s( 7 );
-
-        EXPECT( s.has_value()        );
-        EXPECT( S::dtor_count() == 0 );
-    }
-    EXPECT( S::dtor_count() == 1 );
-}
-
-namespace issue59 {
-
-struct Type {
-    Type(int)     { std::cout << "issue59::Type: construct\n"; }
-#if optional_CPP11_OR_GREATER
-    Type(Type &&) { std::cout << "issue59::Type: move\n"     ; }
-#endif
-    ~Type()       { std::cout << "issue59::Type: destruct\n" ; }
-};
-} // issue59
-
-CASE( "optional: Constructor/destructor of optional type called twice" "[.issue-59-print]" )
-{
-    nonstd::optional<issue59::Type> t(0);
-
-    EXPECT( t.has_value() );
-}
-
 // end of file
