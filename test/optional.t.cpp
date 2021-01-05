@@ -970,14 +970,21 @@ CASE( "optional: Allows to obtain moved-value or moved-default via value_or() (C
     SETUP( "" ) {
         optional<int> d;
         optional<int> e( 42 );
+        optional<std::string> ds;
+        optional<std::string> es("77");
 
     SECTION("for l-values") {
-        EXPECT( d.value_or( 7 ) ==  7 );
-        EXPECT( e.value_or( 7 ) == 42 );
+        EXPECT(  d.value_or( 7 ) ==   7  );
+        EXPECT(  e.value_or( 7 ) ==  42  );
+        EXPECT( ds.value_or("7") ==  "7" );
+        EXPECT( es.value_or("7") == "77" );
+        EXPECT_NOT( es->empty() );  // see issue-60
     }
     SECTION("for r-values") {
-        EXPECT( std::move( d ).value_or( 7 ) ==  7 );
-        EXPECT( std::move( e ).value_or( 7 ) == 42 );
+        EXPECT( std::move(  d ).value_or( 7 ) ==   7  );
+        EXPECT( std::move(  e ).value_or( 7 ) ==  42  );
+        EXPECT( std::move( ds ).value_or("7") ==  "7" );
+        EXPECT( std::move( es ).value_or("7") == "77" );
     }}
 #else
     EXPECT( !!"optional: move-semantics are not available (no C++11)" );
