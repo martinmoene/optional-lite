@@ -332,6 +332,7 @@ namespace nonstd {
 #define optional_HAVE_NOEXCEPT          optional_CPP11_140
 #define optional_HAVE_NULLPTR           optional_CPP11_100
 #define optional_HAVE_REF_QUALIFIER     optional_CPP11_140_C290_G490
+#define optional_HAVE_STATIC_ASSERT     optional_CPP11_110
 #define optional_HAVE_INITIALIZER_LIST  optional_CPP11_140
 
 // Presence of C++14 language features:
@@ -403,6 +404,12 @@ namespace nonstd {
 #else
 # define optional_ref_qual  /*&*/
 # define optional_refref_qual  /*&&*/
+#endif
+
+#if optional_HAVE( STATIC_ASSERT )
+# define optional_static_assert(expr, text)    static_assert(expr, text);
+#else
+# define optional_static_assert(expr, text)  /*static_assert(expr, text);*/
 #endif
 
 // additional includes:
@@ -917,6 +924,15 @@ public:
 template< typename T>
 class optional
 {
+    optional_static_assert(( !std::is_same<typename std::remove_cv<T>::type, nullopt_t>::value  ),
+        "T in optional<T> must not be of type 'nullopt_t'.")
+
+    optional_static_assert(( !std::is_same<typename std::remove_cv<T>::type, in_place_t>::value ),
+        "T in optional<T> must not be of type 'in_place_t'.")
+
+    optional_static_assert(( std::is_object<T>::value && std::is_destructible<T>::value && !std::is_array<T>::value ),
+        "T in optional<T> must meet the Cpp17Destructible requirements.")
+
 private:
     template< typename > friend class optional;
 
@@ -925,7 +941,7 @@ private:
 public:
     typedef T value_type;
 
-    // x.x.3.1, constructors
+     // x.x.3.1, constructors
 
     // 1a - default construct
     optional_constexpr optional() optional_noexcept
