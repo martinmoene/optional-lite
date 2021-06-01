@@ -1,0 +1,17 @@
+{
+    "name": "optional-lite",
+    "keywords": "std",
+    "description": "A single-file header-only version of a C++17-like optional, a nullable object for C++98, C++11 and later",
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/martinmoene/optional-lite.git"
+    },
+    "frameworks": "*",
+    "platforms": "*",
+    "build": {
+        "srcFilter": [
+            "+<include/nonstd/optional.hpp>"
+        ]
+    }
+}
