@@ -9,6 +9,7 @@
     },
     "frameworks": "*",
     "platforms": "*",
+    "license": "BSL-1.0",
     "build": {
         "srcFilter": [
             "+<include/nonstd/optional.hpp>"
