@@ -39,6 +39,10 @@ table = (
         , r'version\s+=\s+"([0-9]+\.[0-9]+\.[0-9]+)"\s*$'
         , 'version = "{major}.{minor}.{patch}"' )
 
+    , ( 'library.json'
+        , r'"version"\s*:\s+"([0-9]+\.[0-9]+\.[0-9]+)",\s*$'
+        , '"version": "{major}.{minor}.{patch}",' )
+
     , ( 'include/nonstd/optional.hpp'
         , r'\#define\s+optional_lite_MAJOR\s+[0-9]+\s*$'
         , '#define optional_lite_MAJOR  {major}' )
