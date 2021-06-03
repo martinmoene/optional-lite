@@ -1,0 +1,26 @@
+{
+    "name": "optional-lite",
+    "version": "3.4.0",
+    "keywords": "std, nonstd, optional, header",
+    "description": "A single-file header-only version of a C++17-like optional, a nullable object for C++98, C++11 and later",
+    "license": "BSL-1.0",
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/martinmoene/optional-lite.git"
+    },
+    "authors":
+    [
+        {
+            "name": "Martin Moene",
+            "maintainer": true
+        }
+    ],
+    "build": {
+        "srcFilter": [
+            "+<include/nonstd/optional.hpp>"
+        ]
+    },
+    "frameworks": "*",
+    "platforms": "*"
+}
