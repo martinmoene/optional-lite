@@ -16,11 +16,21 @@
             "maintainer": true
         }
     ],
-    "build": {
-        "srcFilter": [
+    "build":
+    {
+        "srcFilter":
+        [
             "+<include/nonstd/optional.hpp>"
         ]
     },
+    "examples":
+    [
+        {
+            "name": "Text to optional of int",
+            "base": "example",
+            "files": ["01-to_int.cpp"]
+        }
+    ],
     "frameworks": "*",
     "platforms": "*"
 }
