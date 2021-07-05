@@ -17,7 +17,7 @@ set UCAP=%unit%
 call :toupper UCAP
 
 set unit_select=-D%unit%_CONFIG_SELECT_%UCAP%=%unit%_%UCAP%_DEFAULT
-::set unit_select=-D%unit%_CONFIG_SELECT_%UCAP%=%unit%_%UCAP%_NONSTD
+set unit_select=-D%unit%_CONFIG_SELECT_%UCAP%=%unit%_%UCAP%_NONSTD
 ::set unit_select=-D%unit%_CONFIG_SELECT_%UCAP%=%unit%_%UCAP%_STD
 
 set unit_config=
@@ -28,7 +28,7 @@ set msvc_defines=^
 
 set CppCoreCheckInclude=%VCINSTALLDIR%\Auxiliary\VS\include
 
-cl -W3 -EHsc %std% %unit_select% %unit_config% %msvc_defines% -I../include -I. %unit%-main.t.cpp %unit%.t.cpp && %unit%-main.t.exe
+cl -nologo -W3 -EHsc %std% %unit_select% %unit_config% %msvc_defines% -I"%CppCoreCheckInclude%" -Ilest -I../include -I. %unit%-main.t.cpp %unit%.t.cpp && %unit%-main.t.exe
 endlocal & goto :EOF
 
 :: subroutines:
