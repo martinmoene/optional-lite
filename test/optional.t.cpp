@@ -1430,4 +1430,142 @@ CASE( "optional: isocpp-lib: CH 3, p0032r2 -- let's not have too clever tags" "[
     EXPECT_NOT( **a );
 #endif
 }
+
+#if optional_CPP11_110
+namespace issue_61 {
+
+// A: copy & move constructable/assignable
+struct A
+{
+#if optional_CPP11_120
+    A() = default;
+    A(const A &) = default;
+    A& operator=(const A &) = default;
+    A(A &&) = default;
+    A& operator=(A &&) = default;
+#else
+    A() {}
+    A(const A &) {}
+    A& operator=(const A &) { return *this; }
+#endif
+};
+
+// B: not copy & not move constructable/assignable
+
+struct B
+{
+#if optional_CPP11_120
+    B() = default;
+    B(const B &) = delete;
+    B& operator=(const B &) = delete;
+    B(B &&) = delete;
+    B& operator=(B &&) = delete;
+#else
+    B() {}
+private:
+    B(const B &) {}
+    B& operator=(const B &) { return *this; }
+#endif
+};
+} // issue_61
+#endif
+
+CASE( "optional: Invalid copy/move constructible/assignable detection" "[.issue-61-print]" )
+{
+#if !optional_CPP11_110
+    std::cout << "Note: Test requires C++11/VS2012 or newer, only works from VS2015.\n";
+#else
+    using issue_61::A;
+    using issue_61::B;
+
+    std::cout << "Copy constructible: "
+        << "\n" << std::is_copy_constructible<A>::value
+        << "  " << std::is_copy_constructible<nonstd::optional<A>>::value
+        << "\n" << std::is_copy_constructible<B>::value
+        << "  " << std::is_copy_constructible<nonstd::optional<B>>::value
+        << std::endl;
+
+    std::cout << "Move constructible: "
+        << "\n" << std::is_move_constructible<A>::value
+        << "  " << std::is_move_constructible<nonstd::optional<A>>::value
+        << "\n" << std::is_move_constructible<B>::value
+        << "  " << std::is_move_constructible<nonstd::optional<B>>::value
+        << std::endl;
+
+    std::cout << "Copy assignable: "
+        << "\n" << std::is_copy_assignable<A>::value
+        << "  " << std::is_copy_assignable<nonstd::optional<A>>::value
+        << "\n" << std::is_copy_assignable<B>::value
+        << "  " << std::is_copy_assignable<nonstd::optional<B>>::value
+        << std::endl;
+
+    std::cout << "Move assignable: "
+        << "\n" << std::is_move_assignable<A>::value
+        << "  " << std::is_move_assignable<nonstd::optional<A>>::value
+        << "\n" << std::is_move_assignable<B>::value
+        << "  " << std::is_move_assignable<nonstd::optional<B>>::value
+        << std::endl;
+#endif
+}
+
+CASE( "optional: Invalid copy/move constructible/assignable detection - Copy constructible" "[.issue-61-test]" )
+{
+#if optional_CPP11_140
+    using issue_61::A;
+    using issue_61::B;
+
+    EXPECT( std::is_copy_constructible<A>::value );
+    EXPECT( std::is_copy_constructible<nonstd::optional<A>>::value );
+
+    EXPECT_NOT( std::is_copy_constructible<B>::value );
+    EXPECT_NOT( std::is_copy_constructible<nonstd::optional<B>>::value );
+#else
+#endif
+}
+
+CASE( "optional: Invalid copy/move constructible/assignable detection - Move constructible" "[.issue-61-test]" )
+{
+#if optional_CPP11_140
+    using issue_61::A;
+    using issue_61::B;
+
+    EXPECT( std::is_move_constructible<A>::value );
+    EXPECT( std::is_move_constructible<nonstd::optional<A>>::value );
+
+    EXPECT_NOT( std::is_move_constructible<B>::value );
+    EXPECT_NOT( std::is_move_constructible<nonstd::optional<B>>::value );
+#else
+#endif
+}
+
+CASE( "optional: Invalid copy/move constructible/assignable detection - Copy assignable" "[.issue-61-test]" )
+{
+#if optional_CPP11_140
+    using issue_61::A;
+    using issue_61::B;
+
+    EXPECT( std::is_copy_assignable<A>::value );
+    EXPECT( std::is_copy_assignable<nonstd::optional<A>>::value );
+
+    EXPECT_NOT( std::is_copy_assignable<B>::value );
+    EXPECT_NOT( std::is_copy_assignable<nonstd::optional<B>>::value );
+#else
+#endif
+}
+
+CASE( "optional: Invalid copy/move constructible/assignable detection - Move assignable" "[.issue-61-test]" )
+{
+#if optional_CPP11_140
+    using issue_61::A;
+    using issue_61::B;
+
+    EXPECT( std::is_move_assignable<A>::value );
+    EXPECT( std::is_move_assignable<nonstd::optional<A>>::value );
+
+    EXPECT_NOT( std::is_move_assignable<B>::value );
+    EXPECT_NOT( std::is_move_assignable<nonstd::optional<B>>::value );
+#else
+#endif
+}
+
 // end of file
