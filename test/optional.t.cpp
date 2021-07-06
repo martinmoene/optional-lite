@@ -1437,7 +1437,7 @@ namespace issue_61 {
 // A: copy & move constructable/assignable
 struct A
 {
-#if optional_CPP11_120
+#if optional_CPP11_140
     A() = default;
     A(const A &) = default;
     A& operator=(const A &) = default;
@@ -1454,7 +1454,7 @@ struct A
 
 struct B
 {
-#if optional_CPP11_120
+#if optional_CPP11_140
     B() = default;
     B(const B &) = delete;
     B& operator=(const B &) = delete;
