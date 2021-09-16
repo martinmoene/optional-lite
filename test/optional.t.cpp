@@ -223,17 +223,6 @@ CASE( "optional: Allows to default construct an empty optional with a non-defaul
     EXPECT( !ondcm );
 }
 
-
-CASE( "optional: construct an immovable object" )
-{
-#if optional_CPP11_OR_GREATER
-    optional<NoDefaultCopyMove> ondcm(in_place, std::string("test"));
-    EXPECT( ondcm.has_value() );
-#else
-    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
-#endif
-}
-
 CASE( "optional: Allows to copy-construct from empty optional (2)" )
 {
     optional<int> a;
@@ -470,6 +459,17 @@ CASE( "optional: Allows to move-construct from value, non-explicit converting (C
     EXPECT( *a == Implicit(7) );
 #else
     EXPECT( !!"optional: move-construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to in-place construct an immovable object (C++11, 6" )
+{
+#if optional_CPP11_OR_GREATER
+    optional<NoDefaultCopyMove> ondcm( in_place, std::string("test") );
+
+    EXPECT( ondcm.has_value() );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
 #endif
 }
 
