@@ -1261,7 +1261,11 @@ CASE( "make_optional: Allows to in-place copy-construct optional from arguments 
 
     EXPECT( a->first        == 'a' );
     EXPECT( a->second.value ==  7  );
+#if optional_CPP17_OR_GREATER
     EXPECT( a->second.state == copy_constructed );
+#else
+    EXPECT( a->second.state == move_constructed );
+#endif
     EXPECT(         s.state != moved_from       );
 #else
     EXPECT( !!"optional: in-place construction is not available (no C++11)" );
