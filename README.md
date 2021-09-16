@@ -434,6 +434,7 @@ optional: Allows to copy-construct from value, converting (8)
 optional: Allows to move-construct from value (C++11, 8b)
 optional: Allows to move-construct from value, explicit converting (C++11, 8a)
 optional: Allows to move-construct from value, non-explicit converting (C++11, 8b)
+optional: Allows to in-place construct an immovable object (C++11, 6
 optional: Allows to in-place construct from literal value (C++11, 6)
 optional: Allows to in-place copy-construct from value (C++11, 6)
 optional: Allows to in-place move-construct from value (C++11, 6)
