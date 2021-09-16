@@ -1106,7 +1106,7 @@ public:
     >
     optional_constexpr explicit optional( nonstd_lite_in_place_t(T), Args&&... args )
     : has_value_( true )
-    , contained( T( std::forward<Args>(args)...) )
+    , contained( in_place, std::forward<Args>(args)... )
     {}
 
     // 7 (C++11) - in-place construct,  initializer-list
