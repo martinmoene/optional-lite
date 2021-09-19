@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Martin Moene
+// Copyright 2014-2021 by Martin Moene
 //
 // https://github.com/martinmoene/optional-lite
 //

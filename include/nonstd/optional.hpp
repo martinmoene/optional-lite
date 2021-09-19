@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2014-2018 Martin Moene
+// Copyright (c) 2014-2021 Martin Moene
 //
 // https://github.com/martinmoene/optional-lite
 //
@@ -12,7 +12,7 @@
 #define NONSTD_OPTIONAL_LITE_HPP
 
 #define optional_lite_MAJOR  3
-#define optional_lite_MINOR  4
+#define optional_lite_MINOR  5
 #define optional_lite_PATCH  0
 
 #define optional_lite_VERSION  optional_STRINGIFY(optional_lite_MAJOR) "." optional_STRINGIFY(optional_lite_MINOR) "." optional_STRINGIFY(optional_lite_PATCH)

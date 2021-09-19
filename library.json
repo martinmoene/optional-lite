@@ -1,6 +1,6 @@
 {
     "name": "optional-lite",
-    "version": "3.4.0",
+    "version": "3.5.0",
     "keywords": "std, nonstd, optional, header",
     "description": "A single-file header-only version of a C++17-like optional, a nullable object for C++98, C++11 and later",
     "license": "BSL-1.0",
