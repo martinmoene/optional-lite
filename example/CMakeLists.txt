@@ -1,4 +1,4 @@
-# Copyright 2017-2018 by Martin Moene
+# Copyright 2021-2021 by Martin Moene
 #
 # https://github.com/martinmoene/optional-lite
 #
@@ -6,7 +6,7 @@
 # (See accompanying file LICENSE.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if( NOT DEFINED CMAKE_MINIMUM_REQUIRED_VERSION )
-    cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
+    cmake_minimum_required( VERSION 3.8 FATAL_ERROR )
 endif()
 
 project( example LANGUAGES CXX )
@@ -17,7 +17,28 @@ set( PROGRAM   ${unit_name}-lite )
 
 message( STATUS "Subproject '${PROJECT_NAME}', examples '${PROGRAM}-*'")
 
+# Target default options and definitions:
+
 set( OPTIONS "" )
+#set( DEFINITIONS "" )
+
+# Sources (.cpp), normal and no-exception, and their base names:
+
+set( SOURCES
+    01-to_int.cpp
+    02-nodefltctor.cpp
+    # 04-any-optional-variant.cpp
+    05-no-exceptions.cpp
+)
+
+set( SOURCES_NE
+    05-no-exceptions.cpp
+)
+
+string( REPLACE ".cpp" "" BASENAMES    "${SOURCES}" )
+string( REPLACE ".cpp" "" BASENAMES_NE "${SOURCES_NE}" )
+
+# Determine options:
 
 if( MSVC )
     message( STATUS "Matched: MSVC")
@@ -41,20 +62,40 @@ else()
     message( STATUS "Matched: nothing")
 endif()
 
-function( make_target name no_exceptions )
-    add_executable             ( ${PROGRAM}-${name} ${name}.cpp )
-    target_link_libraries      ( ${PROGRAM}-${name} PRIVATE ${PACKAGE} )
-    if ( no_exceptions )
-        target_compile_options ( ${PROGRAM}-${name} PRIVATE ${NO_EXCEPTIONS_OPTIONS} )
+# Function to emulate ternary operaton `result = b ? x : y`:
+
+macro( ternary var boolean value1 value2 )
+    if( ${boolean} )
+        set( ${var} ${value1} )
     else()
-        target_compile_options ( ${PROGRAM}-${name} PRIVATE ${EXCEPTIONS_OPTIONS} )
+        set( ${var} ${value2} )
+    endif()
+endmacro()
+
+# Function to create a target:
+
+function( make_target name no_exceptions )
+    ternary( ne no_exceptions "-ne" "" )
+
+    add_executable             ( ${PROGRAM}-${name}${ne} ${name}.cpp )
+    target_include_directories ( ${PROGRAM}-${name}${ne} PRIVATE ../../variant-lite/include )
+    target_link_libraries      ( ${PROGRAM}-${name}${ne} PRIVATE ${PACKAGE} )
+    if ( no_exceptions )
+        target_compile_options ( ${PROGRAM}-${name}${ne} PRIVATE ${NO_EXCEPTIONS_OPTIONS} )
+    else()
+        target_compile_options ( ${PROGRAM}-${name}${ne} PRIVATE ${EXCEPTIONS_OPTIONS} )
     endif()
 
 endfunction()
 
-make_target( 01-to_int FALSE )
-make_target( 02-nodefltctor FALSE )
-# 04-any-optional-variant also requires variant-lite.
-make_target( 05-no-exceptions TRUE )
+# Create targets:
+
+foreach( target ${BASENAMES} )
+    make_target( ${target} FALSE )
+endforeach()
+
+foreach( target ${BASENAMES_NE} )
+    make_target( ${target} TRUE )
+endforeach()
 
 # end of file
