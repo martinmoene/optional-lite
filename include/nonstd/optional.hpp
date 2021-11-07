@@ -44,6 +44,12 @@
 # define optional_CONFIG_SELECT_OPTIONAL  ( optional_HAVE_STD_OPTIONAL ? optional_OPTIONAL_STD : optional_OPTIONAL_NONSTD )
 #endif
 
+// Control presence of extensions:
+
+#ifndef optional_CONFIG_NO_EXTENSIONS
+#define optional_CONFIG_NO_EXTENSIONS  0
+#endif
+
 // Control presence of exception handling (try and auto discover):
 
 #ifndef optional_CONFIG_NO_EXCEPTIONS
@@ -1485,7 +1491,54 @@ public:
         return has_value() ? contained.value() : static_cast<value_type>( v );
     }
 
-#endif // optional_CPP11_OR_GREATER
+#endif // optional_HAVE( REF_QUALIFIER )
+
+#if !optional_CONFIG_NO_EXTENSIONS
+#if  optional_HAVE( REF_QUALIFIER )
+
+    template< typename F >
+    optional_constexpr value_type value_or_eval( F f ) const &
+    {
+        if ( has_value() )
+        {
+            return contained.value();
+        }
+        else
+        {
+            return f();
+        }
+    }
+
+    template< typename F >
+    value_type value_or_eval( F f ) &&
+    {
+        if ( has_value() )
+        {
+            return std::move( contained.value() );
+        }
+        else
+        {
+            return f();
+        }
+    }
+
+#else
+
+    template< typename F >
+    optional_constexpr value_type value_or_eval( F f ) const
+    {
+        if ( has_value() )
+        {
+            return contained.value();
+        }
+        else
+        {
+            return f();
+        }
+    }
+
+#endif //  optional_HAVE( REF_QUALIFIER )
+#endif // !optional_CONFIG_NO_EXTENSIONS
 
     // x.x.3.6, modifiers
 

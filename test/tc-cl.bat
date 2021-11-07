@@ -28,7 +28,8 @@ echo %clang% %version%: %std% %unit_select% %args%
 set unit_config=^
     -D%unit%_%UCAP%_HEADER=\"nonstd/%unit%.hpp\" ^
     -D%unit%_TEST_NODISCARD=0 ^
-    -D%unit%_CONFIG_SELECT_%UCAP%=%unit_select%
+    -D%unit%_CONFIG_SELECT_%UCAP%=%unit_select% ^
+    -D%unit%_CONFIG_NO_EXTENSIONS=0
 
 rem -flto / -fwhole-program
 set  optflags=-O2

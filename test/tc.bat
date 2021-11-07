@@ -22,7 +22,8 @@ set unit_select=-D%unit%_CONFIG_SELECT_%UCAP%=%unit%_%UCAP%_DEFAULT
 ::set unit_select=-D%unit%_CONFIG_SELECT_%UCAP%=%unit%_%UCAP%_NONSTD
 ::set unit_select=-D%unit%_CONFIG_SELECT_%UCAP%=%unit%_%UCAP%_STD
 
-set unit_config=
+set unit_config=^
+    -D%unit%_CONFIG_NO_EXTENSIONS=0
 
 rem -flto / -fwhole-program
 set  optflags=-O2

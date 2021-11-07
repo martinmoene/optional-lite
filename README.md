@@ -139,6 +139,8 @@ Synopsis
 
 ### Interface of *optional lite*
 
+`nonstd::optional` provides the non-standard method `value_or_eval()`. Its presence can be controlled via `optional_CONFIG_NO_EXTENSIONS`, see section [Configuration](#configuration).
+
 | Kind         | Std  | Method                                       | Result |
 |--------------|------|---------------------------------------------|--------|
 | Construction |&nbsp;| **optional**() noexcept                          | default construct a nulled object |
@@ -169,9 +171,12 @@ Synopsis
 | &nbsp;       |&nbsp;| value_type & **value**() &                       | the current content (non-const ref);<br>throws bad_optional_access if nulled |
 | &nbsp;       | C++11| value_type const & **value**() &&                | the current content (const ref);<br>throws bad_optional_access if nulled |
 | &nbsp;       | C++11| value_type & **value**() &&                      | the current content (non-const ref);<br>throws bad_optional_access if nulled |
-| &nbsp;       |<C++11| value_type **value_or**( value_type const & default_value ) const | the value, or default_value if nulled<br>value_type must be copy-constructible |
-| &nbsp;       | C++11| value_type **value_or**( value_type && default_value ) &  | the value, or default_value if nulled<br>value_type must be copy-constructible |
-| &nbsp;       | C++11| value_type **value_or**( value_type && default_value ) && | the value, or default_value if nulled<br>value_type must be copy-constructible |
+| &nbsp;       |&lt;C++11| value_type **value_or**(<br>value_type const & default_value ) const | the value, or default_value if nulled<br>value_type must be copy-constructible |
+| &nbsp;       | C++11| value_type **value_or**(<br>value_type && default_value ) &  | the value, or default_value if nulled<br>value_type must be copy-constructible |
+| &nbsp;       | C++11| value_type **value_or**(<br>value_type && default_value ) && | the value, or default_value if nulled<br>value_type must be copy-constructible |
+| &nbsp;       |&lt;C++11| template&lt;typename F><br>value_type **value_or_eval**(F f) const | the value, or function call result if nulled<br>non-standard extension |
+| &nbsp;       | C++11| template&lt;typename F><br>value_type **value_or_eval**(F f) &  | the value, or function call result if nulled<br>non-standard extension |
+| &nbsp;       | C++11| template&lt;typename F><br>value_type **value_or_eval**(F f) && | the value, or function call result if nulled<br>non-standard extension |
 | Modifiers    |&nbsp;| void **reset**() noexcept                        | make empty |
 
 
@@ -237,8 +242,12 @@ At default, *optional lite* uses `std::optional` if it is available and lets you
 -D<b>optional\_CONFIG\_SELECT\_OPTIONAL</b>=optional_OPTIONAL_DEFAULT  
 Define this to `optional_OPTIONAL_STD` to select `std::optional` as `nonstd::optional`. Define this to `optional_OPTIONAL_NONSTD` to select `nonstd::optional` as `nonstd::optional`. Default is undefined, which has the same effect as defining to `optional_OPTIONAL_DEFAULT`.
 
+#### Disable extensions
+-D<b>optional\_CONFIG\_NO\_EXTENSIONS</b>=0  
+Define this to 1 if you want to compile without extensions. Default is undefined.
+
 #### Disable exceptions
--D<b>optional_CONFIG_NO_EXCEPTIONS</b>=0
+-D<b>optional\_CONFIG\_NO\_EXCEPTIONS</b>=0  
 Define this to 1 if you want to compile without exceptions. If not defined, the header tries and detect if exceptions have been disabled (e.g. via `-fno-exceptions`). Default is undefined.
 
 #### Macros to control alignment

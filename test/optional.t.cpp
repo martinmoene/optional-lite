@@ -998,6 +998,76 @@ CASE( "optional: Allows to obtain moved-value or moved-default via value_or() (C
 #endif
 }
 
+CASE( "optional: Allows to obtain value or function call result via value_or_eval()" )
+{
+#if !optional_USES_STD_OPTIONAL
+#if !optional_CONFIG_NO_EXTENSIONS
+    const int const7 = 7;
+    struct F { static int seven() { return const7; } };
+
+    SETUP( "" ) {
+        optional<int> d;
+        optional<int> e( 42 );
+
+    SECTION( "value_or_eval( F::zero ) yields value for non-empty optional" ) {
+        EXPECT( e.value_or_eval( F::seven ) == 42 );
+    }
+    SECTION( "value_or( 7 ) yields function result for empty optional" ) {
+        EXPECT( d.value_or_eval( F::seven ) == F::seven() );
+    }
+#if optional_CPP11_OR_GREATER
+    SECTION( "value_or_eval( F::zero ) yields value for non-empty optional - lambda (C++11)" ) {
+        EXPECT( e.value_or_eval( [const7](){ return const7; } ) == 42 );
+    }
+    SECTION( "value_or( 7 ) yields function result for empty optional - lambda (C++11)" ) {
+        EXPECT( d.value_or_eval( [const7](){ return const7; } ) == const7 );
+    }
+#endif
+    }
+#else
+    EXPECT( !!"optional: value_or_eval() is not available (optional_CONFIG_NO_EXTENSIONS=1)" );
+#endif
+#else
+    EXPECT( !!"optional: value_or_eval() is not available (using std::optional)" );
+#endif
+}
+
+CASE( "optional: Allows to obtain moved-value or function call result via value_or_eval() (C++11)" )
+{
+#if !optional_USES_STD_OPTIONAL
+#if !optional_CONFIG_NO_EXTENSIONS
+#if  optional_CPP11_OR_GREATER
+    SETUP( "" ) {
+        optional<int> d;
+        optional<int> e( 42 );
+        optional<std::string> ds;
+        optional<std::string> es("77");
+
+    SECTION("for l-values") {
+        EXPECT(  d.value_or_eval( [](){ return  7;  } ) ==   7  );
+        EXPECT(  e.value_or_eval( [](){ return  7;  } ) ==  42  );
+        EXPECT( ds.value_or_eval( [](){ return "7"; } ) ==  "7" );
+        EXPECT( es.value_or_eval( [](){ return "7"; } ) == "77" );
+        EXPECT_NOT( es->empty() );
+    }
+    SECTION("for r-values") {
+        EXPECT( std::move(  d ).value_or_eval( [](){ return  7;  } ) ==   7  );
+        EXPECT( std::move(  e ).value_or_eval( [](){ return  7;  } ) ==  42  );
+        EXPECT( std::move( ds ).value_or_eval( [](){ return "7"; } ) ==  "7" );
+        EXPECT( std::move( es ).value_or_eval( [](){ return "7"; } ) == "77" );
+        EXPECT( es->empty() );
+    }}
+#else
+    EXPECT( !!"optional: move-semantics are not available (no C++11)" );
+#endif
+#else
+    EXPECT( !!"optional: value_or_eval() is not available (optional_CONFIG_NO_EXTENSIONS=1)" );
+#endif
+#else
+    EXPECT( !!"optional: value_or_eval() is not available (using std::optional)" );
+#endif
+}
+
 CASE( "optional: Throws bad_optional_access at disengaged access" )
 {
 #if optional_USES_STD_OPTIONAL && defined(__APPLE__)
