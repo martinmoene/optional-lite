@@ -1003,7 +1003,10 @@ CASE( "optional: Allows to obtain value or function call result via value_or_eva
 #if !optional_USES_STD_OPTIONAL
 #if !optional_CONFIG_NO_EXTENSIONS
     const int const7 = 7;
-    struct F { static int seven() { return const7; } };
+
+    // accommodate VS2013/MSVC12.0/1800 and earlier:
+    struct F { static int seven() { return 7; } };
+//  struct F { static int seven() { return const7; } };
 
     SETUP( "" ) {
         optional<int> d;
