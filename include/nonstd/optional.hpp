@@ -1497,16 +1497,9 @@ public:
 #if  optional_HAVE( REF_QUALIFIER )
 
     template< typename F >
-    optional_constexpr14 value_type value_or_eval( F f ) const &
+    optional_constexpr value_type value_or_eval( F f ) const &
     {
-        if ( has_value() )
-        {
-            return contained.value();
-        }
-        else
-        {
-            return f();
-        }
+        return has_value() ? contained.value() : f();
     }
 
     template< typename F >
@@ -1525,16 +1518,9 @@ public:
 #else
 
     template< typename F >
-    optional_constexpr14 value_type value_or_eval( F f ) const
+    optional_constexpr value_type value_or_eval( F f ) const
     {
-        if ( has_value() )
-        {
-            return contained.value();
-        }
-        else
-        {
-            return f();
-        }
+        return has_value() ? contained.value() : f();
     }
 
 #endif //  optional_HAVE( REF_QUALIFIER )
