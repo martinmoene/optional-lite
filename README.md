@@ -419,6 +419,10 @@ The version of *optional lite* is available via tag `[.version]`. The following 
 
 ### A.2 Optional Lite test specification
 
+<details>
+<summary>click to expand</summary>
+<p>
+
 ```
 union: A C++03 union can only contain POD types
 optional: Allows to default construct an empty optional (1a)
@@ -471,6 +475,8 @@ optional: Allows to obtain value via value()
 optional: Allows to obtain moved-value via value() (C++11)
 optional: Allows to obtain value or default via value_or()
 optional: Allows to obtain moved-value or moved-default via value_or() (C++11)
+optional: Allows to obtain value or function call result via value_or_eval() [extension]
+optional: Allows to obtain moved-value or function call result via value_or_eval() (C++11) [extension]
 optional: Throws bad_optional_access at disengaged access
 optional: Throws bad_optional_access with non-empty what()
 optional: Allows to reset content
@@ -488,3 +494,5 @@ make_optional: Allows to in-place move-construct optional from initializer-list 
 std::hash<>: Allows to obtain hash (C++11)
 tweak header: reads tweak header if supported [tweak]
 ```
+</p>
+</details>

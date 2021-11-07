@@ -998,7 +998,7 @@ CASE( "optional: Allows to obtain moved-value or moved-default via value_or() (C
 #endif
 }
 
-CASE( "optional: Allows to obtain value or function call result via value_or_eval()" )
+CASE( "optional: Allows to obtain value or function call result via value_or_eval()" " [extension]" )
 {
 #if !optional_USES_STD_OPTIONAL
 #if !optional_CONFIG_NO_EXTENSIONS
@@ -1035,7 +1035,7 @@ CASE( "optional: Allows to obtain value or function call result via value_or_eva
 #endif
 }
 
-CASE( "optional: Allows to obtain moved-value or function call result via value_or_eval() (C++11)" )
+CASE( "optional: Allows to obtain moved-value or function call result via value_or_eval() (C++11)"  " [extension]" )
 {
 #if !optional_USES_STD_OPTIONAL
 #if !optional_CONFIG_NO_EXTENSIONS
