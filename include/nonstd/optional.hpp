@@ -1497,7 +1497,7 @@ public:
 #if  optional_HAVE( REF_QUALIFIER )
 
     template< typename F >
-    optional_constexpr value_type value_or_eval( F f ) const &
+    optional_constexpr14 value_type value_or_eval( F f ) const &
     {
         if ( has_value() )
         {
@@ -1510,7 +1510,7 @@ public:
     }
 
     template< typename F >
-    value_type value_or_eval( F f ) &&
+    optional_constexpr14 value_type value_or_eval( F f ) &&
     {
         if ( has_value() )
         {
@@ -1525,7 +1525,7 @@ public:
 #else
 
     template< typename F >
-    optional_constexpr value_type value_or_eval( F f ) const
+    optional_constexpr14 value_type value_or_eval( F f ) const
     {
         if ( has_value() )
         {
