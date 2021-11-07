@@ -17,9 +17,7 @@
 - [Notes and references](#notes-and-references)
 - [Appendix](#appendix)
 
-
-Example usage
--------------
+## Example usage
 
 ```Cpp
 #include "nonstd/optional.hpp"
@@ -48,14 +46,16 @@ int main( int argc, char * argv[] )
     else      std::cout << "'" << text << "' isn't a number";
 }
 ```
+
 ### Compile and run
-```
+
+```Console
 prompt>g++ -Wall -Wextra -std=c++03 -I../include -o 01-to_int.exe 01-to_int.cpp && 01-to_int x1
 'x1' isn't a number
 ```
 
-In a nutshell
----------------
+## In a nutshell
+
 **optional lite** is a single-file header-only library to represent optional (nullable) objects and pass them by value. The library aims to provide a [C++17-like optional](http://en.cppreference.com/w/cpp/utility/optional) for use with C++98 and later. If available, std::optional is used. There's also a simpler version, [*optional bare*](https://github.com/martinmoene/optional-bare). Unlike *optional lite*, *optional bare* is limited to default-constructible and copyable types.
 
 **Features and properties of optional lite** are ease of installation (single header), freedom of dependencies other than the standard library and control over object alignment (if needed). *optional lite* shares the approach to in-place tags with [any-lite](https://github.com/martinmoene/any-lite), [expected-lite](https://github.com/martinmoene/expected-lite) and with [variant-lite](https://github.com/martinmoene/variant-lite) and these libraries can be used together.
@@ -64,19 +64,15 @@ In a nutshell
 
 For more examples, see [this answer on StackOverflow](http://stackoverflow.com/a/16861022) [8] and the [quick start guide](http://www.boost.org/doc/libs/1_57_0/libs/optional/doc/html/boost_optional/quick_start.html) [9] of Boost.Optional (note that its interface differs from *optional lite*).
 
+## License
 
-License
--------
 *optional lite* is distributed under the [Boost Software License](LICENSE.txt).
 
+## Dependencies
 
-Dependencies
-------------
 *optional lite* has no other dependencies than the [C++ standard library](http://en.cppreference.com/w/cpp/header).
 
-
-Installation
-------------
+## Installation
 
 *optional lite* is a single-file header-only library. Put `optional.hpp` in the [include](include) folder directly into the project source tree or somewhere reachable from your project.
 
@@ -114,8 +110,7 @@ Or, if you use the [conan package manager](https://www.conan.io/), you might fol
     ```
 
 
-Synopsis
---------
+## Synopsis
 
 **Contents**  
 [Types in namespace nonstd](#types-in-namespace-nonstd)  
@@ -179,7 +174,6 @@ Synopsis
 | &nbsp;       | C++11| template&lt;typename F><br>value_type **value_or_eval**(F f) && | the value, or function call result if nulled<br>non-standard extension |
 | Modifiers    |&nbsp;| void **reset**() noexcept                        | make empty |
 
-
 ### Algorithms for *optional lite*
 
 | Kind                     | Std  | Function |
@@ -225,7 +219,6 @@ Synopsis
 | &nbsp;                   | C++11| template< class T, class U, class... Args ><br>optional&lt;T> **make_optional**( std::initializer_list&lt;U> il, Args&&... args ) |
 | hash                     | C++11| template< class T ><br>class **hash**< nonstd::optional&lt;T> > |
 
-
 ### Configuration
 
 #### Tweak header
@@ -233,20 +226,24 @@ Synopsis
 If the compiler supports [`__has_include()`](https://en.cppreference.com/w/cpp/preprocessor/include), *optional lite* supports the [tweak header](https://vector-of-bool.github.io/2020/10/04/lib-configuration.html) mechanism. Provide your *tweak header* as `nonstd/optional.tweak.hpp` in a folder in the include-search-path. In the tweak header, provide definitions as documented below, like `#define optional_CPLUSPLUS 201103L`.
 
 #### Standard selection macro
+
 \-D<b>optional\_CPLUSPLUS</b>=199711L  
 Define this macro to override the auto-detection of the supported C++ standard, if your compiler does not set the `__cplusplus` macro correctly.
 
 #### Select `std::optional` or `nonstd::optional`
+
 At default, *optional lite* uses `std::optional` if it is available and lets you use it via namespace `nonstd`. You can however override this default and explicitly request to use `std::optional` or optional lite's `nonstd::optional` as `nonstd::optional` via the following macros.
 
 -D<b>optional\_CONFIG\_SELECT\_OPTIONAL</b>=optional_OPTIONAL_DEFAULT  
 Define this to `optional_OPTIONAL_STD` to select `std::optional` as `nonstd::optional`. Define this to `optional_OPTIONAL_NONSTD` to select `nonstd::optional` as `nonstd::optional`. Default is undefined, which has the same effect as defining to `optional_OPTIONAL_DEFAULT`.
 
 #### Disable extensions
+
 -D<b>optional\_CONFIG\_NO\_EXTENSIONS</b>=0  
 Define this to 1 if you want to compile without extensions. Default is undefined.
 
 #### Disable exceptions
+
 -D<b>optional\_CONFIG\_NO\_EXCEPTIONS</b>=0  
 Define this to 1 if you want to compile without exceptions. If not defined, the header tries and detect if exceptions have been disabled (e.g. via `-fno-exceptions`). Default is undefined.
 
@@ -263,9 +260,7 @@ Define this to the *pod-type* you want to align to (no default).
 -D<b>optional_CONFIG_ALIGN_AS_FALLBACK</b>=*pod-type*  
 Define this to the *pod-type* to use for alignment if the algorithm of *optional lite* cannot find a suitable POD type to use for alignment. Default is double.
 
-
-Comparison of std::optional, optional lite and Boost.Optional
--------------------------------------------------------------
+## Comparison of std::optional, optional lite and Boost.Optional
 
 *optional lite* is inspired on std::optional, which in turn is inspired on Boost.Optional. Here are the significant differences.
 
@@ -285,9 +280,8 @@ Comparison of std::optional, optional lite and Boost.Optional
 
 1) is_initialized(), reset(), get().
 
+## Reported to work with
 
-Reported to work with
----------------------
 The table below mentions the compiler versions *optional lite* is reported to work with.
 
 OS        | Compiler   | Versions |
@@ -300,9 +294,8 @@ GNU/Linux | Clang/LLVM | 3.5.0, 3.6.0, 7.0.0 |
 &nbsp;    | ICC        | 19       |
 macOS     | Xcode      | 8.3, 9, 10, 11 |
 
+## Building the tests
 
-Building the tests
-------------------
 To build the tests you need:
 
 - [CMake](http://cmake.org), version 2.8.12 or later to be installed and in your PATH.
@@ -333,9 +326,7 @@ Here we use c:\optional-lite\build-win-x86-vc10.
 
 All tests should pass, indicating your platform is supported and you are ready to use *optional lite*.
 
-
-Implementation notes
---------------------
+## Implementation notes
 
 ### Object allocation and alignment
 
@@ -370,16 +361,15 @@ The class template `alignment_of<>` is gleaned from [Boost.TypeTraits, alignment
 
 For more information on constructed unions and alignment, see [8-12].
 
+## Other implementations of optional
 
-Other implementations of optional
----------------------------------
 - Isabella Muerte. [MNMLSTC Core](https://github.com/mnmlstc/core) (C++11).
 - Andrzej Krzemieński. [optional (nullable) objects for C++14](https://github.com/akrzemi1/Optional). Reference implementation.
 - Simon Brand. [C++11/14/17 std::optional with functional-style extensions](https://github.com/TartanLlama/optional).
 - Daniela Engert. [boost20.optional, an educational C++20 implementation of Boost.Optional that also is-a C++20 std::optional](https://github.com/DanielaE/boost20.optional).
 
-Notes and references
---------------------
+## Notes and references
+
 [1] CppReference. [Optional](http://en.cppreference.com/w/cpp/utility/optional).
 
 [2] ISO/IEC WG21. [N4606, section 20.6 Optional objects](http://wg21.link/n4606). July 2016.
@@ -410,9 +400,7 @@ Notes and references
 
 [15] Martin Moene. [spike-expected](https://github.com/martinmoene/spike-expected) ([expected-lite.hpp](https://github.com/martinmoene/spike-expected/blob/master/exception_ptr_lite.hpp)).
 
-
-Appendix
---------
+## Appendix
 
 ### A.1 Compile-time information
 
@@ -424,7 +412,7 @@ The version of *optional lite* is available via tag `[.version]`. The following 
 <summary>click to expand</summary>
 <p>
 
-```
+```Text
 union: A C++03 union can only contain POD types
 optional: Allows to default construct an empty optional (1a)
 optional: Allows to explicitly construct a disengaged, empty optional via nullopt (1b)
@@ -495,5 +483,6 @@ make_optional: Allows to in-place move-construct optional from initializer-list 
 std::hash<>: Allows to obtain hash (C++11)
 tweak header: reads tweak header if supported [tweak]
 ```
+
 </p>
 </details>
