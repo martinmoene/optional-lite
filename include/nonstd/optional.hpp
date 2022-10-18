@@ -789,7 +789,7 @@ union storage_t
 
     void construct_value( value_type && v )
     {
-        ::new( value_ptr() ) value_type( std::move( v ) );
+        ::new( const_cast<void *>(static_cast<const volatile void *>(value_ptr())) ) value_type( std::move( v ) );
     }
 
     template< class... Args >
@@ -801,13 +801,13 @@ union storage_t
     template< class... Args >
     void emplace( Args&&... args )
     {
-        ::new( value_ptr() ) value_type( std::forward<Args>(args)... );
+        ::new( const_cast<void *>(static_cast<const volatile void *>(value_ptr())) ) value_type( std::forward<Args>(args)... );
     }
 
     template< class U, class... Args >
     void emplace( std::initializer_list<U> il, Args&&... args )
     {
-        ::new( value_ptr() ) value_type( il, std::forward<Args>(args)... );
+        ::new( const_cast<void *>(static_cast<const volatile void *>(value_ptr())) ) value_type( il, std::forward<Args>(args)... );
     }
 
 #endif

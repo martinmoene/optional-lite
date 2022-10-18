@@ -487,6 +487,20 @@ CASE( "optional: Allows to in-place construct from literal value (C++11, 6)" )
 #endif
 }
 
+CASE( "optional: Allows to in-place construct from literal value (C++11, 6, const)" )
+{
+#if optional_CPP11_OR_GREATER
+    using pair_t = std::pair<char, int>;
+
+    optional<const pair_t> a( in_place, 'a', 7 );
+
+    EXPECT( a->first  == 'a' );
+    EXPECT( a->second ==  7  );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
 CASE( "optional: Allows to in-place copy-construct from value (C++11, 6)" )
 {
 #if optional_CPP11_OR_GREATER
@@ -494,6 +508,23 @@ CASE( "optional: Allows to in-place copy-construct from value (C++11, 6)" )
     using pair_t = std::pair<char, S>;
 
     optional<pair_t> a( in_place, c, s );
+
+    EXPECT( a->first        == 'a' );
+    EXPECT( a->second.value ==  7  );
+    EXPECT( a->second.state == copy_constructed );
+    EXPECT(         s.state != moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to in-place copy-construct from value (C++11, 6, const)" )
+{
+#if optional_CPP11_OR_GREATER
+    char c = 'a'; S s( 7 );
+    using pair_t = std::pair<char, S>;
+
+    optional<const pair_t> a( in_place, c, s );
 
     EXPECT( a->first        == 'a' );
     EXPECT( a->second.value ==  7  );
@@ -537,6 +568,24 @@ CASE( "optional: Allows to in-place copy-construct from initializer-list (C++11,
 #else
     EXPECT( a->s.state == move_constructed );
 #endif
+    EXPECT(    s.state != moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to in-place copy-construct from initializer-list (C++11, 7, const)" )
+{
+#if optional_CPP11_OR_GREATER
+    S s( 7 );
+    optional<const InitList> a( in_place, { 7, 8, 9, }, 'a', s );
+
+    EXPECT( a->vec[0]  ==  7 );
+    EXPECT( a->vec[1]  ==  8 );
+    EXPECT( a->vec[2]  ==  9 );
+    EXPECT( a->c       == 'a');
+    EXPECT( a->s.value ==  7 );
+    EXPECT( a->s.state == copy_constructed );
     EXPECT(    s.state != moved_from       );
 #else
     EXPECT( !!"optional: in-place construction is not available (no C++11)" );
@@ -753,6 +802,24 @@ CASE( "optional: Allows to copy-emplace content from arguments (C++11, 7)" )
 #endif
 }
 
+CASE( "optional: Allows to copy-emplace content from arguments (C++11, 7, const)" )
+{
+#if optional_CPP11_OR_GREATER
+    using pair_t = std::pair<char, S>;
+    S s( 7 );
+    optional<const pair_t> a;
+
+    a.emplace( 'a', s );
+
+    EXPECT( a->first        == 'a' );
+    EXPECT( a->second.value ==  7  );
+    EXPECT( a->second.state == copy_constructed );
+    EXPECT(         s.state != moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
 CASE( "optional: Allows to move-emplace content from arguments (C++11, 7)" )
 {
 #if optional_CPP11_OR_GREATER
@@ -776,6 +843,26 @@ CASE( "optional: Allows to copy-emplace content from intializer-list and argumen
 #if optional_CPP11_OR_GREATER
     S s( 7 );
     optional<InitList> a;
+
+    a.emplace( { 7, 8, 9, }, 'a', s );
+
+    EXPECT( a->vec[0]  ==  7  );
+    EXPECT( a->vec[1]  ==  8  );
+    EXPECT( a->vec[2]  ==  9  );
+    EXPECT( a->c       == 'a' );
+    EXPECT( a->s.value ==  7  );
+    EXPECT( a->s.state == copy_constructed );
+    EXPECT(    s.state != moved_from       );
+#else
+    EXPECT( !!"optional: in-place construction is not available (no C++11)" );
+#endif
+}
+
+CASE( "optional: Allows to copy-emplace content from intializer-list and arguments (C++11, 8, const)" )
+{
+#if optional_CPP11_OR_GREATER
+    S s( 7 );
+    optional<const InitList> a;
 
     a.emplace( { 7, 8, 9, }, 'a', s );
 
