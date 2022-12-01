@@ -1205,7 +1205,7 @@ CASE( "optional: Allows to reset content" )
     EXPECT_NOT( a.has_value() );
 }
 
-// desctruction:
+// destruction:
 
 namespace destruction {
 
