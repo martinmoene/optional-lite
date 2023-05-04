@@ -1555,7 +1555,7 @@ private:
     void initialize( V && value )
     {
         assert( ! has_value()  );
-        contained.construct_value( std::move( value ) );
+        contained.construct_value( std::forward<V>( value ) );
         has_value_ = true;
     }
 
