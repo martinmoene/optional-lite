@@ -37,6 +37,11 @@ BUCKAROO_DEPS
 # Build folder
 /build/
 
+# CMake generated files.
+CMakeFiles
+*.cmake
+/Makefile
+
 # CodeBlocks IDE files
 *.layout
 
