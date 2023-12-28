@@ -1,0 +1,7 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "optional-lite",
+    hdrs = ["include/nonstd/optional.hpp"],
+    visibility = ["//visibility:public"],
+)
