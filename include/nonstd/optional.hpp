@@ -761,7 +761,7 @@ typedef
 /// C++03 constructed union to hold value.
 
 template< typename T >
-union storage_t
+struct storage_t
 {
 //private:
 //    template< typename > friend class optional;
@@ -929,7 +929,7 @@ public:
 /// optional
 
 template< typename T>
-class optional
+class optional : detail::storage_t< T >
 {
     optional_static_assert(( !std::is_same<typename std::remove_cv<T>::type, nullopt_t>::value  ),
         "T in optional<T> must not be of type 'nullopt_t'.")
@@ -945,6 +945,17 @@ private:
 
     typedef void (optional::*safe_bool)() const;
 
+    typedef detail::storage_t<T> storage_type;
+
+    storage_type& contained()
+    {
+        return static_cast<storage_type&>(*this);
+    }
+    const storage_type& contained() const
+    {
+        return static_cast<const storage_type&>(*this);
+    }
+
 public:
     typedef T value_type;
 
@@ -952,15 +963,15 @@ public:
 
     // 1a - default construct
     optional_constexpr optional() optional_noexcept
-    : has_value_( false )
-    , contained()
+    : storage_type()
+    , has_value_( false )
     {}
 
     // 1b - construct explicitly empty
     // NOLINTNEXTLINE( google-explicit-constructor, hicpp-explicit-conversions )
     optional_constexpr optional( nullopt_t /*unused*/ ) optional_noexcept
-    : has_value_( false )
-    , contained()
+        : storage_type()
+        , has_value_( false )
     {}
 
     // 2 - copy-construct
@@ -977,7 +988,7 @@ public:
     {
         if ( other.has_value() )
         {
-            contained.construct_value( other.contained.value() );
+            contained().construct_value( other.contained().value() );
         }
     }
 
@@ -997,7 +1008,7 @@ public:
     {
         if ( other.has_value() )
         {
-            contained.construct_value( std::move( other.contained.value() ) );
+            contained().construct_value( std::move( other.contained().value() ) );
         }
     }
 
@@ -1021,7 +1032,7 @@ public:
     {
         if ( other.has_value() )
         {
-            contained.construct_value( T{ other.contained.value() } );
+            contained().construct_value( T{ other.contained().value() } );
         }
     }
 #endif // optional_CPP11_OR_GREATER
@@ -1049,7 +1060,7 @@ public:
     {
         if ( other.has_value() )
         {
-            contained.construct_value( other.contained.value() );
+            contained().construct_value( other.contained().value() );
         }
     }
 
@@ -1076,7 +1087,7 @@ public:
     {
         if ( other.has_value() )
         {
-            contained.construct_value( T{ std::move( other.contained.value() ) } );
+            contained().construct_value( T{ std::move( other.contained().value() ) } );
         }
     }
 
@@ -1101,7 +1112,7 @@ public:
     {
         if ( other.has_value() )
         {
-            contained.construct_value( std::move( other.contained.value() ) );
+            contained().construct_value( std::move( other.contained().value() ) );
         }
     }
 
@@ -1112,8 +1123,8 @@ public:
         )
     >
     optional_constexpr explicit optional( nonstd_lite_in_place_t(T), Args&&... args )
-    : has_value_( true )
-    , contained( in_place, std::forward<Args>(args)... )
+        : storage_type( in_place, std::forward<Args>(args)... )
+        , has_value_( true )
     {}
 
     // 7 (C++11) - in-place construct,  initializer-list
@@ -1123,8 +1134,8 @@ public:
         )
     >
     optional_constexpr explicit optional( nonstd_lite_in_place_t(T), std::initializer_list<U> il, Args&&... args )
-    : has_value_( true )
-    , contained( T( il, std::forward<Args>(args)...) )
+        : storage_type( T( il, std::forward<Args>(args)...) )
+        , has_value_( true )
     {}
 
     // 8a (C++11) - explicit move construct from value
@@ -1137,8 +1148,8 @@ public:
         )
     >
     optional_constexpr explicit optional( U && value )
-    : has_value_( true )
-    , contained( nonstd_lite_in_place(T), std::forward<U>( value ) )
+        : storage_type( nonstd_lite_in_place(T), std::forward<U>( value ) )
+        , has_value_( true )
     {}
 
     // 8b (C++11) - non-explicit move construct from value
@@ -1152,16 +1163,16 @@ public:
     >
     // NOLINTNEXTLINE( google-explicit-constructor, hicpp-explicit-conversions )
     optional_constexpr /*non-explicit*/ optional( U && value )
-    : has_value_( true )
-    , contained( nonstd_lite_in_place(T), std::forward<U>( value ) )
+        : storage_type( nonstd_lite_in_place(T), std::forward<U>( value ) )
+        , has_value_( true )
     {}
 
 #else // optional_CPP11_OR_GREATER
 
     // 8 (C++98)
     optional( value_type const & value )
-    : has_value_( true )
-    , contained( value )
+        : storage_type( value )
+        , has_value_( true )
     {}
 
 #endif // optional_CPP11_OR_GREATER
@@ -1172,7 +1183,7 @@ public:
     {
         if ( has_value() )
         {
-            contained.destruct_value();
+            contained().destruct_value();
         }
     }
 
@@ -1205,7 +1216,7 @@ public:
     {
         if      ( (has_value() == true ) && (other.has_value() == false) ) { reset(); }
         else if ( (has_value() == false) && (other.has_value() == true ) ) { initialize( *other ); }
-        else if ( (has_value() == true ) && (other.has_value() == true ) ) { contained.value() = *other; }
+        else if ( (has_value() == true ) && (other.has_value() == true ) ) { contained().value() = *other; }
         return *this;
     }
 
@@ -1223,7 +1234,7 @@ public:
     {
         if      ( (has_value() == true ) && (other.has_value() == false) ) { reset(); }
         else if ( (has_value() == false) && (other.has_value() == true ) ) { initialize( std::move( *other ) ); }
-        else if ( (has_value() == true ) && (other.has_value() == true ) ) { contained.value() = std::move( *other ); }
+        else if ( (has_value() == true ) && (other.has_value() == true ) ) { contained().value() = std::move( *other ); }
         return *this;
     }
 
@@ -1242,7 +1253,7 @@ public:
     {
         if ( has_value() )
         {
-            contained.value() = std::forward<U>( value );
+            contained().value() = std::forward<U>( value );
         }
         else
         {
@@ -1257,7 +1268,7 @@ public:
     template< typename U /*= T*/ >
     optional & operator=( U const & value )
     {
-        if ( has_value() ) contained.value() = value;
+        if ( has_value() ) contained().value() = value;
         else               initialize( T( value ) );
         return *this;
     }
@@ -1329,9 +1340,9 @@ public:
     T& emplace( Args&&... args )
     {
         *this = nullopt;
-        contained.emplace( std::forward<Args>(args)...  );
+        contained().emplace( std::forward<Args>(args)...  );
         has_value_ = true;
-        return contained.value();
+        return contained().value();
     }
 
     // 8 (C++11) - emplace, initializer-list
@@ -1343,9 +1354,9 @@ public:
     T& emplace( std::initializer_list<U> il, Args&&... args )
     {
         *this = nullopt;
-        contained.emplace( il, std::forward<Args>(args)...  );
+        contained().emplace( il, std::forward<Args>(args)...  );
         has_value_ = true;
-        return contained.value();
+        return contained().value();
     }
 
 #endif // optional_CPP11_OR_GREATER
@@ -1371,25 +1382,25 @@ public:
     optional_constexpr value_type const * operator ->() const
     {
         return assert( has_value() ),
-            contained.value_ptr();
+            contained().value_ptr();
     }
 
     optional_constexpr14 value_type * operator ->()
     {
         return assert( has_value() ),
-            contained.value_ptr();
+            contained().value_ptr();
     }
 
     optional_constexpr value_type const & operator *() const optional_ref_qual
     {
         return assert( has_value() ),
-            contained.value();
+            contained().value();
     }
 
     optional_constexpr14 value_type & operator *() optional_ref_qual
     {
         return assert( has_value() ),
-            contained.value();
+            contained().value();
     }
 
 #if optional_HAVE( REF_QUALIFIER )
@@ -1435,7 +1446,7 @@ public:
             throw bad_optional_access();
         }
 #endif
-        return contained.value();
+        return contained().value();
     }
 
     optional_constexpr14 value_type & value() optional_ref_qual
@@ -1448,7 +1459,7 @@ public:
             throw bad_optional_access();
         }
 #endif
-        return contained.value();
+        return contained().value();
     }
 
 #if optional_HAVE( REF_QUALIFIER )  &&  ( !optional_COMPILER_GNUC_VERSION || optional_COMPILER_GNUC_VERSION >= 490 )
@@ -1471,16 +1482,16 @@ public:
     template< typename U >
     optional_constexpr value_type value_or( U && v ) const optional_ref_qual
     {
-        return has_value() ? contained.value() : static_cast<T>(std::forward<U>( v ) );
+        return has_value() ? contained().value() : static_cast<T>(std::forward<U>( v ) );
     }
 
     template< typename U >
     optional_constexpr14 value_type value_or( U && v ) optional_refref_qual
     {
 #if optional_COMPILER_CLANG_VERSION
-        return has_value() ? /*std::move*/( contained.value() ) : static_cast<T>(std::forward<U>( v ) );
+        return has_value() ? /*std::move*/( contained().value() ) : static_cast<T>(std::forward<U>( v ) );
 #else
-        return has_value() ? std::move( contained.value() ) : static_cast<T>(std::forward<U>( v ) );
+        return has_value() ? std::move( contained().value() ) : static_cast<T>(std::forward<U>( v ) );
 #endif
     }
 
@@ -1489,7 +1500,7 @@ public:
     template< typename U >
     optional_constexpr value_type value_or( U const & v ) const
     {
-        return has_value() ? contained.value() : static_cast<value_type>( v );
+        return has_value() ? contained().value() : static_cast<value_type>( v );
     }
 
 #endif // optional_HAVE( REF_QUALIFIER )
@@ -1500,7 +1511,7 @@ public:
     template< typename F >
     optional_constexpr value_type value_or_eval( F f ) const &
     {
-        return has_value() ? contained.value() : f();
+        return has_value() ? contained().value() : f();
     }
 
     template< typename F >
@@ -1508,7 +1519,7 @@ public:
     {
         if ( has_value() )
         {
-            return std::move( contained.value() );
+            return std::move( contained().value() );
         }
         else
         {
@@ -1521,7 +1532,7 @@ public:
     template< typename F >
     optional_constexpr value_type value_or_eval( F f ) const
     {
-        return has_value() ? contained.value() : f();
+        return has_value() ? contained().value() : f();
     }
 
 #endif //  optional_HAVE( REF_QUALIFIER )
@@ -1533,7 +1544,7 @@ public:
     {
         if ( has_value() )
         {
-            contained.destruct_value();
+            contained().destruct_value();
         }
 
         has_value_ = false;
@@ -1546,7 +1557,7 @@ private:
     void initialize( V const & value )
     {
         assert( ! has_value()  );
-        contained.construct_value( value );
+        contained().construct_value( value );
         has_value_ = true;
     }
 
@@ -1555,7 +1566,7 @@ private:
     void initialize( V && value )
     {
         assert( ! has_value()  );
-        contained.construct_value( std::forward<V>( value ) );
+        contained().construct_value( std::forward<V>( value ) );
         has_value_ = true;
     }
 
@@ -1563,7 +1574,6 @@ private:
 
 private:
     bool has_value_;
-    detail::storage_t< value_type > contained;
 
 };
 
