@@ -768,7 +768,15 @@ struct storage_t
 
     typedef T value_type;
 
-    storage_t() optional_is_default
+    ~storage_t()
+    {
+        if ( has_value )
+        {
+            destruct_value();
+        }
+    }
+
+    storage_t() : has_value(false) {}
 
     explicit storage_t( value_type const & v )
     {
@@ -778,6 +786,7 @@ struct storage_t
     void construct_value( value_type const & v )
     {
         ::new( value_ptr() ) value_type( v );
+        has_value = true;
     }
 
 #if optional_CPP11_OR_GREATER
@@ -790,6 +799,7 @@ struct storage_t
     void construct_value( value_type && v )
     {
         ::new( const_cast<void *>(static_cast<const volatile void *>(value_ptr())) ) value_type( std::move( v ) );
+        has_value = true;
     }
 
     template< class... Args >
@@ -802,19 +812,23 @@ struct storage_t
     void emplace( Args&&... args )
     {
         ::new( const_cast<void *>(static_cast<const volatile void *>(value_ptr())) ) value_type( std::forward<Args>(args)... );
+        has_value = true;
     }
 
     template< class U, class... Args >
     void emplace( std::initializer_list<U> il, Args&&... args )
     {
         ::new( const_cast<void *>(static_cast<const volatile void *>(value_ptr())) ) value_type( il, std::forward<Args>(args)... );
+        has_value = true;
     }
 
 #endif
 
     void destruct_value()
     {
+        assert( has_value );
         value_ptr()->~T();
+        has_value = false;
     }
 
     optional_nodiscard value_type const * value_ptr() const
@@ -829,11 +843,13 @@ struct storage_t
 
     optional_nodiscard value_type const & value() const optional_ref_qual
     {
+        assert( has_value );
         return * value_ptr();
     }
 
     value_type & value() optional_ref_qual
     {
+        assert( has_value );
         return * value_ptr();
     }
 
@@ -873,6 +889,8 @@ struct storage_t
 
 #endif // optional_CONFIG_MAX_ALIGN_HACK
 
+    bool has_value;
+
     optional_nodiscard void * ptr() optional_noexcept
     {
         return &data;
@@ -880,6 +898,7 @@ struct storage_t
 
     optional_nodiscard void const * ptr() const optional_noexcept
     {
+        assert( has_value );
         return &data;
     }
 
@@ -964,14 +983,12 @@ public:
     // 1a - default construct
     optional_constexpr optional() optional_noexcept
     : storage_type()
-    , has_value_( false )
     {}
 
     // 1b - construct explicitly empty
     // NOLINTNEXTLINE( google-explicit-constructor, hicpp-explicit-conversions )
     optional_constexpr optional( nullopt_t /*unused*/ ) optional_noexcept
         : storage_type()
-        , has_value_( false )
     {}
 
     // 2 - copy-construct
@@ -984,7 +1001,6 @@ public:
     // >
 #endif
     optional_constexpr14 optional( optional const & other )
-    : has_value_( other.has_value() )
     {
         if ( other.has_value() )
         {
@@ -1004,7 +1020,6 @@ public:
     optional_constexpr14 optional( optional && other )
     // NOLINTNEXTLINE( performance-noexcept-move-constructor )
         noexcept( std11::is_nothrow_move_constructible<T>::value )
-    : has_value_( other.has_value() )
     {
         if ( other.has_value() )
         {
@@ -1028,7 +1043,6 @@ public:
         )
     >
     explicit optional( optional<U> const & other )
-    : has_value_( other.has_value() )
     {
         if ( other.has_value() )
         {
@@ -1056,7 +1070,6 @@ public:
     >
     // NOLINTNEXTLINE( google-explicit-constructor, hicpp-explicit-conversions )
     /*non-explicit*/ optional( optional<U> const & other )
-    : has_value_( other.has_value() )
     {
         if ( other.has_value() )
         {
@@ -1081,9 +1094,7 @@ public:
             && !std::is_convertible<                     U &&, T>::value /*=> explicit */
         )
     >
-    explicit optional( optional<U> && other
-    )
-    : has_value_( other.has_value() )
+    explicit optional( optional<U> && other)
     {
         if ( other.has_value() )
         {
@@ -1108,7 +1119,6 @@ public:
     >
     // NOLINTNEXTLINE( google-explicit-constructor, hicpp-explicit-conversions )
     /*non-explicit*/ optional( optional<U> && other )
-    : has_value_( other.has_value() )
     {
         if ( other.has_value() )
         {
@@ -1124,7 +1134,6 @@ public:
     >
     optional_constexpr explicit optional( nonstd_lite_in_place_t(T), Args&&... args )
         : storage_type( in_place, std::forward<Args>(args)... )
-        , has_value_( true )
     {}
 
     // 7 (C++11) - in-place construct,  initializer-list
@@ -1135,7 +1144,6 @@ public:
     >
     optional_constexpr explicit optional( nonstd_lite_in_place_t(T), std::initializer_list<U> il, Args&&... args )
         : storage_type( T( il, std::forward<Args>(args)...) )
-        , has_value_( true )
     {}
 
     // 8a (C++11) - explicit move construct from value
@@ -1149,7 +1157,6 @@ public:
     >
     optional_constexpr explicit optional( U && value )
         : storage_type( nonstd_lite_in_place(T), std::forward<U>( value ) )
-        , has_value_( true )
     {}
 
     // 8b (C++11) - non-explicit move construct from value
@@ -1164,7 +1171,6 @@ public:
     // NOLINTNEXTLINE( google-explicit-constructor, hicpp-explicit-conversions )
     optional_constexpr /*non-explicit*/ optional( U && value )
         : storage_type( nonstd_lite_in_place(T), std::forward<U>( value ) )
-        , has_value_( true )
     {}
 
 #else // optional_CPP11_OR_GREATER
@@ -1172,20 +1178,12 @@ public:
     // 8 (C++98)
     optional( value_type const & value )
         : storage_type( value )
-        , has_value_( true )
     {}
 
 #endif // optional_CPP11_OR_GREATER
 
     // x.x.3.2, destructor
-
-    ~optional()
-    {
-        if ( has_value() )
-        {
-            contained().destruct_value();
-        }
-    }
+    // defaulted
 
     // x.x.3.3, assignment
 
@@ -1341,7 +1339,6 @@ public:
     {
         *this = nullopt;
         contained().emplace( std::forward<Args>(args)...  );
-        has_value_ = true;
         return contained().value();
     }
 
@@ -1355,7 +1352,6 @@ public:
     {
         *this = nullopt;
         contained().emplace( il, std::forward<Args>(args)...  );
-        has_value_ = true;
         return contained().value();
     }
 
@@ -1381,26 +1377,22 @@ public:
 
     optional_constexpr value_type const * operator ->() const
     {
-        return assert( has_value() ),
-            contained().value_ptr();
+        return contained().value_ptr();
     }
 
     optional_constexpr14 value_type * operator ->()
     {
-        return assert( has_value() ),
-            contained().value_ptr();
+        return contained().value_ptr();
     }
 
     optional_constexpr value_type const & operator *() const optional_ref_qual
     {
-        return assert( has_value() ),
-            contained().value();
+        return contained().value();
     }
 
     optional_constexpr14 value_type & operator *() optional_ref_qual
     {
-        return assert( has_value() ),
-            contained().value();
+        return contained().value();
     }
 
 #if optional_HAVE( REF_QUALIFIER )
@@ -1432,7 +1424,7 @@ public:
     // NOLINTNEXTLINE( modernize-use-nodiscard )
     /*optional_nodiscard*/ optional_constexpr bool has_value() const optional_noexcept
     {
-        return has_value_;
+        return contained().has_value;
     }
 
     // NOLINTNEXTLINE( modernize-use-nodiscard )
@@ -1546,8 +1538,6 @@ public:
         {
             contained().destruct_value();
         }
-
-        has_value_ = false;
     }
 
 private:
@@ -1558,7 +1548,6 @@ private:
     {
         assert( ! has_value()  );
         contained().construct_value( value );
-        has_value_ = true;
     }
 
 #if optional_CPP11_OR_GREATER
@@ -1567,13 +1556,9 @@ private:
     {
         assert( ! has_value()  );
         contained().construct_value( std::forward<V>( value ) );
-        has_value_ = true;
     }
 
 #endif
-
-private:
-    bool has_value_;
 
 };
 
