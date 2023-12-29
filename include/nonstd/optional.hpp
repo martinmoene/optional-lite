@@ -365,6 +365,7 @@ namespace nonstd {
 #define optional_HAVE_IS_NOTHROW_MOVE_CONSTRUCTIBLE     optional_CPP11_110_C350
 #define optional_HAVE_IS_TRIVIALLY_COPY_CONSTRUCTIBLE   optional_CPP11_110_C350_G500
 #define optional_HAVE_IS_TRIVIALLY_MOVE_CONSTRUCTIBLE   optional_CPP11_110_C350_G500
+#define optional_HAVE_IS_TRIVIALLY_DESTRUCTIBLE         optional_CPP11_110_C350_G500
 
 // C++ feature usage:
 
@@ -520,6 +521,12 @@ typedef bool_constant< false > false_type;
     using std::is_trivially_move_constructible;
 #else
     template< class T > struct is_trivially_move_constructible : std11::true_type{};
+#endif
+
+#if optional_HAVE( IS_TRIVIALLY_DESTRUCTIBLE )
+    using std::is_trivially_destructible;
+#else
+    template< class T > struct is_trivially_destructible : std11::false_type{};
 #endif
 
 } // namespace std11
@@ -758,15 +765,17 @@ typedef
 
 #endif // optional_CONFIG_MAX_ALIGN_HACK
 
-template <typename T, bool = false>
+template <typename T, class = void>
 struct base_storage_t
 {
     typedef T value_type;
 
 #if optional_CPP11_OR_GREATER
 
-    using aligned_storage_t = typename std::aligned_storage< sizeof(value_type), alignof(value_type) >::type;
-    aligned_storage_t data;
+    union {
+        bool dummy = {};
+        T data;
+    };
 
 #elif optional_CONFIG_MAX_ALIGN_HACK
 
@@ -799,26 +808,107 @@ struct base_storage_t
         : has_value( false )
     {}
 
+    base_storage_t(base_storage_t const & other)
+        : has_value ( other.has_value
+                      ? ( ::new( (void*)&data ) value_type( *other.value_ptr() ) , true)
+                      : false )
+    {}
+
 
 #if !optional_CPP11_OR_GREATER
 
-    base_storage_t( value_type const & v )
+    base_storage_t( nonstd_lite_in_place_t(T), value_type const & v )
         : has_value( true )
     {
-        ::new( &data ) value_type( v );
+        ::new( (void*)&data ) value_type( v );
+    }
+
+    value_type * value_ptr()
+    {
+        return (T*)&data;
+    }
+    const value_type * value_ptr() const
+    {
+        return (const T*)&data;
     }
 
 #else
+
+    base_storage_t(base_storage_t && other)
+        : has_value ( other.has_value
+                      ? ( ::new( (void*)&data ) value_type( std::move(*other.value_ptr()) ) , true)
+                      : false )
+    {}
 
     template< class... Args >
     base_storage_t( nonstd_lite_in_place_t(T), Args&&... args)
         : has_value( true )
     {
-        ::new( &data ) value_type( std::forward<Args>(args)... );
+        ::new( (void*)&data ) value_type( std::forward<Args>(args)... );
+    }
+
+    optional_constexpr14
+    value_type * value_ptr()
+    {
+        return &data;
+    }
+    optional_constexpr
+    const value_type * value_ptr() const
+    {
+        return &data;
     }
 
 #endif
 };
+
+#if optional_CPP11_OR_GREATER
+
+template <typename T>
+struct base_storage_t<
+    T,
+    typename std::enable_if<
+        std::is_trivially_destructible<T>::value
+        and
+        std::is_trivially_copy_constructible<T>::value
+        >::type
+    >
+{
+    using value_type = T;
+
+    union {
+        bool dummy = {};
+        value_type data;
+    };
+
+    bool has_value = false;
+
+    optional_constexpr base_storage_t()
+        : has_value { false }
+    {}
+
+    base_storage_t(base_storage_t const&) = default;
+    base_storage_t(base_storage_t &&) = default;
+
+    template< class... Args >
+    optional_constexpr base_storage_t( nonstd_lite_in_place_t(T), Args&&... args)
+        : data{ std::forward<Args>(args)... }
+        , has_value{ true }
+    {}
+
+    optional_constexpr14
+    value_type * value_ptr()
+    {
+        return &data;
+    }
+    optional_constexpr
+    const value_type * value_ptr() const
+    {
+        return &data;
+    }
+
+};
+
+#endif
 
 /// C++03 constructed union to hold value.
 
@@ -830,22 +920,35 @@ struct storage_t : base_storage_t<T>
 
     typedef T value_type;
 
+    optional_constexpr
     storage_t() : base_storage_t<T>() {}
 
-    explicit storage_t( value_type const & v )
-        : base_storage_t<T>( v )
+    optional_constexpr
+    storage_t( storage_t const & other )
+        : base_storage_t<T>( static_cast<base_storage_t<T> const &>(other) )
+    {}
+
+    optional_constexpr
+    explicit storage_t( nonstd_lite_in_place_t(T), value_type const & v )
+        : base_storage_t<T>( in_place, v )
     {}
 
     void copy_construct_value( value_type const & v )
     {
         assert( not this->has_value );
-        ::new( value_ptr() ) value_type( v );
+        ::new( this->value_ptr() ) value_type( v );
         this->has_value = true;
     }
 
 #if optional_CPP11_OR_GREATER
 
+    optional_constexpr
+    storage_t( storage_t && other )
+        : base_storage_t<T>( static_cast<base_storage_t<T>&&>(other) )
+    {}
+
     template< class... Args >
+    optional_constexpr
     storage_t( nonstd_lite_in_place_t(T), Args&&... args )
         : base_storage_t<T>( in_place, std::forward<Args>(args)... )
     {}
@@ -853,14 +956,14 @@ struct storage_t : base_storage_t<T>
     template< class... Args >
     void emplace( Args&&... args )
     {
-        ::new( const_cast<void *>(static_cast<const volatile void *>(value_ptr())) ) value_type( std::forward<Args>(args)... );
+        ::new( const_cast<void *>(static_cast<const volatile void *>(this->value_ptr())) ) value_type( std::forward<Args>(args)... );
         this->has_value = true;
     }
 
     template< class U, class... Args >
     void emplace( std::initializer_list<U> il, Args&&... args )
     {
-        ::new( const_cast<void *>(static_cast<const volatile void *>(value_ptr())) ) value_type( il, std::forward<Args>(args)... );
+        ::new( const_cast<void *>(static_cast<const volatile void *>(this->value_ptr())) ) value_type( il, std::forward<Args>(args)... );
         this->has_value = true;
     }
 
@@ -869,39 +972,33 @@ struct storage_t : base_storage_t<T>
     void destruct_value()
     {
         assert( this->has_value );
-        value_ptr()->~T();
+        this->value_ptr()->~T();
         this->has_value = false;
     }
 
-    optional_nodiscard value_type const * value_ptr() const
-    {
-        return as<value_type>();
-    }
-
-    value_type * value_ptr()
-    {
-        return as<value_type>();
-    }
-
+    optional_constexpr14
     optional_nodiscard value_type const & value() const optional_ref_qual
     {
         assert( this->has_value );
-        return * value_ptr();
+        return * this->value_ptr();
     }
 
+    optional_constexpr14
     value_type & value() optional_ref_qual
     {
         assert( this->has_value );
-        return * value_ptr();
+        return * this->value_ptr();
     }
 
 #if optional_HAVE( REF_QUALIFIER )
 
+    optional_constexpr14
     optional_nodiscard value_type const && value() const optional_refref_qual
     {
         return std::move( value() );
     }
 
+    optional_constexpr14
     value_type && value() optional_refref_qual
     {
         return std::move( value() );
@@ -909,27 +1006,6 @@ struct storage_t : base_storage_t<T>
 
 #endif
 
-    optional_nodiscard void * ptr() optional_noexcept
-    {
-        return &this->data;
-    }
-
-    optional_nodiscard void const * ptr() const optional_noexcept
-    {
-        return &this->data;
-    }
-
-    template <typename U>
-    optional_nodiscard U * as()
-    {
-        return reinterpret_cast<U*>( ptr() );
-    }
-
-    template <typename U>
-    optional_nodiscard U const * as() const
-    {
-        return reinterpret_cast<U const *>( ptr() );
-    }
 };
 
 } // namespace detail
@@ -983,10 +1059,12 @@ private:
 
     typedef detail::storage_t<T> storage_type;
 
+    optional_constexpr14
     storage_type& contained()
     {
         return static_cast<storage_type&>(*this);
     }
+    optional_constexpr
     const storage_type& contained() const
     {
         return static_cast<const storage_type&>(*this);
@@ -1018,12 +1096,8 @@ public:
     // >
 #endif
     optional_constexpr14 optional( optional const & other )
-    {
-        if ( other.has_value() )
-        {
-            contained().copy_construct_value( other.contained().value() );
-        }
-    }
+        : storage_type( static_cast<storage_type const &>(other) )
+    {}
 
 #if optional_CPP11_OR_GREATER
 
@@ -1037,12 +1111,8 @@ public:
     optional_constexpr14 optional( optional && other )
     // NOLINTNEXTLINE( performance-noexcept-move-constructor )
         noexcept( std11::is_nothrow_move_constructible<T>::value )
-    {
-        if ( other.has_value() )
-        {
-            contained().emplace( std::move( other.contained().value() ) );
-        }
-    }
+        : storage_type( static_cast<storage_type&&>(other) )
+    {}
 
     // 4a (C++11) - explicit converting copy-construct from optional
     template< typename U
@@ -1060,12 +1130,10 @@ public:
         )
     >
     explicit optional( optional<U> const & other )
-    {
-        if ( other.has_value() )
-        {
-            contained().emplace( T{ other.contained().value() } );
-        }
-    }
+    : storage_type( other.has_value()
+                    ? storage_type( in_place, T( other.value() ) )
+                    : storage_type() )
+    {}
 #endif // optional_CPP11_OR_GREATER
 
     // 4b (C++98 and later) - non-explicit converting copy-construct from optional
@@ -1087,12 +1155,10 @@ public:
     >
     // NOLINTNEXTLINE( google-explicit-constructor, hicpp-explicit-conversions )
     /*non-explicit*/ optional( optional<U> const & other )
-    {
-        if ( other.has_value() )
-        {
-            contained().copy_construct_value( other.contained().value() );
-        }
-    }
+    : storage_type( other.has_value()
+                    ? storage_type( in_place, other.value() )
+                    : storage_type() )
+    {}
 
 #if optional_CPP11_OR_GREATER
 
@@ -1112,12 +1178,10 @@ public:
         )
     >
     explicit optional( optional<U> && other)
-    {
-        if ( other.has_value() )
-        {
-            contained().emplace( T{ std::move( other.contained().value() ) } );
-        }
-    }
+    : storage_type( other.has_value()
+                    ? storage_type( in_place, T( std::move(other.value()) ) )
+                    : storage_type() )
+    {}
 
     // 5a (C++11) - non-explicit converting move-construct from optional
     template< typename U
@@ -1136,12 +1200,10 @@ public:
     >
     // NOLINTNEXTLINE( google-explicit-constructor, hicpp-explicit-conversions )
     /*non-explicit*/ optional( optional<U> && other )
-    {
-        if ( other.has_value() )
-        {
-            contained().emplace( std::move( other.contained().value() ) );
-        }
-    }
+    : storage_type( other.has_value()
+                    ? storage_type( in_place, std::move(other.value()) )
+                    : storage_type() )
+    {}
 
     // 6 (C++11) - in-place construct
     template< typename... Args
@@ -1194,7 +1256,7 @@ public:
 
     // 8 (C++98)
     optional( value_type const & value )
-        : storage_type( value )
+        : storage_type( in_place, value )
     {}
 
 #endif // optional_CPP11_OR_GREATER
@@ -1445,7 +1507,9 @@ public:
     }
 
     // NOLINTNEXTLINE( modernize-use-nodiscard )
-    /*optional_nodiscard*/ optional_constexpr14 value_type const & value() const optional_ref_qual
+    /*optional_nodiscard*/
+    optional_constexpr14
+    value_type const & value() const optional_ref_qual
     {
 #if optional_CONFIG_NO_EXCEPTIONS
         assert( has_value() );
@@ -1458,7 +1522,8 @@ public:
         return contained().value();
     }
 
-    optional_constexpr14 value_type & value() optional_ref_qual
+    optional_constexpr14
+    value_type & value() optional_ref_qual
     {
 #if optional_CONFIG_NO_EXCEPTIONS
         assert( has_value() );
@@ -1474,12 +1539,15 @@ public:
 #if optional_HAVE( REF_QUALIFIER )  &&  ( !optional_COMPILER_GNUC_VERSION || optional_COMPILER_GNUC_VERSION >= 490 )
 
     // NOLINTNEXTLINE( modernize-use-nodiscard )
-    /*optional_nodiscard*/ optional_constexpr value_type const && value() const optional_refref_qual
+    /*optional_nodiscard*/
+    optional_constexpr14
+    value_type const && value() const optional_refref_qual
     {
         return std::move( value() );
     }
 
-    optional_constexpr14 value_type && value() optional_refref_qual
+    optional_constexpr14
+    value_type && value() optional_refref_qual
     {
         return std::move( value() );
     }

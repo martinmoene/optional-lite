@@ -201,6 +201,22 @@ CASE( "optional: Allows to default construct an empty optional (1a)" )
     EXPECT( !a );
 }
 
+CASE( "optional: usable in constant expression context" )
+{
+#if optional_CPP14_OR_GREATER
+
+    static constexpr optional<int> a;
+    static_assert(not a, "");
+
+    static constexpr optional<int> b{1};
+    static_assert(b, "");
+    static_assert(1 == b.value(), "");
+
+#else
+    EXPECT( !!"optional: not constructible in constant expressions" );
+#endif
+}
+
 CASE( "optional: Allows to explicitly construct a disengaged, empty optional via nullopt (1b)" )
 {
     optional<int> a( nullopt );
