@@ -758,114 +758,10 @@ typedef
 
 #endif // optional_CONFIG_MAX_ALIGN_HACK
 
-/// C++03 constructed union to hold value.
-
-template< typename T >
-struct storage_t
+template <typename T, bool = false>
+struct base_storage_t
 {
-//private:
-//    template< typename > friend class optional;
-
     typedef T value_type;
-
-    ~storage_t()
-    {
-        if ( has_value )
-        {
-            destruct_value();
-        }
-    }
-
-    storage_t() : has_value(false) {}
-
-    explicit storage_t( value_type const & v )
-    {
-        construct_value( v );
-    }
-
-    void construct_value( value_type const & v )
-    {
-        ::new( value_ptr() ) value_type( v );
-        has_value = true;
-    }
-
-#if optional_CPP11_OR_GREATER
-
-    explicit storage_t( value_type && v )
-    {
-        construct_value( std::move( v ) );
-    }
-
-    void construct_value( value_type && v )
-    {
-        ::new( const_cast<void *>(static_cast<const volatile void *>(value_ptr())) ) value_type( std::move( v ) );
-        has_value = true;
-    }
-
-    template< class... Args >
-    storage_t( nonstd_lite_in_place_t(T), Args&&... args )
-    {
-        emplace( std::forward<Args>(args)... );
-    }
-
-    template< class... Args >
-    void emplace( Args&&... args )
-    {
-        ::new( const_cast<void *>(static_cast<const volatile void *>(value_ptr())) ) value_type( std::forward<Args>(args)... );
-        has_value = true;
-    }
-
-    template< class U, class... Args >
-    void emplace( std::initializer_list<U> il, Args&&... args )
-    {
-        ::new( const_cast<void *>(static_cast<const volatile void *>(value_ptr())) ) value_type( il, std::forward<Args>(args)... );
-        has_value = true;
-    }
-
-#endif
-
-    void destruct_value()
-    {
-        assert( has_value );
-        value_ptr()->~T();
-        has_value = false;
-    }
-
-    optional_nodiscard value_type const * value_ptr() const
-    {
-        return as<value_type>();
-    }
-
-    value_type * value_ptr()
-    {
-        return as<value_type>();
-    }
-
-    optional_nodiscard value_type const & value() const optional_ref_qual
-    {
-        assert( has_value );
-        return * value_ptr();
-    }
-
-    value_type & value() optional_ref_qual
-    {
-        assert( has_value );
-        return * value_ptr();
-    }
-
-#if optional_HAVE( REF_QUALIFIER )
-
-    optional_nodiscard value_type const && value() const optional_refref_qual
-    {
-        return std::move( value() );
-    }
-
-    value_type && value() optional_refref_qual
-    {
-        return std::move( value() );
-    }
-
-#endif
 
 #if optional_CPP11_OR_GREATER
 
@@ -891,15 +787,136 @@ struct storage_t
 
     bool has_value;
 
+    ~base_storage_t()
+    {
+        if ( has_value )
+        {
+            reinterpret_cast<T*>(&data)->~T();
+        }
+    }
+
+    base_storage_t()
+        : has_value( false )
+    {}
+
+
+#if !optional_CPP11_OR_GREATER
+
+    base_storage_t( value_type const & v )
+        : has_value( true )
+    {
+        ::new( &data ) value_type( v );
+    }
+
+#else
+
+    template< class... Args >
+    base_storage_t( nonstd_lite_in_place_t(T), Args&&... args)
+        : has_value( true )
+    {
+        ::new( &data ) value_type( std::forward<Args>(args)... );
+    }
+
+#endif
+};
+
+/// C++03 constructed union to hold value.
+
+template< typename T >
+struct storage_t : base_storage_t<T>
+{
+//private:
+//    template< typename > friend class optional;
+
+    typedef T value_type;
+
+    storage_t() : base_storage_t<T>() {}
+
+    explicit storage_t( value_type const & v )
+        : base_storage_t<T>( v )
+    {}
+
+    void copy_construct_value( value_type const & v )
+    {
+        assert( not this->has_value );
+        ::new( value_ptr() ) value_type( v );
+        this->has_value = true;
+    }
+
+#if optional_CPP11_OR_GREATER
+
+    template< class... Args >
+    storage_t( nonstd_lite_in_place_t(T), Args&&... args )
+        : base_storage_t<T>( in_place, std::forward<Args>(args)... )
+    {}
+
+    template< class... Args >
+    void emplace( Args&&... args )
+    {
+        ::new( const_cast<void *>(static_cast<const volatile void *>(value_ptr())) ) value_type( std::forward<Args>(args)... );
+        this->has_value = true;
+    }
+
+    template< class U, class... Args >
+    void emplace( std::initializer_list<U> il, Args&&... args )
+    {
+        ::new( const_cast<void *>(static_cast<const volatile void *>(value_ptr())) ) value_type( il, std::forward<Args>(args)... );
+        this->has_value = true;
+    }
+
+#endif
+
+    void destruct_value()
+    {
+        assert( this->has_value );
+        value_ptr()->~T();
+        this->has_value = false;
+    }
+
+    optional_nodiscard value_type const * value_ptr() const
+    {
+        return as<value_type>();
+    }
+
+    value_type * value_ptr()
+    {
+        return as<value_type>();
+    }
+
+    optional_nodiscard value_type const & value() const optional_ref_qual
+    {
+        assert( this->has_value );
+        return * value_ptr();
+    }
+
+    value_type & value() optional_ref_qual
+    {
+        assert( this->has_value );
+        return * value_ptr();
+    }
+
+#if optional_HAVE( REF_QUALIFIER )
+
+    optional_nodiscard value_type const && value() const optional_refref_qual
+    {
+        return std::move( value() );
+    }
+
+    value_type && value() optional_refref_qual
+    {
+        return std::move( value() );
+    }
+
+#endif
+
     optional_nodiscard void * ptr() optional_noexcept
     {
-        return &data;
+        return &this->data;
     }
 
     optional_nodiscard void const * ptr() const optional_noexcept
     {
-        assert( has_value );
-        return &data;
+        return &this->data;
     }
 
     template <typename U>
@@ -1004,7 +1021,7 @@ public:
     {
         if ( other.has_value() )
         {
-            contained().construct_value( other.contained().value() );
+            contained().copy_construct_value( other.contained().value() );
         }
     }
 
@@ -1023,7 +1040,7 @@ public:
     {
         if ( other.has_value() )
         {
-            contained().construct_value( std::move( other.contained().value() ) );
+            contained().emplace( std::move( other.contained().value() ) );
         }
     }
 
@@ -1046,7 +1063,7 @@ public:
     {
         if ( other.has_value() )
         {
-            contained().construct_value( T{ other.contained().value() } );
+            contained().emplace( T{ other.contained().value() } );
         }
     }
 #endif // optional_CPP11_OR_GREATER
@@ -1073,7 +1090,7 @@ public:
     {
         if ( other.has_value() )
         {
-            contained().construct_value( other.contained().value() );
+            contained().copy_construct_value( other.contained().value() );
         }
     }
 
@@ -1098,7 +1115,7 @@ public:
     {
         if ( other.has_value() )
         {
-            contained().construct_value( T{ std::move( other.contained().value() ) } );
+            contained().emplace( T{ std::move( other.contained().value() ) } );
         }
     }
 
@@ -1122,7 +1139,7 @@ public:
     {
         if ( other.has_value() )
         {
-            contained().construct_value( std::move( other.contained().value() ) );
+            contained().emplace( std::move( other.contained().value() ) );
         }
     }
 
@@ -1143,7 +1160,7 @@ public:
         )
     >
     optional_constexpr explicit optional( nonstd_lite_in_place_t(T), std::initializer_list<U> il, Args&&... args )
-        : storage_type( T( il, std::forward<Args>(args)...) )
+        : storage_type( in_place, T( il, std::forward<Args>(args)...) )
     {}
 
     // 8a (C++11) - explicit move construct from value
@@ -1547,7 +1564,7 @@ private:
     void initialize( V const & value )
     {
         assert( ! has_value()  );
-        contained().construct_value( value );
+        contained().copy_construct_value( value );
     }
 
 #if optional_CPP11_OR_GREATER
@@ -1555,7 +1572,7 @@ private:
     void initialize( V && value )
     {
         assert( ! has_value()  );
-        contained().construct_value( std::forward<V>( value ) );
+        contained().emplace( std::forward<V>( value ) );
     }
 
 #endif
