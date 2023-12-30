@@ -388,7 +388,7 @@ For more information on constructed unions and alignment, see [10-14].
 
 [9] Fernando Cacciola. [Boost.Optional Quick start guide](http://www.boost.org/doc/libs/1_57_0/libs/optional/doc/html/boost_optional/quick_start.html).
 
-[10] Andrei Alexandrescu. [Generic<Programming>: Discriminated Unions part 1](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2004/alexandr/alexandr.htm), [part 2](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2006/alexandr/alexandr.htm), [part 3](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/CUJ/2002/cexp2008/alexandr/alexandr.htm). April 2002.
+[10] Andrei Alexandrescu. [Generic<Programming>: Discriminated Unions part 1](http://erdani.org/publications/cuj-04-2002.php.html), [part 2](http://erdani.org/publications/cuj-06-2002.php.html), [part 3](http://erdani.org/publications/cuj-08-2002.php.html). April 2002.
 
 [11] Herb Sutter. [Style Case Study #3: Construction Unions](http://www.gotw.ca/gotw/085.htm). GotW #85. 2009
 
