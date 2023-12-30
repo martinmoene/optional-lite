@@ -334,7 +334,7 @@ All tests should pass, indicating your platform is supported and you are ready t
 
 If you access data that's not properly aligned, it 1) may take longer than when it is properly aligned (on x86 processors), or 2) it may terminate the program immediately (many other processors).
 
-Although the C++ standard does not guarantee that all user-defined types have the alignment of some POD type, in practice it's likely they do [8, part 2].
+Although the C++ standard does not guarantee that all user-defined types have the alignment of some POD type, in practice it's likely they do [10, part 2].
 
 If *optional lite* is compiled as C++11 or later, C++11 alignment facilities are used for storage of the underlying object. When compiling as pre-C++11, *optional lite* tries to determine proper alignment using meta programming. If this doesn't work out, you can control alignment via three macros.
 
@@ -355,11 +355,11 @@ If *optional lite* is compiled as C++11 or later, C++11 alignment facilities are
 	- Find a POD type from the list `alignment_types` with exactly alignment A.
 	- If no such POD type is found, use a type with a relatively strict alignment requirement such as double; this type is specified in  `optional_CONFIG_ALIGN_AS_FALLBACK` (default double).
 
-Note that the algorithm of 5. differs from the one Andrei Alexandrescu uses in [8, part 2].
+Note that the algorithm of 5. differs from the one Andrei Alexandrescu uses in [10, part 2].
 
-The class template `alignment_of<>` is gleaned from [Boost.TypeTraits, alignment_of](http://www.boost.org/doc/libs/1_57_0/libs/type_traits/doc/html/boost_typetraits/reference/alignment_of.html) [11]. The storage type `storage_t<>` is adapted from the one I created for [spike-expected, expected lite](https://github.com/martinmoene/spike-expected) [13].
+The class template `alignment_of<>` is gleaned from [Boost.TypeTraits, alignment_of](http://www.boost.org/doc/libs/1_57_0/libs/type_traits/doc/html/boost_typetraits/reference/alignment_of.html) [14]. The storage type `storage_t<>` is adapted from the one I created for [spike-expected, expected lite](https://github.com/martinmoene/spike-expected) [15].
 
-For more information on constructed unions and alignment, see [8-12].
+For more information on constructed unions and alignment, see [10-14].
 
 ## Other implementations of optional
 
