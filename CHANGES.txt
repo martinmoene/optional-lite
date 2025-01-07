@@ -1,4 +1,4 @@
-Changes for Optional Lite – A single-file header-only [type-safe C++17-like any, a] type-safe container for single values of any type for C++98, C++11 and later
+Changes for Optional Lite â€“ A single-file header-only [type-safe C++17-like any, a] type-safe container for single values of any type for C++98, C++11 and later
 
 1.0.2 - 2015-04-14
 
