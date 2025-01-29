@@ -247,6 +247,11 @@ Define this to 1 if you want to compile without extensions. Default is undefined
 -D<b>optional\_CONFIG\_NO\_EXCEPTIONS</b>=0  
 Define this to 1 if you want to compile without exceptions. If not defined, the header tries and detect if exceptions have been disabled (e.g. via `-fno-exceptions`). Default is undefined.
 
+#### Disable \[\[nodiscard\]\]
+
+-D<b>optional\_CONFIG\_NO\_NODISCARD</b>=0
+Define this to 1 if you want to compile without \[\[nodiscard\]\]. Note that the default of marking functions and `class bad_optional_access` with \[\[nodiscard\]\] is not part of the C++17 standard. The rationale to use \[\[nodiscard\]\] is that unnoticed discarded (error) values may break the error handling flow.
+
 #### Macros to control alignment
 
 If *optional lite* is compiled as C++11 or later, C++11 alignment facilities are used for storage of the underlying object. When compiled as pre-C++11, *optional lite* tries to determine proper alignment itself. If this doesn't work out, you can control alignment via the following macros. See also section [Implementation notes](#implementation-notes).

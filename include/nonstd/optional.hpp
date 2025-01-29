@@ -50,6 +50,14 @@
 #define optional_CONFIG_NO_EXTENSIONS  0
 #endif
 
+// Control marking class bad_optional_access and several methods with [[nodiscard]]]:
+
+#if !defined(optional_CONFIG_NO_NODISCARD)
+# define optional_CONFIG_NO_NODISCARD  0
+#else
+# define optional_CONFIG_NO_NODISCARD  1
+#endif
+
 // Control presence of exception handling (try and auto discover):
 
 #ifndef optional_CONFIG_NO_EXCEPTIONS
@@ -386,7 +394,7 @@ namespace nonstd {
 # define optional_constexpr14  /*constexpr*/
 #endif
 
-#if optional_HAVE( NODISCARD )
+#if optional_HAVE( NODISCARD ) && !optional_CONFIG_NO_NODISCARD
 # define optional_nodiscard  [[nodiscard]]
 #else
 # define optional_nodiscard  /*[[nodiscard]]*/
@@ -917,7 +925,7 @@ const nullopt_t nullopt(( nullopt_t::init() ));
 
 #if ! optional_CONFIG_NO_EXCEPTIONS
 
-class bad_optional_access : public std::logic_error
+class optional_nodiscard bad_optional_access : public std::logic_error
 {
 public:
   explicit bad_optional_access()
